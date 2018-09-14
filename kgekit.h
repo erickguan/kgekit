@@ -3,14 +3,24 @@
 #include <string>
 #include <string_view>
 #include <vector>
-#include <experimental/optional>
+#include <optional>
+#include <experimental/filesystem>
 
-using std::experimental::optional;
+namespace kgekit {
+
+using std::optional;
 using std::vector;
 using std::string;
 using std::string_view;
 
-namespace kgekit {
+namespace internal {
+
+namespace fs = std::experimental::filesystem;
+
+void assert_good_file(fs::path filename);
+void assert_triple_order(const string& order);
+
+} // namespace internal
 
 struct TripleIndex {
     uint32_t head;

@@ -6,15 +6,20 @@
 
 namespace kgekit {
 
-static void assert_good_file(std::ifstream& file_stream)
+namespace internal {
+
+void assert_good_file(fs::path filename)
 {
-    file_stream.seekg(0L, std::ios::end);
-    if (!file_stream.good()) {
+    try {
+        if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
+            throw std::invalid_argument("File is not valid. Maybe wrong path or is a directory.");
+        }
+    } catch (const fs::filesystem_error& e) {
         throw std::invalid_argument("File is not valid. Maybe wrong path or is a directory.");
     }
 }
 
-static void assert_triple_order(const string& order)
+void assert_triple_order(const string& order)
 {
     std::unordered_set<char> order_set(order.cbegin(), order.cend());
     if (order_set.empty() || order_set.size() != order.size()) {
@@ -22,10 +27,12 @@ static void assert_triple_order(const string& order)
     }
     if (order_set.find('h') == order_set.end() ||
         order_set.find('r') == order_set.end() ||
-        order_set.find('t') == order_set.end()) {
+        order_set.find('t') == order_set.end() ||
+        order_set.size() != 3) {
         throw std::invalid_argument("Order is not valid. It's not a valid triple shape.");
     }
 }
+} // namespace internal
 
 optional<TripleIndex> get_triple_index(const string& line, const string& order, const char sperator)
 {
@@ -69,11 +76,11 @@ vector<TripleIndex> read_triple_index(
     const std::string triple_order,
     const char sperator)
 {
-    std::ifstream fs(filename);
-    assert_good_file(fs);
-    assert_triple_order(triple_order);
+    internal::assert_good_file(filename);
+    internal::assert_triple_order(triple_order);
 
     vector<TripleIndex> content;
+    std::ifstream fs(filename);
     for (std::string line; std::getline(fs, line); ) {
         if (auto triple = get_triple_index(line, triple_order, sperator)) {
             content.push_back(*triple);
