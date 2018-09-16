@@ -23,9 +23,10 @@ set(TEST_SOURCES kgekit_impl_test.cpp)
 
 add_library(kgekit_impl ${SOURCES})
 target_compile_features(kgekit_impl PUBLIC cxx_std_17)
+target_link_libraries(kgekit_impl PRIVATE range-v3::range-v3)
 
 pybind11_add_module(kgekit SHARED kgekit.cpp)
-target_link_libraries(kgekit PRIVATE kgekit_impl pybind11::pybind11 pybind11::embed pybind11::module range-v3::range-v3)
+target_link_libraries(kgekit PRIVATE kgekit_impl pybind11::pybind11 pybind11::embed pybind11::module)
 
 add_executable(kgekit_test ${SOURCES} ${TEST_SOURCES} ${HEADERS})
 target_compile_features(kgekit_test PUBLIC cxx_std_17)
