@@ -26,6 +26,10 @@ struct TripleIndex {
     uint32_t head;
     uint32_t relation;
     uint32_t tail;
+    bool operator==(const TripleIndex& rhs) const
+    {
+        return rhs.head == head && rhs.relation == relation && rhs.tail == tail;
+    }
 };
 
 struct Triple {

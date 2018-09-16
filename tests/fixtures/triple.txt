@@ -1,0 +1,3 @@
+/m/entity1 /produced_by /m/entity2
+/m/entity2 /country /m/entity3
+/m/entity1 /produced_in /m/entity3

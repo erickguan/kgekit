@@ -56,6 +56,9 @@ TEST_CASE_METHOD(FileFolderTestsFixture, "assert_good_file", "[io]")
     REQUIRE_THROWS_AS(assert_good_file(wrong_file), std::invalid_argument);    // throw for no file
 }
 
+} // namespace internal
+
+
 TEST_CASE("get_triple_index", "[parsing]")
 {
     REQUIRE_THAT(get_triple_index("1\t2\t3", "hrt", '\t'),
@@ -70,5 +73,12 @@ TEST_CASE("get_triple_index", "[parsing]")
                  Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong content for getting the triple index"));
 }
 
-} // namespace internal
+TEST_CASE("read_triple_index", "[parsing][io]")
+{
+    auto index = "../tests/fixtures/triple_index.txt";
+    TripleIndex first { 1, 2, 3 };
+    TripleIndex second { 9, 1, 3 };
+    REQUIRE_THAT(read_triple_index(index, "hrt", ' '), VectorContains(first) || VectorContains(second));
+}
+
 } // namespace kgekit
