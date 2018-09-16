@@ -9,9 +9,9 @@ PYBIND11_MODULE(kgekit, m) {
     m.def("read_triple_index", &kgekit::read_triple_index, "read dataset file includes triple index.",
           py::arg("filename"),
           py::arg("triple_order") = "hrt",
-          py::arg("sperator") = '\t');
+          py::arg("delimiter") = '\t');
     m.def("get_triple_index", &kgekit::get_triple_index, "get triple index from a line",
           py::arg("line"),
           py::arg("order"),
-          py::arg("sperator"));
+          py::arg("delimiter"));
 }

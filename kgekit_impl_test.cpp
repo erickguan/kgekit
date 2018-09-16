@@ -10,6 +10,9 @@ namespace fs = std::experimental::filesystem;
 
 namespace kgekit
 {
+
+using namespace Catch;
+
 namespace internal
 {
 
@@ -51,6 +54,20 @@ TEST_CASE_METHOD(FileFolderTestsFixture, "assert_good_file", "[io]")
     REQUIRE_NOTHROW(assert_good_file(file_in_folder));
     REQUIRE_THROWS_AS(assert_good_file(folder), std::invalid_argument);   // throw for folder
     REQUIRE_THROWS_AS(assert_good_file(wrong_file), std::invalid_argument);    // throw for no file
+}
+
+TEST_CASE("get_triple_index", "[parsing]")
+{
+    REQUIRE_THAT(get_triple_index("1\t2\t3", "hrt", '\t'),
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t->head == 1 && t->relation == 2 && t->tail == 3; }, "gets the triple"));
+    REQUIRE_THAT(get_triple_index("1\t3\t2", "htr", '\t'),
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t->head == 1 && t->relation == 2 && t->tail == 3; }, "gets the triple"));
+    REQUIRE_THAT(get_triple_index("1\t2\t3", "hrt", ' '),
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong separator doesn't return value"));
+    REQUIRE_THAT(get_triple_index("1\t2\t3", "htt", '\t'),
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong order for the triple index"));
+    REQUIRE_THAT(get_triple_index("1\t3", "hrt", '\t'),
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong content for getting the triple index"));
 }
 
 } // namespace internal

@@ -36,11 +36,11 @@ struct Triple {
 vector<TripleIndex> read_triple_index(
     const string& filename,
     const string triple_order="hrt",
-    const char sperator='\t');
+    const char delimiter='\t');
 
 optional<TripleIndex> get_triple_index(
     const string& line,
     const string& order,
-    const char sperator);
+    const char delimiter);
 
 } // namespace kgekit

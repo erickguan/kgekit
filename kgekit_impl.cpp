@@ -1,11 +1,14 @@
 #include <fstream>
 #include <iostream>
+#include <vector>
 #include <unordered_set>
+#include <range/v3/all.hpp>
+#include <range/v3/view/split.hpp>
 
 #include "kgekit.h"
 
 namespace kgekit {
-
+using std::vector;
 namespace internal {
 
 void assert_good_file(fs::path filename)
@@ -34,36 +37,33 @@ void assert_triple_order(const string& order)
 }
 } // namespace internal
 
-optional<TripleIndex> get_triple_index(const string& line, const string& order, const char sperator)
+optional<TripleIndex> get_triple_index(const string& line, const string& order, const char delimiter)
 {
-    auto last_pos = 0;
-    auto distance = 0;
+    try {
+        internal::assert_triple_order(order);
+    } catch (const std::invalid_argument& e) {
+        return {};
+    }
+
+    decltype(line.find(delimiter)) last_pos = 0;
     TripleIndex triple;
 
-    for (auto p : order) {
-        auto pos = line.find(line, last_pos);
-        if (pos == std::string::npos) {
-            distance = line.size() - last_pos;
-        } else {
-            distance = pos - last_pos;
-        }
+    vector<string> view = line | ranges::view::split(delimiter);
 
-        if (distance <= 0) {
-            return {};
-        }
+    for (auto i = 0; i < order.size(); ++i) {
+        if (i >= view.size()) { return {}; }
+        uint32_t idx = static_cast<uint32_t>(std::stoul(view[i]));
 
-        string window(&line[last_pos], distance);
-        last_pos = pos;
-
-        uint32_t idx = static_cast<u_int32_t>(std::stoul(window));
-        switch (p) {
+        switch (order[i]) {
         case 'h':
             triple.head = idx;
             break;
         case 'r':
             triple.relation = idx;
+            break;
         case 't':
             triple.tail = idx;
+            break;
         default:
             break;
         }
@@ -74,7 +74,7 @@ optional<TripleIndex> get_triple_index(const string& line, const string& order, 
 vector<TripleIndex> read_triple_index(
     const std::string& filename,
     const std::string triple_order,
-    const char sperator)
+    const char delimiter)
 {
     internal::assert_good_file(filename);
     internal::assert_triple_order(triple_order);
@@ -82,7 +82,7 @@ vector<TripleIndex> read_triple_index(
     vector<TripleIndex> content;
     std::ifstream fs(filename);
     for (std::string line; std::getline(fs, line); ) {
-        if (auto triple = get_triple_index(line, triple_order, sperator)) {
+        if (auto triple = get_triple_index(line, triple_order, delimiter)) {
             content.push_back(*triple);
         } else {
             throw std::runtime_error("Can't parse file " + filename + '.');
