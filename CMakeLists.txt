@@ -17,19 +17,23 @@ find_package(Catch2 CONFIG REQUIRED)
 hunter_add_package(range-v3)
 find_package(range-v3 CONFIG REQUIRED)
 
+hunter_add_package(Protobuf)
+find_package(Protobuf CONFIG REQUIRED)
+
 set(CMAKE_BUILD_TYPE Debug)
 
-set(SOURCES kgekit_impl.cpp indexer.cpp)
-set(HEADERS kgekit.h indexer.h)
-set(TEST_SOURCES kgekit_impl_test.cpp indexer_test.cpp)
+add_subdirectory(structs)
+
+set(SOURCES kgekit_impl.cpp indexer.cpp translator.cpp)
+set(HEADERS kgekit.h indexer.h translator.h)
+set(TEST_SOURCES kgekit_impl_test.cpp indexer_test.cpp translator_test.cpp)
 
 add_library(kgekit_impl ${SOURCES})
 target_compile_features(kgekit_impl PUBLIC cxx_std_17)
-target_link_libraries(kgekit_impl PRIVATE range-v3::range-v3)
+target_link_libraries(kgekit_impl PUBLIC kgekit_structs PRIVATE range-v3::range-v3)
 
 pybind11_add_module(kgekit SHARED kgekit.cpp)
 target_link_libraries(kgekit PRIVATE kgekit_impl pybind11::pybind11 pybind11::embed pybind11::module c++experimental)
-
 
 add_executable(kgekit_test ${SOURCES} ${TEST_SOURCES} ${HEADERS})
 target_compile_features(kgekit_test PUBLIC cxx_std_17)

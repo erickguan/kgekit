@@ -47,22 +47,28 @@ TEST_CASE_METHOD(IndexerTestsFixture, "returns indexes", "[indexing]")
     TripleIndex first { 0, 0, 1 };
     TripleIndex second { 1, 1, 2 };
     TripleIndex third { 0, 2, 2 };
-    REQUIRE_THAT(indexer.getIndex(), VectorContains(first) && VectorContains(second) && VectorContains(third));
+    REQUIRE_THAT(indexer.getIndex(),
+                 Predicate<decltype(indexer.getIndex())>(
+                     [&](const auto& vec) -> bool {
+                         return vec->at(0) == first &&
+                            vec->at(1) == second &&
+                            vec->at(2) == third;
+                     }));
     REQUIRE_THAT(indexer.getEntity2IdMap(),
                  Predicate<decltype(indexer.getEntity2IdMap())>(
-                     [](auto& maps) -> bool {
-                         return maps.size() == 3 &&
-                             maps.at("/m/entity1") == 0 &&
-                             maps.at("/m/entity2") == 1 &&
-                             maps.at("/m/entity3") == 2; },
+                     [](const auto& maps) -> bool {
+                         return maps->size() == 3 &&
+                             maps->at("/m/entity1") == 0 &&
+                             maps->at("/m/entity2") == 1 &&
+                             maps->at("/m/entity3") == 2; },
                      "entities were inserted."));
     REQUIRE_THAT(indexer.getRelation2IdMap(),
         Predicate<decltype(indexer.getRelation2IdMap())>(
-            [](auto& maps) -> bool {
-                return maps.size() == 3 &&
-                    maps.at("/produced_by") == 0 &&
-                    maps.at("/country") == 1 &&
-                    maps.at("/produced_in") == 2; },
+            [](const auto& maps) -> bool {
+                return maps->size() == 3 &&
+                    maps->at("/produced_by") == 0 &&
+                    maps->at("/country") == 1 &&
+                    maps->at("/produced_in") == 2; },
             "relations were inserted."));
 }
 
