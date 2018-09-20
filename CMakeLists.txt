@@ -28,6 +28,7 @@ if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(FS_LIBRARY c++experimental)
 elseif ("${CMAKE_CXX_COMPILER_ID" STREQUAL "GNU")
     set(FS_LIBRARY stdc++fs)
+endif()
 
 set(SOURCES kgekit_impl.cpp indexer.cpp translator.cpp)
 set(HEADERS kgekit.h indexer.h translator.h)
