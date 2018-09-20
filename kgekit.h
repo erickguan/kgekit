@@ -15,14 +15,16 @@
 
 namespace kgekit {
 
-using std::optional;
+using std::string;
 using std::vector;
 
 #if __GNUC__ <= 9
-using std::experimental::string;
+using std::experimental::optional;
+using std::experimental::make_optional;
 using std::experimental::string_view;
 #else
-using std::string;
+using std::optional;
+using std::make_optional;
 using std::string_view;
 #endif
 
