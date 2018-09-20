@@ -35,6 +35,7 @@ set(HEADERS kgekit.h indexer.h translator.h)
 set(TEST_SOURCES kgekit_impl_test.cpp indexer_test.cpp translator_test.cpp)
 
 add_library(kgekit_impl ${SOURCES})
+set_property(TARGET kgekit_impl PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_compile_features(kgekit_impl PUBLIC cxx_std_17)
 target_link_libraries(kgekit_impl PUBLIC kgekit_structs PRIVATE range-v3::range-v3)
 
