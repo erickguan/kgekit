@@ -1,17 +1,30 @@
 #pragma once
 
 #include <string>
-#include <string_view>
 #include <vector>
-#include <optional>
 #include <experimental/filesystem>
+
+#if __GNUC__ <= 9
+#include <experimental/string_view>
+#include <experimental/optional>
+#else
+#include <string_view>
+#include <optional>
+#endif
+
 
 namespace kgekit {
 
 using std::optional;
 using std::vector;
+
+#if __GNUC__ <= 9
+using std::experimental::string;
+using std::experimental::string_view;
+#else
 using std::string;
 using std::string_view;
+#endif
 
 namespace internal {
 
