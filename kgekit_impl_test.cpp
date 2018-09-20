@@ -66,11 +66,11 @@ TEST_CASE("get_triple_index", "[parsing]")
     REQUIRE_THAT(get_triple_index("1\t3\t2", "htr", '\t'),
                  Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t->head == 1 && t->relation == 2 && t->tail == 3; }, "gets the triple"));
     REQUIRE_THAT(get_triple_index("1\t2\t3", "hrt", ' '),
-                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong separator doesn't return value"));
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t == true; }, "return null when wrong separator doesn't return value"));
     REQUIRE_THAT(get_triple_index("1\t2\t3", "htt", '\t'),
-                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong order for the triple index"));
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t == false; }, "return null when wrong order for the triple index"));
     REQUIRE_THAT(get_triple_index("1\t3", "hrt", '\t'),
-                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return !t.has_value(); }, "return null when wrong content for getting the triple index"));
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t == false; }, "return null when wrong content for getting the triple index"));
 }
 
 TEST_CASE("read_triple_index", "[parsing][io]")
