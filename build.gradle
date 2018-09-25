@@ -1,36 +1,63 @@
-// Establish version and status
-ext.githubProjectName = rootProject.name // Change if github project name is not the same as the root project's name
-group = "com.netflix.${githubProjectName}"
-
 buildscript {
     repositories {
-        mavenLocal()
-        mavenCentral() // maven { url 'http://jcenter.bintray.com' }
+        jcenter()
     }
-    apply from: file('gradle/buildscript.gradle'), to: buildscript 
-}
-
-allprojects {
-    repositories { 
-        mavenLocal()
-        mavenCentral() // maven { url: 'http://jcenter.bintray.com' }
+    dependencies {
+        classpath 'org.junit.platform:junit-platform-gradle-plugin:1.0.2'
     }
 }
 
-apply from: file('gradle/convention.gradle')
-apply from: file('gradle/maven.gradle')
-apply from: file('gradle/check.gradle')
-apply from: file('gradle/license.gradle')
-apply from: file('gradle/release.gradle')
+plugins {
+    id 'nebula.netflixoss' version '4.1.0'
+}
 
-apply plugin: 'war'
-apply plugin: 'jetty'
+// Establish version and status
+ext.githubProjectName = rootProject.name // Change if github project name is not the same as the root project's name
 
-dependencies {
-    compile 'javax.ws.rs:jsr311-api:1.1.1'
-    compile 'com.sun.jersey:jersey-core:1.11'
-    compile 'com.sun.jersey:jersey-server:1.11'
-    compile 'com.sun.jersey:jersey-servlet:1.11'
-    testCompile 'org.testng:testng:6.1.1'
-    testCompile 'org.mockito:mockito-core:1.8.5'
+subprojects {
+    apply plugin: 'nebula.netflixoss'
+    group = "me.erickguan.${githubProjectName}" // TEMPLATE: Set to organization of project
+
+    afterEvaluate {
+
+        repositories {
+            jcenter()
+        }
+
+        compileJava {
+            inputs.property("moduleName", moduleName)
+            doFirst {
+                options.compilerArgs = [
+                        '--module-path', classpath.asPath,
+                ]
+                classpath = files()
+            }
+        }
+
+        compileTestJava {
+            inputs.property("moduleName", moduleName)
+            doFirst {
+                options.compilerArgs = [
+                        '--module-path', classpath.asPath,
+                        '--add-modules', 'junit',
+                        '--add-reads', "$moduleName=junit",
+                        '--patch-module', "$moduleName=" + files(sourceSets.test.java.srcDirs).asPath,
+                ]
+                classpath = files()
+            }
+        }
+
+        test {
+            inputs.property("moduleName", moduleName)
+            doFirst {
+                jvmArgs = [
+                        '--module-path', classpath.asPath,
+                        '--add-modules', 'ALL-MODULE-PATH',
+                        '--add-reads', "$moduleName=junit",
+                        '--patch-module', "$moduleName=" + files(sourceSets.test.java.outputDir).asPath,
+                ]
+                classpath = files()
+            }
+        }
+    }
 }
