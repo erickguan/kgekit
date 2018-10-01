@@ -1,0 +1,16 @@
+plugins {
+    id 'java'
+}
+
+apply plugin: 'org.junit.platform.gradle.plugin'
+
+sourceCompatibility = JavaVersion.VERSION_1_10
+
+ext.moduleName = 'me.erickguan.transformer'
+
+dependencies {
+    implementation 'org.eclipse.rdf4j:rdf4j-rio-api:2.4.0-M3'
+    testImplementation('org.junit.jupiter:junit-jupiter-api:5.3.1')
+    testImplementation('org.junit.jupiter:junit-jupiter-params:5.3.1')
+    testRuntime('org.junit.jupiter:junit-jupiter-engine:5.3.1')
+}
