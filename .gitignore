@@ -1,2 +1,7 @@
 build
 *.o
+.classpath
+.project
+out
+.settings
+.gradle
