@@ -1,0 +1,100 @@
+
+@base <http://yago-knowledge.org/resource/> .
+@prefix dbp: <http://dbpedia.org/ontology/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<yagoTheme_yagoLabels>	<hasGloss>	"This file is part of the ontology YAGO3. It is licensed under a Creative-Commons Attribution License by the YAGO team at the Max Planck Institute for Informatics/Germany. See http://yago-knowledge.org for all details. This file was generated on 2017-06-19 T 08:01:29.0838. All facts of YAGO that contain labels (rdfs:label, skos:prefLabel, isPreferredMeaningOf, hasGivenName, hasFamilyName, hasGloss, redirectedFrom) CORE" .
+#@ <id_fOrMgmH8cn_UVh_o6kCJ3crP?>
+<Buffalo_Bill_Gun>	skos:prefLabel	"Buffalo Bill Gun"@eng .
+#@ <id_Wb68!v3Sw4_UVh_Kaw39yghjh>
+<Swimming_at_the_2012_European_Aquatics_Championships_–_Women's_1500_metre_freestyle>	skos:prefLabel	"Swimming at the 2012 European Aquatics Championships – Women's 1500 metre freestyle"@eng .
+#@ <id_rvwwOm6XOw_UVh_UgHXAnjmAh>
+<wordnet_superfecta_100507539>	skos:prefLabel	"superfecta"@eng .
+#@ <id_9kw08I9o?t_UVh_AD0Jd0elBC>
+<Gornje_Biosko>	skos:prefLabel	"Gornje Biosko"@eng .
+#@ <id_avA9jfopqk_UVh_Wy2d3mVdX7>
+<nl/Ondermarck_(familie)>	skos:prefLabel	"Ondermarck (familie)"@eng .
+#@ <id_GSYqJNHf1f_UVh_BGyHpEV5Iz>
+<Wood_End,_Hampshire>	skos:prefLabel	"Wood End, Hampshire"@eng .
+#@ <id_cpnlUxbk5Y_UVh_bs3ifm9M3u>
+<Cecilia_High_School>	skos:prefLabel	"Cecilia High School"@eng .
+#@ <id_HlqjqkTaaT_UVh_HlqjqkTaaT>
+<Bashmalakh>	skos:prefLabel	"Bashmalakh"@eng .
+#@ <id_25cKESBO8R_UVh_tbZPFZT5Y5>
+<Championship_Fighting_Alliance>	skos:prefLabel	"Championship Fighting Alliance"@eng .
+#@ <id_7TtzaHU5oO_UVh_Y97ZoLwm2k>
+<de/Wolfgang_Noack>	skos:prefLabel	"Wolfgang Noack"@eng .
+#@ <id_sgvCPkBTLX_UVh_VLGuwaGGJe>
+<Minuteman_Bikeway>	skos:prefLabel	"Minuteman Bikeway"@eng .
+#@ <id_1FiGcfO4pp_UVh_8!mBR92H1W>
+<Georges_Combret>	skos:prefLabel	"Georges Combret"@eng .
+#@ <id_2erbGC4akl_UVh_HQZRAGCzJ>
+<G.O.Y.A._(Gunz_Or_Yay_Available)>	skos:prefLabel	"G.O.Y.A. (Gunz Or Yay Available)"@eng .
+#@ <id_2rNwivuXOb_UVh_BB81A!TIC6>
+<Falmouth,_Jamaica>	skos:prefLabel	"Falmouth, Jamaica"@eng .
+#@ <id_Fmt7eglvSj_UVh_gamCbU4vqg>
+<Lucille_Lessard>	skos:prefLabel	"Lucille Lessard"@eng .
+#@ <id_wHEVFm4nQm_UVh_wHEVFm4nQm>
+<Buchhofen>	skos:prefLabel	"Buchhofen"@eng .
+#@ <id_CQQe5EP7dG_UVh_y1tunqfwPB>
+<fr/Bébé_protège_sa_sœur>	skos:prefLabel	"Bébé protège sa sœur"@eng .
+#@ <id_c21F1tV3m3_UVh_leOTUaHG31>
+<Popular_Republican_Movement>	skos:prefLabel	"Popular Republican Movement"@eng .
+#@ <id_biCCX3W1q0_UVh_ajsDPG7DiH>
+<Adolph_Lessig>	skos:prefLabel	"Adolph Lessig"@eng .
+#@ <id_ynVF152sHi_UVh_kLFfp3zAtz>
+<Vladimir_Romashkin>	skos:prefLabel	"Vladimir Romashkin"@eng .
+#@ <id_k19bYefOjV_UVh_T36jQPQalj>
+<1961_VFA_season>	skos:prefLabel	"1961 VFA season"@eng .
+#@ <id_WLVoRl83ZI_UVh_2ZPs8HVjIX>
+<Terrorist_incidents_in_Pakistan_in_2005>	skos:prefLabel	"Terrorist incidents in Pakistan in 2005"@eng .
+#@ <id_MvmIZXCffw_UVh_p4YnCsNdss>
+<Ontario_Debutante_Stakes>	skos:prefLabel	"Ontario Debutante Stakes"@eng .
+#@ <id_SwMv0Uiamh_UVh_iqr!LqKExw>
+<Districts_of_the_Unitarian_Universalist_Association>	skos:prefLabel	"Districts of the Unitarian Universalist Association"@eng .
+#@ <id_jHvpCaJuX?_UVh_i5MIFiEq1m>
+<Poster_artist>	skos:prefLabel	"Poster artist"@eng .
+#@ <id_bjLZcSO7Wv_UVh_CalhPY8Dv7>
+<Marianów,_Gmina_Strzelce>	skos:prefLabel	"Marianów, Gmina Strzelce"@eng .
+#@ <id_WOQFhqkey?_UVh_Z7vH4u?zcL>
+<de/David_Netter>	skos:prefLabel	"David Netter"@eng .
+#@ <id_Ox15xf!5uS_UVh_N2xjHMKeVg>
+<1672_in_England>	skos:prefLabel	"1672 in England"@eng .
+#@ <id_mz1FvN8gOR_UVh_zYc8ghik0!>
+<de/Karl_von_Graberg>	skos:prefLabel	"Karl von Graberg"@eng .
+#@ <id_0syVXfsFU2_UVh_VmXwA2CiIA>
+<Districts_of_Turku>	skos:prefLabel	"Districts of Turku"@eng .
+#@ <id_IPuVmJ4WpV_UVh_iYgqB7YK1E>
+<Rowland_Bowen>	skos:prefLabel	"Rowland Bowen"@eng .
+#@ <id_FbRm75vH1h_UVh_6QWSiYio5W>
+<fr/Conté_(société)>	skos:prefLabel	"Conté (société)"@eng .
+#@ <id_MvBF6OdvNX_UVh_c1wQHrq5zu>
+<Sarat_Sumpradit>	skos:prefLabel	"Sarat Sumpradit"@eng .
+#@ <id_6YDetyJvXO_UVh_CMlL5PYlUx>
+<Erwin_McManus>	skos:prefLabel	"Erwin McManus"@eng .
+#@ <id_sPBZiNZpYU_UVh_lyVuQ47h7P>
+<Huwasi_stone>	skos:prefLabel	"Huwasi stone"@eng .
+#@ <id_ufOqbhyF6Z_UVh_2GnQLVlyz4>
+<de/Rösen_im_Thorskov>	skos:prefLabel	"Rösen im Thorskov"@eng .
+#@ <id_DSkxixi5lt_UVh_jhT4wNbyNs>
+<de/Engelsburg-Gymnasium>	skos:prefLabel	"Engelsburg-Gymnasium"@eng .
+#@ <id_5zzkbeMWYc_UVh_g0WNo4Wonw>
+<fr/Néoeskimo>	skos:prefLabel	"Néoeskimo"@eng .
+#@ <id_WhNULdb2Nw_UVh_?iKa1aiOrk>
+<de/Megan_Donahue>	skos:prefLabel	"Megan Donahue"@eng .
+#@ <id_2KJ30yMXK?_UVh_aqzDmv?3HD>
+<Expeditie_Robinson_2011>	skos:prefLabel	"Expeditie Robinson 2011"@eng .
+#@ <id_3DYOkc0YEE_UVh_Ml5voQe8rD>
+<de/Mohr-Gruber-Denkmal>	skos:prefLabel	"Mohr-Gruber-Denkmal"@eng .
+#@ <id_E9e5YuNRxP_UVh_O3bJSGZppT>
+<Brig_%22Mercury%22_Attacked_by_Two_Turkish_Ships>	skos:prefLabel	"Brig %22Mercury%22 Attacked by Two Turkish Ships"@eng .
+#@ <id_gPK!CarBo6_UVh_ZrdoSYW!TQ>
+<wordnet_transpiration_113569774>	skos:prefLabel	"transpiration"@eng .
+#@ <id_9mvwS0wa!H_UVh_yiszXbWfow>
+<Curtis_Plum>	skos:prefLabel	"Curtis Plum"@eng .
+#@ <id_P?2TkgDwTk_UVh_Xb21i?tPvu>
+<1919_in_Sweden>	skos:prefLabel	"1919 in Sweden"@eng .
