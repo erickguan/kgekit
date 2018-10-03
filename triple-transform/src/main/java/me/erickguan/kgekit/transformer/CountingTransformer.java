@@ -10,8 +10,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 
 public class CountingTransformer {
@@ -20,9 +23,29 @@ public class CountingTransformer {
         this.numberOfLink = numberOfLink;
     }
 
-    public HashMap<Value, Integer> getSubjects() {
+    public Model pullSubjectStatements(Resource value) {
+        return model.filter(value, null, null);
+    }
+
+
+    public Model pullObjectStatements(Value value) {
+        return model.filter(null, null, value);
+    }
+
+    public HashSet<Statement> gatherStatement() {
+        HashSet<Statement> stmts = new HashSet<>();
+        for (HashMap.Entry<Resource, Integer> subjEntry : this.getSubjects().entrySet()) {
+            stmts.addAll(pullSubjectStatements(subjEntry.getKey()));
+        }
+        for (HashMap.Entry<Value, Integer> objEntry : this.getObjects().entrySet()) {
+            stmts.addAll(pullObjectStatements(objEntry.getKey()));
+        }
+        return stmts;
+    }
+
+    public HashMap<Resource, Integer> getSubjects() {
         Model model;
-        HashMap<Value, Integer> map = new HashMap<>();
+        HashMap<Resource, Integer> map = new HashMap<>();
         try {
             model = this.getResults();
         } catch (IOException e) {
@@ -40,7 +63,7 @@ public class CountingTransformer {
         return map;
     }
 
-    public HashMap<Value, Integer> getPredicates() {
+    public HashMap<Value, Integer> getObjects() {
         Model model;
         HashMap<Value, Integer> map = new HashMap<>();
         try {
