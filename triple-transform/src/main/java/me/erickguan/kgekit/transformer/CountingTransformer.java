@@ -28,10 +28,15 @@ public class CountingTransformer {
         } catch (IOException e) {
             model = new LinkedHashModel();
         }
-        for (Resource subject : model.subjects())
-            for (Statement stmt : model.filter(subject, null, null)) {
+        for (Resource subject : model.subjects()) {
+            Model stmts = model.filter(subject, null, null);
+            if (stmts.size() <= numberOfLink) {
+                continue;
+            }
+            for (Statement stmt : stmts) {
                 map.merge(stmt.getSubject(), 1, Integer::sum);
             }
+        }
         return map;
     }
 
