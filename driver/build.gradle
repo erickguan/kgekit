@@ -10,6 +10,7 @@ sourceCompatibility = JavaVersion.VERSION_1_10
 ext.moduleName = 'me.erickguan.kgekit.cli'
 
 dependencies {
+    implementation 'commons-cli:commons-cli:1.4'
     implementation project(':triple-transform')
     implementation 'org.eclipse.rdf4j:rdf4j-rio-api:2.4.0-M3'
 }
