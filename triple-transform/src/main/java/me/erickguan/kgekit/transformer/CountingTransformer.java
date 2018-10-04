@@ -88,7 +88,7 @@ public class CountingTransformer implements Transformer {
         HashMap<Resource, Integer> map = new HashMap<>();
         for (Resource subject : model.subjects()) {
             Model stmts = model.filter(subject, null, null);
-            if (stmts.size() <= numberOfLink) {
+            if (stmts.predicates().size() <= numberOfLink) {
                 continue;
             }
             for (Statement stmt : stmts) {
@@ -102,7 +102,7 @@ public class CountingTransformer implements Transformer {
         HashMap<Value, Integer> map = new HashMap<>();
         for (Value object : model.objects()) {
             Model stmts = model.filter(null, null, object);
-            if (stmts.size() <= numberOfLink) {
+            if (stmts.predicates().size() <= numberOfLink) {
                 continue;
             }
             for (Statement stmt : stmts) {
