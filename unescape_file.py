@@ -13,7 +13,7 @@ def unescape_file(path):
     paths, filename = os.path.split(path)
     with open(path, 'r') as f1, open(os.path.join(paths, "processed_"+filename), 'w') as f2:
         content = f1.read()
-        escaped = re.sub(r'%(\d+)', unescape_pecentage_encoded, content)
+        escaped = re.sub(r'%(\d\d)', unescape_pecentage_encoded, content)
         f2.write(escaped)
 
 unescape_file(sys.argv[1])
