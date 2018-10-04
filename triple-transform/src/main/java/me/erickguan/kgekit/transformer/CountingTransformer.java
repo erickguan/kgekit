@@ -47,7 +47,7 @@ public class CountingTransformer implements Transformer {
             Model model = new LinkedHashModel();
             StatementCollector collector = new StatementCollector(model);
             rdfParser.setRDFHandler(collector);
-            rdfParser.parse(in, null);
+            rdfParser.parse(in, ".");
             return model.unmodifiable();
         } catch (IOException e) {
             // handle IO problems (e.g. the file could not be read)
