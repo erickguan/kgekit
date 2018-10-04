@@ -118,7 +118,6 @@ public class SimpleRDFWriter extends AbstractRDFWriter implements RDFWriter {
         try {
             writeResource(subj);
             wrapLine(true);
-            writer.increaseIndentation();
 
             // Write new predicate
             writePredicate(pred);
