@@ -27,8 +27,8 @@ public class CountingTransformer implements Transformer {
     }
 
     private void writeTriples(OutputStream outputStream, Model model) throws RDFHandlerException {
-        RDFWriter writer = new SimpleRDFWriter(outputStream);
-
+        SimpleRDFWriter writer = new SimpleRDFWriter(outputStream);
+        writer.setPrefixToBeRemoved("http://yago-knowledge.org/resource/");
         try {
             writer.startRDF();
             for (Statement st: model) {

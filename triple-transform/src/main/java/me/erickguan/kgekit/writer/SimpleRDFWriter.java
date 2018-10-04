@@ -56,6 +56,12 @@ public class SimpleRDFWriter extends AbstractRDFWriter implements RDFWriter {
         lastWrittenPredicate = null;
     }
 
+    private int prefixToBeRemoved;
+
+    public void setPrefixToBeRemoved(String prefix) {
+        prefixToBeRemoved = prefix.length();
+    }
+
     @Override
     public RDFFormat getRDFFormat() {
         return SIMPLE;
@@ -182,7 +188,7 @@ public class SimpleRDFWriter extends AbstractRDFWriter implements RDFWriter {
     protected void writeURI(IRI uri)
             throws IOException
     {
-        String uriString = uri.toString();
+        String uriString = uri.toString().substring(prefixToBeRemoved);
 
         // Write full URI
         writer.write(TurtleUtil.encodeURIString(uriString));
