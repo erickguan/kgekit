@@ -188,7 +188,10 @@ public class SimpleRDFWriter extends AbstractRDFWriter implements RDFWriter {
     protected void writeURI(IRI uri)
             throws IOException
     {
-        String uriString = uri.toString().substring(prefixToBeRemoved);
+        String uriString = uri.toString();
+        if (uriString.length() > prefixToBeRemoved) {
+            uriString = uriString.substring(prefixToBeRemoved);
+        }
 
         // Write full URI
         writer.write(TurtleUtil.encodeURIString(uriString));
