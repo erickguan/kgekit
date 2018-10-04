@@ -17,7 +17,7 @@ public class Driver {
         options.addOption("triple_output", true, "path to triple output file");
         HelpFormatter formatter = new HelpFormatter();
         try {
-            CommandLine cmd = parser.parse(options, args);
+            CommandLine cmd = parser.parse(options, args, false);
             String action = cmd.getOptionValue("action");
             if (action != null) {
                 if (action.equals("extractTriple")) {
