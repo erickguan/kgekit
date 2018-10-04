@@ -14,7 +14,7 @@ public class Driver {
         Options options = new Options();
         options.addOption("action", true, "describe action");
         options.addOption("triple_file", true, "path to ttl triple file");
-        options.addOption("triple_output", true, "path to triple output file")
+        options.addOption("triple_output", true, "path to triple output file");
         HelpFormatter formatter = new HelpFormatter();
         try {
             CommandLine cmd = parser.parse(options, args);
