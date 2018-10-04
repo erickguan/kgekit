@@ -1,1 +1,1 @@
-./gradlew run --args="extractTriple --triple_file ../../yagodump/escaped_yagoFacts.ttl --triple_output=../triples.txt"
+./gradlew run --args="extractTriple --triple_file=../../yagodump/escaped_yagoFacts.ttl --output_file=../triples.txt"
