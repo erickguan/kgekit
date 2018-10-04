@@ -5,7 +5,7 @@ import binascii
 
 def unescape_pecentage_encoded(matchobj):
     if matchobj:
-        return binascii.unhexlify(match.group(1)).decode('UTF-8')
+        return binascii.unhexlify(matchobj.group(1)).decode('UTF-8')
     else:
         return ''
 
