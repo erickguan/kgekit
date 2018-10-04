@@ -1,7 +1,7 @@
 package me.erickguan.kgekit.cli;
 
-import me.erickguan.kgekit.transformer.CountingTransformer;
-import me.erickguan.kgekit.transformer.FileTransfromer;
+import me.erickguan.kgekit.transformer.CountingTripleStrategy;
+import me.erickguan.kgekit.transformer.FileTransformer;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Command;
 
@@ -24,11 +24,17 @@ public class ExtractTriple implements Runnable {
         if (!Files.exists(path)) {
             System.err.println("Can't find triple file at " + inFilepath);
         }
-        FileTransfromer transfromer = new FileTransfromer(inFilepath, outFilepath, new CountingTransformer(10));
         try {
+            FileTransformer transfromer = new FileTransformer(inFilepath,
+                                                              outFilepath,
+                                                              null,
+                                                              null,
+                                                              null,
+                                                              null,
+                                                              new CountingTripleStrategy(10));
             transfromer.transform();
         } catch (IOException e) {
-            System.err.println("Failed to transform.");
+            System.err.println("Failed to transform. " + e.getMessage());
         }
     }
 }

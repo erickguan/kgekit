@@ -12,7 +12,7 @@ import java.util.List;
         name = "kgekit",
         mixinStandardHelpOptions = true,
         version = "kgekit 0.1",
-        subcommands = {ExtractTriple.class})
+        subcommands = {ExtractTriple.class, ExtractLabel.class})
 public class Driver implements Runnable {
     public static void main(String args[]) {
         CommandLine cli = new CommandLine(new Driver());
