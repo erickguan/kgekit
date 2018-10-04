@@ -5,7 +5,7 @@ import binascii
 
 def unescape_pecentage_encoded(matchobj):
     if matchobj:
-        return binascii.unhexlify(matchobj.group(1)).encode('charmap')
+        return binascii.unhexlify(matchobj.group(1)).decode('charmap')
     else:
         return ''
 
