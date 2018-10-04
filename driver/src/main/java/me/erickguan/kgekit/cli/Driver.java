@@ -1,49 +1,28 @@
 package me.erickguan.kgekit.cli;
 
-import me.erickguan.kgekit.transformer.CountingTransformer;
-import me.erickguan.kgekit.transformer.FileTransfromer;
-import org.apache.commons.cli.*;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import picocli.CommandLine;
+import picocli.CommandLine.RunLast;
+import picocli.CommandLine.RunLast;
+import picocli.CommandLine.Command;
+import picocli.CommandLine.Option;
 
-public class Driver {
+import java.util.List;
+
+@Command(description = "Operates kgekit CLI.",
+        name = "kgekit",
+        mixinStandardHelpOptions = true,
+        version = "kgekit 0.1",
+        subcommands = {ExtractTriple.class})
+public class Driver implements Runnable {
     public static void main(String args[]) {
-        CommandLineParser parser = new DefaultParser();
-        Options options = new Options();
-        options.addOption("action", true, "describe action");
-        options.addOption("triple_file", true, "path to ttl triple file");
-        options.addOption("triple_output", true, "path to triple output file");
-        HelpFormatter formatter = new HelpFormatter();
-        try {
-            CommandLine cmd = parser.parse(options, args, false);
-            String action = cmd.getOptionValue("action");
-            if (action != null) {
-                if (action.equals("extractTriple")) {
-                    extractTriple(cmd.getOptionValue("triple_file"),
-                                  cmd.getOptionValue("triple_output"));
-                } else {
-                    formatter.printHelp("kgekit", options);
-                }
-            } else {
-                formatter.printHelp("kgekit", options);
-            }
-        } catch (ParseException e) {
-            System.err.println("Parsing failed. Reason: " + e.getMessage());
-        }
+        CommandLine cli = new CommandLine(new Driver());
+        cli.setUnmatchedArgumentsAllowed(true);
+        cli.setUnmatchedOptionsArePositionalParams(true);
+        List<Object> result = cli.parseWithHandler(new RunLast(), args);
     }
 
-    static private void extractTriple(String inFilepath, String outFilepath) {
-        Path path = Paths.get(inFilepath);
-        if (!Files.exists(path)) {
-            System.err.println("Can't find triple file at " + inFilepath);
-        }
-        FileTransfromer transfromer = new FileTransfromer(inFilepath, outFilepath, new CountingTransformer(10));
-        try {
-            transfromer.transform();
-        } catch (IOException e) {
-            System.err.println("Failed to transform.");
-        }
+    public void run() {
+        System.out.println("Specify a command.");
     }
+
 }
