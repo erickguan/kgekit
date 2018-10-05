@@ -4,7 +4,7 @@
 #include <vector>
 #include <experimental/filesystem>
 
-#if defined(__clang__) && __clang_major__ < 7
+#if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
 #include <experimental/string_view>
 #include <experimental/optional>
 #elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 9
@@ -20,7 +20,7 @@ namespace kgekit {
 using std::string;
 using std::vector;
 
-#if defined(__clang__) && __clang_major__ < 7
+#if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
 using std::experimental::optional;
 using std::experimental::make_optional;
 using std::experimental::string_view;
