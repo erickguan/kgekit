@@ -27,7 +27,7 @@ protected:
         return translator;
     }
 private:
-    std::string path = "../tests/fixtures/triple.txt";
+    std::string path = "../../tests/fixtures/triple.txt";
 };
 
 TEST_CASE_METHOD(TranslatorTestsFixture, "gets entity from id", "[indexing]")

@@ -28,7 +28,7 @@ protected:
         return Entity2NumberIndexer(std::make_shared<std::vector<std::array<std::string, 3>>>(content), "hrt");
     }
 private:
-    std::string path = "../tests/fixtures/triple.txt";
+    std::string path = "../../tests/fixtures/triple.txt";
     std::vector<std::array<std::string, 3>> content;
 };
 

@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 rdflib = "*"
+kgekit = {editable = true, path = "."}
 
 [dev-packages]
 
