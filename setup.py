@@ -8,6 +8,8 @@ import subprocess
 from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
+from shutil import copyfile, copymode
+
 
 class CMakeExtension(Extension):
     def __init__(self, name, sourcedir=''):
@@ -34,6 +36,7 @@ class CMakeBuild(build_ext):
             self.build_extension(ext)
 
     def copy_test_file(self, src_file):
+
         '''
         Copy ``src_file`` to `tests/bin` directory, ensuring parent directory
         exists. Messages like `creating directory /path/to/package` and
@@ -52,16 +55,6 @@ class CMakeBuild(build_ext):
         print("copying {} -> {}".format(src_file, dest_file))
         copyfile(src_file, dest_file)
         copymode(src_file, dest_file)
-        subprocess.check_call(['cmake', ext.sourcedir] + cmake_args,
-                        cwd=self.build_temp, env=env)
-        subprocess.check_call(['cmake', '--build', '.'] + build_args,
-                              cwd=self.build_temp)
-        # Copy *_test file to tests directory
-        test_bin = os.path.join(self.build_temp, 'python_cpp_example_test')
-        self.copy_test_file(test_bin)
-        print() # Add empty line for nicer output
-
-
 
     def build_extension(self, ext):
         extdir = os.path.abspath(
@@ -93,6 +86,9 @@ class CMakeBuild(build_ext):
                               cwd=self.build_temp, env=env)
         subprocess.check_call(['cmake', '--build', '.'] + build_args,
                               cwd=self.build_temp)
+        # Copy *_test file to tests directory
+        test_bin = os.path.join(self.build_temp, 'src', 'kgekit_test')
+        self.copy_test_file(test_bin)
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
@@ -106,5 +102,5 @@ setup(name='kgekit',
       package_dir={'': 'src'},
       cmdclass=dict(build_ext=CMakeBuild),
       ext_modules=[CMakeExtension('kgekit')],
-      test_suite='test',
+      test_suite='tests',
       zip_safe=False)
