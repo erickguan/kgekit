@@ -10,8 +10,6 @@ find_package(range-v3 CONFIG REQUIRED)
 hunter_add_package(Protobuf)
 find_package(Protobuf CONFIG REQUIRED)
 
-set(CMAKE_BUILD_TYPE Debug)
-
 add_subdirectory(structs)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")

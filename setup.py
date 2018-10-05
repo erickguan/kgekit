@@ -9,6 +9,7 @@ from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 from shutil import copyfile, copymode
+from setuptools import find_packages
 
 
 class CMakeExtension(Extension):
@@ -60,7 +61,8 @@ class CMakeBuild(build_ext):
         extdir = os.path.abspath(
             os.path.dirname(self.get_ext_fullpath(ext.name)))
         cmake_args = ['-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=' + extdir,
-                      '-DPYTHON_EXECUTABLE=' + sys.executable]
+                      '-DPYTHON_EXECUTABLE=' + sys.executable,
+                      '-DCMAKE_DEBUG_POSTFIX=""']
 
         cfg = 'Debug' if self.debug else 'Release'
         build_args = ['--config', cfg]
@@ -98,7 +100,7 @@ setup(name='kgekit',
       author='Erick Guan',
       author_email='fantasticfears@gmail.com',
       license='MIT',
-      packages=['kgekit'],
+      packages=find_packages('src'),
       package_dir={'': 'src'},
       cmdclass=dict(build_ext=CMakeBuild),
       ext_modules=[CMakeExtension('kgekit')],
