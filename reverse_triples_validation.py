@@ -2,6 +2,7 @@ import sys
 import kgekit
 
 def validate(triples):
+    kgekit.
     pass
 
 if __name__ == '__main__':

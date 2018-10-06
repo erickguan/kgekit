@@ -1,6 +1,7 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 #include "kgekit.h"
+#include "indexer.h"
 
 namespace pybind11 {
 namespace detail {
@@ -84,4 +85,11 @@ PYBIND11_MODULE(kgekit, m) {
           py::arg("line"),
           py::arg("order"),
           py::arg("delimiter"));
+    py::class_<kgekit::EntityNumberIndexer>(m, "EntityNumberIndexer")
+        .def(py::init<std::shared_ptr<std::vector<std::array<std::string, 3>>>, const std::string&>());
+        // .def("getEntityIdMap", &kgekit::EntityNumberIndexer::getEntityIdMap)
+        // .def("getRelationIdMap", &kgekit::EntityNumberIndexer::getRelationIdMap)
+        // .def("getIndex", &kgekit::EntityNumberIndexer::getIndex)
+        // .def("getEntities", &kgekit::EntityNumberIndexer::getEntities)
+        // .def("getRelations", &kgekit::EntityNumberIndexer::getRelations);
 }

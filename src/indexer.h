@@ -17,24 +17,24 @@ using std::string;
 using std::make_shared;
 using std::unordered_map;
 
-class Entity2NumberIndexer {
+class EntityNumberIndexer {
 public:
-    Entity2NumberIndexer(shared_ptr<vector<array<string, 3>>> triples, const string& order);
-    shared_ptr<unordered_map<string, uint32_t>> getEntity2IdMap();
-    shared_ptr<unordered_map<string, uint32_t>> getRelation2IdMap();
+    EntityNumberIndexer(shared_ptr<vector<array<string, 3>>> triples, const string& order);
+    shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap();
+    shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap();
     shared_ptr<vector<TripleIndex>> getIndex();
     shared_ptr<vector<string>> getEntities();
     shared_ptr<vector<string>> getRelations();
-    bool isIndexBuilt() const;
+    bool isIndexBuilt() const; // public for testing
 private:
     void buildIndex();
-    shared_ptr<vector<string>> m_entities;
-    shared_ptr<vector<string>> m_relations;
-    shared_ptr<unordered_map<string, uint32_t>> m_entity2id;
-    shared_ptr<unordered_map<string, uint32_t>> m_relation2id;
-    shared_ptr<vector<TripleIndex>> m_indexes;
-    shared_ptr<vector<array<string, 3>>> m_triples;
-    string m_order;
+    shared_ptr<vector<string>> entities_;
+    shared_ptr<vector<string>> relations_;
+    shared_ptr<unordered_map<string, uint32_t>> entity2id_;
+    shared_ptr<unordered_map<string, uint32_t>> relation2id_;
+    shared_ptr<vector<TripleIndex>> indexes_;
+    shared_ptr<vector<array<string, 3>>> triples_;
+    string order_;
 };
 
 } // namespace kgekit

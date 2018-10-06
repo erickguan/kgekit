@@ -22,8 +22,8 @@ protected:
         while (f >> h >> r >> t) {
             content.push_back({h, r, t});
         }
-        Entity2NumberIndexer indexer(std::make_shared<std::vector<std::array<std::string, 3>>>(content), "hrt");
-        TripleIndexTranslator translator(indexer.getEntities(), indexer.getRelations(), indexer.getEntity2IdMap(), indexer.getRelation2IdMap());
+        EntityNumberIndexer indexer(std::make_shared<std::vector<std::array<std::string, 3>>>(content), "hrt");
+        TripleIndexTranslator translator(indexer.getEntities(), indexer.getRelations(), indexer.getEntityIdMap(), indexer.getRelationIdMap());
         return translator;
     }
 private:

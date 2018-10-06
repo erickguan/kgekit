@@ -11,100 +11,100 @@ using std::shared_ptr;
 using std::vector;
 using std::array;
 
-Entity2NumberIndexer::Entity2NumberIndexer(shared_ptr<vector<array<string, 3>>> triples, const string& order) : m_triples(triples), m_order(order)
+EntityNumberIndexer::EntityNumberIndexer(shared_ptr<vector<array<string, 3>>> triples, const string& order) : triples_(triples), order_(order)
 {
 }
 
-shared_ptr<unordered_map<string, uint32_t>> Entity2NumberIndexer::getEntity2IdMap()
-{
-    if (!this->isIndexBuilt()) {
-        this->buildIndex();
-    }
-    return m_entity2id;
-}
-
-shared_ptr<unordered_map<string, uint32_t>> Entity2NumberIndexer::getRelation2IdMap()
+shared_ptr<unordered_map<string, uint32_t>> EntityNumberIndexer::getEntityIdMap()
 {
     if (!this->isIndexBuilt()) {
         this->buildIndex();
     }
-    return m_relation2id;
+    return entity2id_;
 }
 
-bool Entity2NumberIndexer::isIndexBuilt() const
-{
-    return m_triples != nullptr && m_entities != nullptr && m_relations != nullptr && m_entity2id != nullptr && m_relation2id != nullptr;
-}
-
-shared_ptr<vector<TripleIndex>> Entity2NumberIndexer::getIndex()
+shared_ptr<unordered_map<string, uint32_t>> EntityNumberIndexer::getRelationIdMap()
 {
     if (!this->isIndexBuilt()) {
         this->buildIndex();
     }
-    return m_indexes;
+    return relation2id_;
 }
 
-shared_ptr<vector<string>> Entity2NumberIndexer::getEntities()
+bool EntityNumberIndexer::isIndexBuilt() const
+{
+    return triples_ != nullptr && entities_ != nullptr && relations_ != nullptr && entity2id_ != nullptr && relation2id_ != nullptr;
+}
+
+shared_ptr<vector<TripleIndex>> EntityNumberIndexer::getIndex()
 {
     if (!this->isIndexBuilt()) {
         this->buildIndex();
     }
-    return m_entities;
+    return indexes_;
 }
 
-shared_ptr<vector<string>> Entity2NumberIndexer::getRelations()
+shared_ptr<vector<string>> EntityNumberIndexer::getEntities()
+{
+    if (!this->isIndexBuilt()) {
+        this->buildIndex();
+    }
+    return entities_;
+}
+
+shared_ptr<vector<string>> EntityNumberIndexer::getRelations()
 {
    if (!this->isIndexBuilt()) {
         this->buildIndex();
     }
-    return m_relations;
+    return relations_;
 }
 
-void Entity2NumberIndexer::buildIndex()
+void EntityNumberIndexer::buildIndex()
 {
-    internal::assert_triple_order(m_order);
+    internal::assert_triple_order(order_);
 
-    m_entities = make_shared<vector<string>>();
-    m_relations = make_shared<vector<string>>();
-    m_entity2id = make_shared<unordered_map<string, uint32_t>>();
-    m_relation2id = make_shared<unordered_map<string, uint32_t>>();
-    m_indexes = make_shared<vector<TripleIndex>>();
+    entities_ = make_shared<vector<string>>();
+    relations_ = make_shared<vector<string>>();
+    entity2id_ = make_shared<unordered_map<string, uint32_t>>();
+    relation2id_ = make_shared<unordered_map<string, uint32_t>>();
+    indexes_ = make_shared<vector<TripleIndex>>();
 
-    for (const auto& t : *m_triples) {
+    for (const auto& t : *triples_) {
         TripleIndex triple_idx;
         uint32_t idx;
-        for (auto i = 0; i < m_order.size(); ++i) {
-            switch (m_order[i]) {
+        for (auto i = 0; i < order_.size(); ++i) {
+            switch (order_[i]) {
             case 'h':
-                if (m_entity2id->find(t[i]) == m_entity2id->end()) {
-                    idx = (*m_entity2id)[t[i]] = m_entities->size();
-                    m_entities->push_back(t[i]);
+                if (entity2id_->find(t[i]) == entity2id_->end()) {
+                    idx = (*entity2id_)[t[i]] = entities_->size();
+                    entities_->push_back(t[i]);
                 } else {
-                    idx = m_entity2id->at(t[i]);
+                    idx = entity2id_->at(t[i]);
                 }
                 triple_idx.head = idx;
                 break;
             case 't':
-                if (m_entity2id->find(t[i]) == m_entity2id->end()) {
-                    idx = (*m_entity2id)[t[i]] = m_entities->size();
-                    m_entities->push_back(t[i]);
+                if (entity2id_->find(t[i]) == entity2id_->end()) {
+                    idx = (*entity2id_)[t[i]] = entities_->size();
+                    entities_->push_back(t[i]);
                 } else {
-                    idx = m_entity2id->at(t[i]);
+                    idx = entity2id_->at(t[i]);
                 }
                 triple_idx.tail = idx;
                 break;
             case 'r':
-                if (m_relation2id->find(t[i]) == m_relation2id->end()) {
-                    idx = (*m_relation2id)[t[i]] = m_relation2id->size();
-                    m_relations->push_back(t[i]);
+                if (relation2id_->find(t[i]) == relation2id_->end()) {
+                    idx = (*relation2id_)[t[i]] = relation2id_->size();
+                    relations_->push_back(t[i]);
                 } else {
-                    idx = m_relation2id->at(t[i]);
+                    idx = relation2id_->at(t[i]);
                 }
                 triple_idx.relation = idx;
                 break;
             }
         }
-        m_indexes->push_back(triple_idx);
+        indexes_->push_back(triple_idx);
     }
 }
 
