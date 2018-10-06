@@ -1,5 +1,6 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+#include <pybind11/stl_bind.h>
 #include "kgekit.h"
 #include "indexer.h"
 
@@ -73,6 +74,15 @@ public:
 } // namespace pybind11
 
 
+// PYBIND11_MAKE_OPAQUE
+namespace pybind11 {
+    namespace detail {
+        template<> class type_caster<std::unordered_map<std::string, uint32_t>> : public type_caster_base<std::unordered_map<std::string, uint32_t>> {};
+        template<> class type_caster<std::vector<kgekit::TripleIndex>> : public type_caster_base<std::vector<kgekit::TripleIndex>> {};
+        template<> class type_caster<std::vector<std::string>> : public type_caster_base<std::vector<std::string>> {};
+    }
+}
+
 namespace py = pybind11;
 
 PYBIND11_MODULE(kgekit, m) {
@@ -85,10 +95,15 @@ PYBIND11_MODULE(kgekit, m) {
           py::arg("line"),
           py::arg("order"),
           py::arg("delimiter"));
-    py::class_<kgekit::EntityNumberIndexer>(m, "EntityNumberIndexer")
-        .def(py::init<std::shared_ptr<std::vector<std::array<std::string, 3>>>, const std::string&>());
-        // .def("getEntityIdMap", &kgekit::EntityNumberIndexer::getEntityIdMap)
-        // .def("getRelationIdMap", &kgekit::EntityNumberIndexer::getRelationIdMap)
+
+    py::bind_map<std::unordered_map<std::string, uint32_t>>(m, "EntryIdMap");
+    py::bind_vector<std::vector<kgekit::TripleIndex>>(m, "TripleIndexList");
+    py::bind_vector<std::vector<std::string>>(m, "EntryList");
+
+    py::class_<kgekit::EntityNumberIndexer> entity_number_indexer(m, "EntityNumberIndexer");
+    entity_number_indexer
+        .def(py::init<const std::vector<std::array<std::string, 3>>&, const std::string&>())
+        .def("getEntityIdMap", &kgekit::EntityNumberIndexer::getEntityIdMap);        // .def("getRelationIdMap", &kgekit::EntityNumberIndexer::getRelationIdMap)
         // .def("getIndex", &kgekit::EntityNumberIndexer::getIndex)
         // .def("getEntities", &kgekit::EntityNumberIndexer::getEntities)
         // .def("getRelations", &kgekit::EntityNumberIndexer::getRelations);

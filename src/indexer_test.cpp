@@ -25,7 +25,7 @@ public:
 protected:
     EntityNumberIndexer getEntityNumberIndexer()
     {
-        return EntityNumberIndexer(std::make_shared<std::vector<std::array<std::string, 3>>>(content), "hrt");
+        return EntityNumberIndexer(content, "hrt");
     }
 private:
     std::string path = "../../tests/fixtures/triple.txt";

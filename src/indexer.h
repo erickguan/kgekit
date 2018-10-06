@@ -19,7 +19,7 @@ using std::unordered_map;
 
 class EntityNumberIndexer {
 public:
-    EntityNumberIndexer(shared_ptr<vector<array<string, 3>>> triples, const string& order);
+    EntityNumberIndexer(const vector<array<string, 3>>& triples, const string& order);
     shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap();
     shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap();
     shared_ptr<vector<TripleIndex>> getIndex();

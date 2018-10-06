@@ -11,7 +11,7 @@ using std::shared_ptr;
 using std::vector;
 using std::array;
 
-EntityNumberIndexer::EntityNumberIndexer(shared_ptr<vector<array<string, 3>>> triples, const string& order) : triples_(triples), order_(order)
+EntityNumberIndexer::EntityNumberIndexer(const vector<array<string, 3>>& triples, const string& order) : triples_(make_shared<vector<array<string, 3>>>(triples)), order_(order)
 {
 }
 
