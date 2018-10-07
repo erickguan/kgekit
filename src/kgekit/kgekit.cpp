@@ -85,21 +85,17 @@ namespace pybind11 {
 }
 
 namespace py = pybind11;
-
-PYBIND11_MODULE(kgekit, m) {
-    m.doc() = "kgekit helps with io and sampling"; // optional module docstring
-    m.def("read_triple_index", &kgekit::read_triple_index, "read dataset file includes triple index.",
-          py::arg("filename"),
-          py::arg("triple_order") = "hrt",
-          py::arg("delimiter") = '\t');
+/*
+ * The naming convention of this file is to help mix with Python code.
+ */
+PYBIND11_MODULE(_kgekit, m) {
+    py::bind_map<std::unordered_map<std::string, uint32_t>>(m, "EntryIdMap");
+    py::bind_vector<std::vector<kgekit::TripleIndex>>(m, "TripleIndexList");
+    py::bind_vector<std::vector<std::string>>(m, "EntryList");
     m.def("get_triple_index", &kgekit::get_triple_index, "get triple index from a line",
           py::arg("line"),
           py::arg("order"),
           py::arg("delimiter"));
-
-    py::bind_map<std::unordered_map<std::string, uint32_t>>(m, "EntryIdMap");
-    py::bind_vector<std::vector<kgekit::TripleIndex>>(m, "TripleIndexList");
-    py::bind_vector<std::vector<std::string>>(m, "EntryList");
 
     py::class_<kgekit::EntityNumberIndexer, std::shared_ptr<kgekit::EntityNumberIndexer>>(m, "EntityNumberIndexer")
         .def(py::init<const std::vector<std::array<std::string, 3>>&, const std::string&>())
@@ -111,7 +107,6 @@ PYBIND11_MODULE(kgekit, m) {
 
 
     auto translation = m.def_submodule("translation", "translation service for kgekit");
-
     translation.def("get_entity_from_id", &kgekit::get_entity_from_id, "gets the entity name from id",
                     py::arg("indexer"),
                     py::arg("id"));
