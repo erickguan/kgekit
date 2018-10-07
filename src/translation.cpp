@@ -3,7 +3,7 @@
 
 namespace kgekit {
 
-optional<string> getEntityFromId(const shared_ptr<Indexer>& indexer, uint32_t id)
+optional<string> get_entity_from_id(const shared_ptr<Indexer>& indexer, uint32_t id)
 {
     auto entities = indexer->getEntities();
     if (id >= entities->size()) {
@@ -13,7 +13,7 @@ optional<string> getEntityFromId(const shared_ptr<Indexer>& indexer, uint32_t id
     }
 }
 
-optional<string> getRelationFromId(const shared_ptr<Indexer>& indexer, uint32_t id)
+optional<string> get_relation_from_id(const shared_ptr<Indexer>& indexer, uint32_t id)
 {
     auto relations = indexer->getRelations();
     if (id >= relations->size()) {
@@ -23,7 +23,7 @@ optional<string> getRelationFromId(const shared_ptr<Indexer>& indexer, uint32_t 
     }
 }
 
-optional<uint32_t> getIdFromEntity(const shared_ptr<Indexer>& indexer, const string& entity)
+optional<uint32_t> get_id_from_entity(const shared_ptr<Indexer>& indexer, const string& entity)
 {
     auto entity2id = indexer->getEntityIdMap();
     const auto entity_id = entity2id->find(entity);
@@ -34,7 +34,7 @@ optional<uint32_t> getIdFromEntity(const shared_ptr<Indexer>& indexer, const str
     }
 }
 
-optional<uint32_t> getIdFromRelation(const shared_ptr<Indexer>& indexer, const string& relation)
+optional<uint32_t> get_id_from_relation(const shared_ptr<Indexer>& indexer, const string& relation)
 {
     auto relation2id = indexer->getRelationIdMap();
     const auto relation_id = relation2id->find(relation);

@@ -15,9 +15,9 @@ using std::unordered_map;
 
 class Indexer;
 
-optional<string> getEntityFromId(const shared_ptr<Indexer>& indexer, uint32_t id);
-optional<string> getRelationFromId(const shared_ptr<Indexer>& indexer, uint32_t id);
-optional<uint32_t> getIdFromEntity(const shared_ptr<Indexer>& indexer, const string& entity);
-optional<uint32_t> getIdFromRelation(const shared_ptr<Indexer>& indexer, const string& relation);
+optional<string> get_entity_from_id(const shared_ptr<Indexer>& indexer, uint32_t id);
+optional<string> get_relation_from_id(const shared_ptr<Indexer>& indexer, uint32_t id);
+optional<uint32_t> get_id_from_entity(const shared_ptr<Indexer>& indexer, const string& entity);
+optional<uint32_t> get_id_from_relation(const shared_ptr<Indexer>& indexer, const string& relation);
 
 } // namespace kgekit

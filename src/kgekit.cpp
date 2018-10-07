@@ -112,16 +112,16 @@ PYBIND11_MODULE(kgekit, m) {
 
     auto translation = m.def_submodule("translation", "translation service for kgekit");
 
-    translation.def("getEntityFromId", &kgekit::getEntityFromId, "gets the entity name from id",
+    translation.def("get_entity_from_id", &kgekit::get_entity_from_id, "gets the entity name from id",
                     py::arg("indexer"),
                     py::arg("id"));
-    translation.def("getRelationFromId", &kgekit::getRelationFromId, "gets the relation name from id",
+    translation.def("get_relation_from_id", &kgekit::get_relation_from_id, "gets the relation name from id",
                     py::arg("indexer"),
                     py::arg("id"));
-    translation.def("getIdFromEntity", &kgekit::getEntityFromId, "gets the entity id from name",
+    translation.def("get_id_from_entity", &kgekit::get_entity_from_id, "gets the entity id from name",
                     py::arg("indexer"),
                     py::arg("entity"));
-    translation.def("getIdFromRelation", &kgekit::getEntityFromId, "gets the entity name from id",
+    translation.def("get_id_from_relation", &kgekit::get_entity_from_id, "gets the entity name from id",
                     py::arg("indexer"),
                     py::arg("relation"));
 }
