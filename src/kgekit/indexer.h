@@ -28,7 +28,7 @@ public:
 
 class EntityNumberIndexer : public Indexer {
 public:
-    EntityNumberIndexer(const vector<array<string, 3>>& triples, const string& order);
+    EntityNumberIndexer(const vector<Triple>& triples, const string& order);
     shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() override;
     shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() override;
     shared_ptr<vector<TripleIndex>> getIndex() override;
@@ -42,7 +42,7 @@ private:
     shared_ptr<unordered_map<string, uint32_t>> entity2id_;
     shared_ptr<unordered_map<string, uint32_t>> relation2id_;
     shared_ptr<vector<TripleIndex>> indexes_;
-    shared_ptr<vector<array<string, 3>>> triples_;
+    shared_ptr<vector<Triple>> triples_;
     string order_;
 };
 

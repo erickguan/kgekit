@@ -71,6 +71,25 @@ TEST_CASE("get_triple_index", "[parsing]")
                  Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { if (t) { return false; } else { return true; } }, "return null when wrong order for the triple index"));
     REQUIRE_THAT(get_triple_index("1\t3", "hrt", '\t'),
                  Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { if (t) { return false; } else { return true; } }, "return null when wrong content for getting the triple index"));
+    REQUIRE_THAT(get_triple_index("1\t2\t3", "htt", '\t', true),
+                 Predicate<optional<TripleIndex>>([] (const auto& t) -> bool { return t->head == 1 && t->relation == 0 && t->tail == 3; }, "tries to get the triple if skipping flag"));
+}
+
+
+TEST_CASE("get_triple", "[parsing]")
+{
+    REQUIRE_THAT(get_triple("Essential myocardial infarction", "hrt", ' '),
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { return t->head == "Essential" && t->relation == "myocardial" && t->tail == "infarction"; }, "gets the triple"));
+    REQUIRE_THAT(get_triple("Essential infarction myocardial", "htr", ' '),
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { return t->head == "Essential" && t->relation == "myocardial" && t->tail == "infarction"; }, "gets the triple"));
+    REQUIRE_THAT(get_triple("1\t2\t3", "hrt", ' '), // can be replaced by t.has_value()
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { if (t) { return false; } else { return true; } }, "return null when wrong separator doesn't return value"));
+    REQUIRE_THAT(get_triple("1\t2\t3", "htt", '\t'),
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { if (t) { return false; } else { return true; } }, "return null when wrong order for the triple index"));
+    REQUIRE_THAT(get_triple("1\t3", "hrt", '\t'),
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { if (t) { return false; } else { return true; } }, "return null when wrong content for getting the triple index"));
+    REQUIRE_THAT(get_triple("Essential myocardial infarction", "htt", ' ', true),
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { return t->head == "Essential" && t->relation == "infarction" && t->tail == "infarction";}, "tries to get the triple if skipping flag"));
 }
 
 TEST_CASE("read_triple_index", "[parsing][io]")

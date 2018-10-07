@@ -18,7 +18,7 @@ protected:
     {
         std::ifstream f(path);
         std::string h, r, t;
-        vector<array<string, 3>> content;
+        vector<Triple> content;
         while (f >> h >> r >> t) {
             content.push_back({h, r, t});
         }

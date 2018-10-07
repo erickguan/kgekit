@@ -11,7 +11,7 @@ using std::shared_ptr;
 using std::vector;
 using std::array;
 
-EntityNumberIndexer::EntityNumberIndexer(const vector<array<string, 3>>& triples, const string& order) : triples_(make_shared<vector<array<string, 3>>>(triples)), order_(order)
+EntityNumberIndexer::EntityNumberIndexer(const vector<Triple>& triples, const string& order) : triples_(make_shared<vector<Triple>>(triples)), order_(order)
 {
 }
 
@@ -76,29 +76,29 @@ void EntityNumberIndexer::buildIndex()
         for (auto i = 0; i < order_.size(); ++i) {
             switch (order_[i]) {
             case 'h':
-                if (entity2id_->find(t[i]) == entity2id_->end()) {
-                    idx = (*entity2id_)[t[i]] = entities_->size();
-                    entities_->push_back(t[i]);
+                if (entity2id_->find(t.head) == entity2id_->end()) {
+                    idx = (*entity2id_)[t.head] = entities_->size();
+                    entities_->push_back(t.head);
                 } else {
-                    idx = entity2id_->at(t[i]);
+                    idx = entity2id_->at(t.head);
                 }
                 triple_idx.head = idx;
                 break;
             case 't':
-                if (entity2id_->find(t[i]) == entity2id_->end()) {
-                    idx = (*entity2id_)[t[i]] = entities_->size();
-                    entities_->push_back(t[i]);
+                if (entity2id_->find(t.tail) == entity2id_->end()) {
+                    idx = (*entity2id_)[t.tail] = entities_->size();
+                    entities_->push_back(t.tail);
                 } else {
-                    idx = entity2id_->at(t[i]);
+                    idx = entity2id_->at(t.tail);
                 }
                 triple_idx.tail = idx;
                 break;
             case 'r':
-                if (relation2id_->find(t[i]) == relation2id_->end()) {
-                    idx = (*relation2id_)[t[i]] = relation2id_->size();
-                    relations_->push_back(t[i]);
+                if (relation2id_->find(t.relation) == relation2id_->end()) {
+                    idx = (*relation2id_)[t.relation] = relation2id_->size();
+                    relations_->push_back(t.relation);
                 } else {
-                    idx = relation2id_->at(t[i]);
+                    idx = relation2id_->at(t.relation);
                 }
                 triple_idx.relation = idx;
                 break;

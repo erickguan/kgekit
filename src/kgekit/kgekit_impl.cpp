@@ -37,14 +37,15 @@ void assert_triple_order(const string& order)
 }
 } // namespace internal
 
-optional<TripleIndex> get_triple_index(const string& line, const string& order, const char delimiter)
+optional<TripleIndex> get_triple_index(const string& line, const string& order, const char delimiter, bool skip_checking_order)
 {
-    try {
-        internal::assert_triple_order(order);
-    } catch (const std::invalid_argument& e) {
-        return {};
+    if (!skip_checking_order) {
+        try {
+            internal::assert_triple_order(order);
+        } catch (const std::invalid_argument& e) {
+            return {};
+        }
     }
-
     decltype(line.find(delimiter)) last_pos = 0;
     TripleIndex triple;
 
@@ -54,6 +55,46 @@ optional<TripleIndex> get_triple_index(const string& line, const string& order, 
         if (i >= view.size()) { return {}; }
         uint32_t idx = static_cast<uint32_t>(std::stoul(view[i]));
 
+        switch (order[i]) {
+        case 'h':
+            triple.head = idx;
+            break;
+        case 'r':
+            triple.relation = idx;
+            break;
+        case 't':
+            triple.tail = idx;
+            break;
+        default:
+            break;
+        }
+    }
+    return { triple };
+}
+
+
+optional<Triple> get_triple(
+    const string& line,
+    const string& order,
+    const char delimiter,
+    bool skip_checking_order)
+{
+    if (!skip_checking_order) {
+        try {
+            internal::assert_triple_order(order);
+        } catch (const std::invalid_argument& e) {
+            return {};
+        }
+    }
+    decltype(line.find(delimiter)) last_pos = 0;
+    Triple triple;
+
+    vector<string> view = line | ranges::view::split(delimiter);
+
+    for (auto i = 0; i < order.size(); ++i) {
+        if (i >= view.size()) { return {}; }
+
+        auto& idx = view[i];
         switch (order[i]) {
         case 'h':
             triple.head = idx;

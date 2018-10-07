@@ -29,7 +29,7 @@ protected:
     }
 private:
     std::string path = "../../tests/fixtures/triple.txt";
-    std::vector<std::array<std::string, 3>> content;
+    std::vector<Triple> content;
 };
 
 TEST_CASE_METHOD(IndexerTestsFixture, "build index lazyly", "[indexing]")

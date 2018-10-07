@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <array>
 #include <vector>
 #include <experimental/filesystem>
 
@@ -19,6 +20,7 @@ namespace kgekit {
 
 using std::string;
 using std::vector;
+using std::array;
 
 #if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
 using std::experimental::optional;
@@ -58,6 +60,7 @@ struct Triple {
     string relation;
     string tail;
 };
+
 vector<TripleIndex> read_triple_index(
     const string& filename,
     const string triple_order="hrt",
@@ -66,6 +69,14 @@ vector<TripleIndex> read_triple_index(
 optional<TripleIndex> get_triple_index(
     const string& line,
     const string& order,
-    const char delimiter);
+    const char delimiter,
+    bool skip_checking_order = false);
+
+optional<Triple> get_triple(
+    const string& line,
+    const string& order,
+    const char delimiter,
+    bool skip_checking_order = false);
+
 
 } // namespace kgekit
