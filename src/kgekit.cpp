@@ -3,6 +3,7 @@
 #include <pybind11/stl_bind.h>
 #include "kgekit.h"
 #include "indexer.h"
+#include "translation.h"
 
 namespace pybind11 {
 namespace detail {
@@ -100,11 +101,27 @@ PYBIND11_MODULE(kgekit, m) {
     py::bind_vector<std::vector<kgekit::TripleIndex>>(m, "TripleIndexList");
     py::bind_vector<std::vector<std::string>>(m, "EntryList");
 
-    py::class_<kgekit::EntityNumberIndexer> entity_number_indexer(m, "EntityNumberIndexer");
-    entity_number_indexer
+    py::class_<kgekit::EntityNumberIndexer, std::shared_ptr<kgekit::EntityNumberIndexer>>(m, "EntityNumberIndexer")
         .def(py::init<const std::vector<std::array<std::string, 3>>&, const std::string&>())
-        .def("getEntityIdMap", &kgekit::EntityNumberIndexer::getEntityIdMap);        // .def("getRelationIdMap", &kgekit::EntityNumberIndexer::getRelationIdMap)
-        // .def("getIndex", &kgekit::EntityNumberIndexer::getIndex)
-        // .def("getEntities", &kgekit::EntityNumberIndexer::getEntities)
-        // .def("getRelations", &kgekit::EntityNumberIndexer::getRelations);
+        .def("getEntityIdMap", &kgekit::EntityNumberIndexer::getEntityIdMap)
+        .def("getRelationIdMap", &kgekit::EntityNumberIndexer::getRelationIdMap)
+        .def("getIndex", &kgekit::EntityNumberIndexer::getIndex)
+        .def("getEntities", &kgekit::EntityNumberIndexer::getEntities)
+        .def("getRelations", &kgekit::EntityNumberIndexer::getRelations);
+
+
+    auto translation = m.def_submodule("translation", "translation service for kgekit");
+
+    translation.def("getEntityFromId", &kgekit::getEntityFromId, "gets the entity name from id",
+                    py::arg("indexer"),
+                    py::arg("id"));
+    translation.def("getRelationFromId", &kgekit::getRelationFromId, "gets the relation name from id",
+                    py::arg("indexer"),
+                    py::arg("id"));
+    translation.def("getIdFromEntity", &kgekit::getEntityFromId, "gets the entity id from name",
+                    py::arg("indexer"),
+                    py::arg("entity"));
+    translation.def("getIdFromRelation", &kgekit::getEntityFromId, "gets the entity name from id",
+                    py::arg("indexer"),
+                    py::arg("relation"));
 }

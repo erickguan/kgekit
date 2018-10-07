@@ -17,14 +17,23 @@ using std::string;
 using std::make_shared;
 using std::unordered_map;
 
-class EntityNumberIndexer {
+class Indexer {
+public:
+    virtual shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() = 0;
+    virtual shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() = 0;
+    virtual shared_ptr<vector<TripleIndex>> getIndex() = 0;
+    virtual shared_ptr<vector<string>> getEntities() = 0;
+    virtual shared_ptr<vector<string>> getRelations() = 0;
+};
+
+class EntityNumberIndexer : public Indexer {
 public:
     EntityNumberIndexer(const vector<array<string, 3>>& triples, const string& order);
-    shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap();
-    shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap();
-    shared_ptr<vector<TripleIndex>> getIndex();
-    shared_ptr<vector<string>> getEntities();
-    shared_ptr<vector<string>> getRelations();
+    shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() override;
+    shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() override;
+    shared_ptr<vector<TripleIndex>> getIndex() override;
+    shared_ptr<vector<string>> getEntities() override;
+    shared_ptr<vector<string>> getRelations() override;
     bool isIndexBuilt() const; // public for testing
 private:
     void buildIndex();

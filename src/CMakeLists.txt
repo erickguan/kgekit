@@ -22,9 +22,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(FS_LIBRARY stdc++fs)
 endif()
 
-set(SOURCES kgekit_impl.cpp indexer.cpp translator.cpp)
-set(HEADERS kgekit.h indexer.h translator.h)
-set(TEST_SOURCES kgekit_impl_test.cpp indexer_test.cpp translator_test.cpp)
+set(SOURCES kgekit_impl.cpp indexer.cpp translation.cpp)
+set(HEADERS kgekit.h indexer.h translation.h)
+set(TEST_SOURCES kgekit_impl_test.cpp indexer_test.cpp translation_test.cpp)
 
 add_library(kgekit_impl ${SOURCES})
 set_property(TARGET kgekit_impl PROPERTY POSITION_INDEPENDENT_CODE ON)
