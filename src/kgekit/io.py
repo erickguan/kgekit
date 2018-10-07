@@ -1,6 +1,7 @@
 """IO functions"""
 
 from pathlib import Path
+import kgekit
 
 def _assert_good_file(filename):
     path = Path(filename)
@@ -8,25 +9,18 @@ def _assert_good_file(filename):
         raise FileNotFoundError("Can't find the triple file.")
 
 def _assert_triple_order(order):
-    if frozenset(order) != frozenset(['hrt']):
+    if frozenset(order) != frozenset('hrt'):
         raise RuntimeError("Wrong triple order.")
 
-def read_triple_index(filename, triple_order="hrt", delimiter='\t'):
+def read_triple_indexes(filename, triple_order="hrt", delimiter='\t'):
     _assert_good_file(filename)
     _assert_triple_order(triple_order)
-    print("hello")
+    with open(filename) as f:
+        return list(filter(None.__ne__, [kgekit.get_triple_index(l.rstrip('\n'), triple_order, delimiter, True) for l in f]))
 
 def read_triples(filename, triple_order="hrt", delimiter='\t'):
     _assert_good_file(filename)
     _assert_triple_order(triple_order)
-    pass
+    with open(filename) as f:
+        return list(filter(None.__ne__, [kgekit.get_triple(l.rstrip('\n'), triple_order, delimiter, True) for l in f]))
 
-    vector<TripleIndex> content;
-    std::ifstream fs(filename);
-    for (std::string line; std::getline(fs, line); ) {
-        if (auto triple = get_triple_index(line, triple_order, delimiter)) {
-            content.push_back(*triple);
-        } else {
-            throw std::runtime_error("Can't parse file " + filename + '.');
-        }
-    }
