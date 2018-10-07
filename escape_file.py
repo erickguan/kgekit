@@ -1,3 +1,6 @@
+"""YAGO3's ttle file contain escaped unicode symbol like `\u0022`. This file
+percentage encoded the ttl files.
+"""
 import re
 import sys
 import os

@@ -1,3 +1,7 @@
+"""YAGO3's ttle file contain escaped unicode symbol like `\u0022`. They are
+escaped by `escape_file.py`. This file reverse the symbol of percentage encoded
+symbols to UTF-8 string.
+"""
 import re
 import sys
 import os
