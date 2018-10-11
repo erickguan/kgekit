@@ -21,29 +21,9 @@ class Indexer {
 public:
     virtual shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() = 0;
     virtual shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() = 0;
-    virtual shared_ptr<vector<TripleIndex>> getIndex() = 0;
+    virtual shared_ptr<vector<TripleIndex>> getIndexes() = 0;
     virtual shared_ptr<vector<string>> getEntities() = 0;
     virtual shared_ptr<vector<string>> getRelations() = 0;
-};
-
-class EntityNumberIndexer : public Indexer {
-public:
-    EntityNumberIndexer(const vector<Triple>& triples, const string& order);
-    shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() override;
-    shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() override;
-    shared_ptr<vector<TripleIndex>> getIndex() override;
-    shared_ptr<vector<string>> getEntities() override;
-    shared_ptr<vector<string>> getRelations() override;
-    bool isIndexBuilt() const; // public for testing
-private:
-    void buildIndex();
-    shared_ptr<vector<string>> entities_;
-    shared_ptr<vector<string>> relations_;
-    shared_ptr<unordered_map<string, uint32_t>> entity2id_;
-    shared_ptr<unordered_map<string, uint32_t>> relation2id_;
-    shared_ptr<vector<TripleIndex>> indexes_;
-    shared_ptr<vector<Triple>> triples_;
-    string order_;
 };
 
 } // namespace kgekit
