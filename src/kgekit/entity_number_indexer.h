@@ -17,7 +17,6 @@ namespace kgekit {
 
 using std::shared_ptr;
 using std::vector;
-using std::array;
 using std::string;
 using std::make_shared;
 using std::unordered_map;

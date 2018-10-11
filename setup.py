@@ -89,7 +89,7 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', '--build', '.'] + build_args,
                               cwd=self.build_temp)
         # Copy *_test file to tests directory
-        test_bin = os.path.join(self.build_temp, 'src', 'kgekit_test')
+        test_bin = os.path.join(self.build_temp, 'src', 'kgekit', 'kgekit_test')
         self.copy_test_file(test_bin)
         print()  # Add an empty line for cleaner output
 

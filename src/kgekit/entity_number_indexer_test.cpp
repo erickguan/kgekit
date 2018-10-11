@@ -3,7 +3,9 @@
 #include <catch.hpp>
 
 #include "kgekit.h"
-#include "indexer.h"
+#include "entity_number_indexer.h"
+#include <pybind11/pybind11.h>
+#include <pybind11/pytypes.h>
 
 namespace kgekit
 {
@@ -19,7 +21,7 @@ public:
 
         std::string h, r, t;
         while (f >> h >> r >> t) {
-            content.push_back(Triple({h, r, t}));
+            content.append(Triple({h, r, t}));
         }
     }
 protected:
@@ -29,7 +31,7 @@ protected:
     }
 private:
     std::string path = "../../tests/fixtures/triple.txt";
-    std::vector<Triple> content;
+    py::list content;
 };
 
 TEST_CASE_METHOD(IndexerTestsFixture, "build index lazyly", "[indexing]")
@@ -47,8 +49,8 @@ TEST_CASE_METHOD(IndexerTestsFixture, "returns indexes", "[indexing]")
     TripleIndex first({ 0, 0, 1 });
     TripleIndex second({ 1, 1, 2 });
     TripleIndex third({ 0, 2, 2 });
-    REQUIRE_THAT(indexer.getIndex(),
-                 Predicate<decltype(indexer.getIndex())>(
+    REQUIRE_THAT(indexer.getIndexes(),
+                 Predicate<decltype(indexer.getIndexes())>(
                      [&](const auto& vec) -> bool {
                          return vec->at(0) == first &&
                             vec->at(1) == second &&

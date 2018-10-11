@@ -3,7 +3,7 @@
 #include <catch.hpp>
 
 #include "kgekit.h"
-#include "indexer.h"
+#include "entity_number_indexer.h"
 #include "translation.h"
 
 namespace kgekit
@@ -18,9 +18,9 @@ protected:
     {
         std::ifstream f(path);
         std::string h, r, t;
-        vector<Triple> content;
+        py::list content;
         while (f >> h >> r >> t) {
-            content.push_back(Triple({h, r, t}));
+            content.append(Triple({h, r, t}));
         }
         EntityNumberIndexer indexer(content, "hrt");
         return indexer;

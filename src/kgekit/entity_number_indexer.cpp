@@ -1,27 +1,12 @@
-#include <array>
 #include <vector>
 #include <memory>
-#include <algorithm>
-#include <pybind11/stl.h>
-#include <pybind11/stl_bind.h>
 
 #include "entity_number_indexer.h"
-
-using _EntryIdMap = std::unordered_map<std::string, uint32_t>;
-using _TripleIndexList = std::vector<kgekit::TripleIndex>;
-using _TripleList = std::vector<kgekit::Triple>;
-using _EntryList = std::vector<std::string>;
-
-PYBIND11_MAKE_OPAQUE(_EntryIdMap);
-PYBIND11_MAKE_OPAQUE(_TripleIndexList);
-PYBIND11_MAKE_OPAQUE(_TripleList);
-PYBIND11_MAKE_OPAQUE(_EntryList);
 
 namespace kgekit {
 
 using std::shared_ptr;
 using std::vector;
-using std::array;
 
 EntityNumberIndexer::EntityNumberIndexer(const py::list& triples, const string& order) : triples_(triples), order_(order)
 {
