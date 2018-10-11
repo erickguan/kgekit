@@ -95,8 +95,8 @@ TEST_CASE("get_triple", "[parsing]")
 TEST_CASE("read_triple_index", "[parsing][io]")
 {
     auto index = "../../tests/fixtures/triple_index.txt";
-    TripleIndex first { 1, 2, 3 };
-    TripleIndex second { 9, 1, 3 };
+    TripleIndex first({ 1, 2, 3 });
+    TripleIndex second({ 9, 1, 3 });
     REQUIRE_THAT(read_triple_index(index, "hrt", ' '), VectorContains(first) && VectorContains(second));
 }
 

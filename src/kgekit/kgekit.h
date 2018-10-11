@@ -3,6 +3,7 @@
 #include <string>
 #include <array>
 #include <vector>
+#include <cstdlib>
 #include <experimental/filesystem>
 
 #if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
@@ -42,16 +43,29 @@ namespace fs = std::experimental::filesystem;
 
 void assert_good_file(fs::path filename);
 void assert_triple_order(const string& order);
+const auto kBufferSize = 128;
 
 } // namespace internal
 
+/*
+ * Low level data structure are smaller to manuplate in C++.
+ * So they are exported to Python.
+ */
 struct TripleIndex {
     uint32_t head;
     uint32_t relation;
     uint32_t tail;
+    TripleIndex() = default;
+    TripleIndex(const array<uint32_t, 3>& tuple) : head(tuple[0]), relation(tuple[1]), tail(tuple[2]) {}
     bool operator==(const TripleIndex& rhs) const
     {
         return rhs.head == head && rhs.relation == relation && rhs.tail == tail;
+    }
+    string repr() const
+    {
+        char buffer[internal::kBufferSize];
+        sprintf(buffer, "(%ul, %ul, %ul)", head, relation, tail);
+        return string(buffer);
     }
 };
 
@@ -59,6 +73,18 @@ struct Triple {
     string head;
     string relation;
     string tail;
+    Triple() = default;
+    Triple(const array<string, 3>& tuple) : head(tuple[0]), relation(tuple[1]), tail(tuple[2])
+    {
+    }
+    bool operator==(const Triple& rhs) const
+    {
+        return rhs.head == head && rhs.relation == relation && rhs.tail == tail;
+    }
+    string repr() const
+    {
+        return "(" + head + ", " + relation + ", " + tail + ")";
+    }
 };
 
 vector<TripleIndex> read_triple_index(

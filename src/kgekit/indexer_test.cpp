@@ -19,7 +19,7 @@ public:
 
         std::string h, r, t;
         while (f >> h >> r >> t) {
-            content.push_back({h, r, t});
+            content.push_back(Triple({h, r, t}));
         }
     }
 protected:
@@ -44,9 +44,9 @@ TEST_CASE_METHOD(IndexerTestsFixture, "returns indexes", "[indexing]")
 {
     auto indexer = getEntityNumberIndexer();
 
-    TripleIndex first { 0, 0, 1 };
-    TripleIndex second { 1, 1, 2 };
-    TripleIndex third { 0, 2, 2 };
+    TripleIndex first({ 0, 0, 1 });
+    TripleIndex second({ 1, 1, 2 });
+    TripleIndex third({ 0, 2, 2 });
     REQUIRE_THAT(indexer.getIndex(),
                  Predicate<decltype(indexer.getIndex())>(
                      [&](const auto& vec) -> bool {
