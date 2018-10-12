@@ -11,17 +11,6 @@ namespace kgekit {
 using std::vector;
 namespace internal {
 
-void assert_good_file(fs::path filename)
-{
-    try {
-        if (!fs::exists(filename) || !fs::is_regular_file(filename)) {
-            throw std::invalid_argument("File is not valid. Maybe wrong path or is a directory.");
-        }
-    } catch (const fs::filesystem_error& e) {
-        throw std::invalid_argument("File is not valid. Maybe wrong path or is a directory.");
-    }
-}
-
 void assert_triple_order(const string& order)
 {
     std::unordered_set<char> order_set(order.cbegin(), order.cend());
@@ -110,48 +99,6 @@ optional<Triple> get_triple(
         }
     }
     return { triple };
-}
-
-vector<TripleIndex> read_triple_index(
-    const std::string& filename,
-    const std::string triple_order,
-    const char delimiter)
-{
-    internal::assert_good_file(filename);
-    internal::assert_triple_order(triple_order);
-
-    vector<TripleIndex> content;
-    std::ifstream fs(filename);
-    for (std::string line; std::getline(fs, line); ) {
-        if (auto triple = get_triple_index(line, triple_order, delimiter)) {
-            content.push_back(*triple);
-        } else {
-            throw std::runtime_error("Can't parse file " + filename + '.');
-        }
-    }
-
-    return content;
-}
-
-vector<TripleIndex> read_triple(
-    const std::string& filename,
-    const std::string triple_order,
-    const char delimiter)
-{
-    internal::assert_good_file(filename);
-    internal::assert_triple_order(triple_order);
-
-    vector<TripleIndex> content;
-    std::ifstream fs(filename);
-    for (std::string line; std::getline(fs, line); ) {
-        if (auto triple = get_triple_index(line, triple_order, delimiter)) {
-            content.push_back(*triple);
-        } else {
-            throw std::runtime_error("Can't parse file " + filename + '.');
-        }
-    }
-
-    return content;
 }
 
 } // namespace kgekit

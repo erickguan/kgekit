@@ -52,9 +52,9 @@ const auto kBufferSize = 128;
  * So they are exported to Python.
  */
 struct TripleIndex {
-    uint32_t head;
-    uint32_t relation;
-    uint32_t tail;
+    uint32_t head = 0;
+    uint32_t relation = 0;
+    uint32_t tail = 0;
     TripleIndex() = default;
     TripleIndex(const array<uint32_t, 3>& tuple) : head(tuple[0]), relation(tuple[1]), tail(tuple[2]) {}
     bool operator==(const TripleIndex& rhs) const

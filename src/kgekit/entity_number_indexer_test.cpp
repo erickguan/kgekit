@@ -1,11 +1,10 @@
 #include <fstream>
 #include <memory>
 #include <catch.hpp>
+#include <pybind11/pybind11.h>
 
 #include "kgekit.h"
 #include "entity_number_indexer.h"
-#include <pybind11/pybind11.h>
-#include <pybind11/pytypes.h>
 
 namespace kgekit
 {
@@ -14,24 +13,22 @@ using namespace Catch;
 using namespace std;
 
 class IndexerTestsFixture {
-public:
-    IndexerTestsFixture()
-    {
-        std::ifstream f(path);
-
-        std::string h, r, t;
-        while (f >> h >> r >> t) {
-            content.append(Triple({h, r, t}));
-        }
-    }
 protected:
     EntityNumberIndexer getEntityNumberIndexer()
     {
+        py::list content;
+        if (content.size() == 0) {
+            std::ifstream f(path);
+
+            std::string h, r, t;
+            while (f >> h >> r >> t) {
+                content.append(Triple({h, r, t}));
+            }
+        }
         return EntityNumberIndexer(content, "hrt");
     }
-private:
     std::string path = "../../tests/fixtures/triple.txt";
-    py::list content;
+    // static py::list content;
 };
 
 TEST_CASE_METHOD(IndexerTestsFixture, "build index lazyly", "[indexing]")

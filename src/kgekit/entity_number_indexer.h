@@ -10,6 +10,7 @@
 #include "indexer.h"
 
 #include <pybind11/pytypes.h>
+#include <pybind11/cast.h>
 
 namespace py = pybind11;
 

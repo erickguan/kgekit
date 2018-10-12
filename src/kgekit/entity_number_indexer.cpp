@@ -26,7 +26,7 @@ py::dict EntityNumberIndexer::relationIdMap()
 {
     auto relation_id = getRelationIdMap();
     py::dict res;
-    for (auto const& [key, val] : *relation_id) {
+    for (auto const&  [key, val] : *relation_id) {
         res[key.c_str()] = val;
     }
     return res;
@@ -34,9 +34,9 @@ py::dict EntityNumberIndexer::relationIdMap()
 
 py::list EntityNumberIndexer::indexes()
 {
-    auto indexes = getIndexes();
+    auto idxes = getIndexes();
     py::list res;
-    for (auto const& idx : *indexes) {
+    for (auto const& idx : *idxes) {
         res.append(idx);
     }
     return res;
@@ -44,9 +44,9 @@ py::list EntityNumberIndexer::indexes()
 
 py::list EntityNumberIndexer::entities()
 {
-    auto entities = getEntities();
+    auto ents = getEntities();
     py::list res;
-    for (auto const& idx : *entities) {
+    for (auto const& idx : *ents) {
         res.append(idx);
     }
     return res;
@@ -54,9 +54,9 @@ py::list EntityNumberIndexer::entities()
 
 py::list EntityNumberIndexer::relations()
 {
-   auto relations = getRelations();
+    auto rels = getRelations();
     py::list res;
-    for (auto const& idx : *relations) {
+    for (auto const& idx : *rels) {
         res.append(idx);
     }
     return res;

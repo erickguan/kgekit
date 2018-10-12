@@ -1,7 +1,5 @@
 #define CATCH_CONFIG_MAIN
 
-#include <fstream>
-#include <experimental/filesystem>
 #include <cstdio>
 #include <catch.hpp>
 #include "kgekit.h"
@@ -25,35 +23,6 @@ TEST_CASE("assert_triple_order", "[io]")
     REQUIRE_THROWS_AS(assert_triple_order("hft"), std::invalid_argument);    // no random character
     REQUIRE_THROWS_AS(assert_triple_order("hrtwes"), std::invalid_argument); // no too long order
     REQUIRE_THROWS_AS(assert_triple_order("h"), std::invalid_argument);      // not too short order
-}
-
-
-struct FileFolderTestsFixture {
-    FileFolderTestsFixture()
-    {
-        std::ofstream f1;
-        f1.open(local);
-        fs::create_directory(folder);
-        std::ofstream f2;
-        f2.open(file_in_folder);
-    }
-    ~FileFolderTestsFixture()
-    {
-        fs::remove(local);
-        fs::remove_all(folder);
-    }
-    fs::path local = "local.txt";
-    fs::path folder = "folder";
-    fs::path file_in_folder = folder / "file.txt";
-    fs::path wrong_file = "wrong.txt";
-};
-
-TEST_CASE_METHOD(FileFolderTestsFixture, "assert_good_file", "[io]")
-{
-    REQUIRE_NOTHROW(assert_good_file(local));
-    REQUIRE_NOTHROW(assert_good_file(file_in_folder));
-    REQUIRE_THROWS_AS(assert_good_file(folder), std::invalid_argument);   // throw for folder
-    REQUIRE_THROWS_AS(assert_good_file(wrong_file), std::invalid_argument);    // throw for no file
 }
 
 } // namespace internal
@@ -89,15 +58,7 @@ TEST_CASE("get_triple", "[parsing]")
     REQUIRE_THAT(get_triple("1\t3", "hrt", '\t'),
                  Predicate<optional<Triple>>([] (const auto& t) -> bool { if (t) { return false; } else { return true; } }, "return null when wrong content for getting the triple index"));
     REQUIRE_THAT(get_triple("Essential myocardial infarction", "htt", ' ', true),
-                 Predicate<optional<Triple>>([] (const auto& t) -> bool { return t->head == "Essential" && t->relation == "infarction" && t->tail == "infarction";}, "tries to get the triple if skipping flag"));
-}
-
-TEST_CASE("read_triple_index", "[parsing][io]")
-{
-    auto index = "../../tests/fixtures/triple_index.txt";
-    TripleIndex first({ 1, 2, 3 });
-    TripleIndex second({ 9, 1, 3 });
-    REQUIRE_THAT(read_triple_index(index, "hrt", ' '), VectorContains(first) && VectorContains(second));
+                 Predicate<optional<Triple>>([] (const auto& t) -> bool { return t->head == "Essential" && t->relation == "" && t->tail == "infarction";}, "tries to get the triple if skipping flag"));
 }
 
 } // namespace kgekit
