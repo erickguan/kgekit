@@ -28,7 +28,6 @@ protected:
         return EntityNumberIndexer(content, "hrt");
     }
     std::string path = "../../tests/fixtures/triple.txt";
-    // static py::list content;
 };
 
 TEST_CASE_METHOD(IndexerTestsFixture, "build index lazyly", "[indexing]")
