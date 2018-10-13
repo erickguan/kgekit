@@ -25,12 +25,14 @@ protected:
   template <typename T>
   shared_ptr<T> getIndexer()
   {
-//    py::gil_scoped_acquire acquire;
     auto kgekit = py::module::import("kgekit_testing");
     py::list content;
-    content.append(py::cast(Triple("/m/entity1", "/produced_by", "/m/entity2")));
-    content.append(py::cast(Triple("/m/entity2", "/country", "/m/entity3")));
-    content.append(py::cast(Triple("/m/entity1", "/produced_in", "/m/entity3")));
+    std::ifstream f(path);
+
+    std::string h, r, t;
+    while (f >> h >> r >> t) {
+      content.append(Triple(h, r, t));
+    }
     assert(content.size() == 3);
 
     return make_shared<T>(content, "hrt");
