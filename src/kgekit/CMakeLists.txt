@@ -24,8 +24,7 @@ endif()
 
 set(SOURCES kgekit.h kgekit_impl.cpp translation.cpp indexer.h translation.h)
 set(PY_SOURCES kgekit.cpp entity_number_indexer.cpp)
-set(TEST_SOURCES kgekit_impl_test.cpp)
-set(PY_TEST_SOURCES entity_number_indexer_test.cpp entity_number_indexer.h translation_test.cpp)
+set(TEST_SOURCES test_helper.cpp kgekit_impl_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h translation_test.cpp translation.h test_helper.h)
 
 add_library(kgekit_impl ${SOURCES})
 target_compile_features(kgekit_impl PUBLIC cxx_std_17)
@@ -37,14 +36,9 @@ target_compile_features(kgekit PUBLIC cxx_std_17)
 target_link_libraries(kgekit PUBLIC kgekit_impl PRIVATE range-v3::range-v3)
 set_property(TARGET kgekit PROPERTY PREFIX _)
 
-pybind11_add_module(kgekit_py_test STATIC ${PY_TEST_SOURCES})
-target_compile_features(kgekit_py_test PUBLIC cxx_std_17)
-set_property(TARGET kgekit_py_test PROPERTY POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(kgekit_py_test PUBLIC kgekit_impl pybind11::pybind11 pybind11::embed pybind11::module ${FS_LIBRARY} PRIVATE Catch2::Catch)
-
-add_executable(kgekit_test ${TEST_SOURCES} ${PY_SOURCES})
+add_executable(kgekit_test ${TEST_SOURCES} ${PY_SOURCES} ${SOURCES})
 target_compile_features(kgekit_test PUBLIC cxx_std_17)
-target_link_libraries(kgekit_test PRIVATE kgekit_structs kgekit_py_test Catch2::Catch)
+target_link_libraries(kgekit_test PUBLIC Catch2::Catch PRIVATE kgekit_structs pybind11::pybind11 pybind11::embed pybind11::module)
 
 enable_testing()
-add_test(COMMAND kgekit_test)
+add_test(COMMAND bin/kgekit_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)

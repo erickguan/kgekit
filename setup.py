@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import glob
 import sysconfig
 import platform
 import subprocess
@@ -91,6 +92,9 @@ class CMakeBuild(build_ext):
         # Copy *_test file to tests directory
         test_bin = os.path.join(self.build_temp, 'src', 'kgekit', 'kgekit_test')
         self.copy_test_file(test_bin)
+        # print(os.path.join(os.path.dirname(__file__), 'src', 'kgekit', 'kgekit_py_test*'))
+        # test_lib = glob.glob(os.path.join(os.path.dirname(__file__), 'src', 'kgekit', 'kgekit_py_test*'))
+        # self.copy_test_file(test_lib)
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',

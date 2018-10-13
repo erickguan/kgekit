@@ -56,7 +56,7 @@ struct TripleIndex {
     uint32_t relation = 0;
     uint32_t tail = 0;
     TripleIndex() = default;
-    TripleIndex(const array<uint32_t, 3>& tuple) : head(tuple[0]), relation(tuple[1]), tail(tuple[2]) {}
+    TripleIndex(uint32_t h, uint32_t r, uint32_t t) : head(h), relation(r), tail(t) {}
     bool operator==(const TripleIndex& rhs) const
     {
         return rhs.head == head && rhs.relation == relation && rhs.tail == tail;
@@ -74,9 +74,7 @@ struct Triple {
     string relation;
     string tail;
     Triple() = default;
-    Triple(const array<string, 3>& tuple) : head(tuple[0]), relation(tuple[1]), tail(tuple[2])
-    {
-    }
+    Triple(const string& h, const string& r, const string& t) : head(h), relation(r), tail(t) {}
     bool operator==(const Triple& rhs) const
     {
         return rhs.head == head && rhs.relation == relation && rhs.tail == tail;

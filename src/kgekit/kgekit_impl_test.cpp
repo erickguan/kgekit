@@ -1,10 +1,7 @@
 #define CATCH_CONFIG_MAIN
 
-#include <cstdio>
-#include <catch.hpp>
+#include "test_helper.h"
 #include "kgekit.h"
-
-namespace fs = std::experimental::filesystem;
 
 namespace kgekit
 {

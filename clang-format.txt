@@ -1,0 +1,7 @@
+﻿---
+BasedOnStyle: Google
+BreakBeforeBraces: Stroustrup
+TabWidth: '2'
+UseTab: Never
+
+...

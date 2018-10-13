@@ -1,14 +1,14 @@
-#include <fstream>
-#include <iostream>
+#include "kgekit.h"
+
 #include <vector>
 #include <unordered_set>
 #include <range/v3/all.hpp>
 #include <range/v3/view/split.hpp>
 
-#include "kgekit.h"
-
 namespace kgekit {
+
 using std::vector;
+
 namespace internal {
 
 void assert_triple_order(const string& order)

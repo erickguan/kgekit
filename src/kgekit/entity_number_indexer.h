@@ -6,13 +6,10 @@
 #include <string>
 #include <unordered_map>
 
-#include "kgekit.h"
-#include "indexer.h"
-
 #include <pybind11/pytypes.h>
 #include <pybind11/cast.h>
-
-namespace py = pybind11;
+#include "kgekit.h"
+#include "indexer.h"
 
 namespace kgekit {
 
@@ -25,11 +22,11 @@ using std::unordered_map;
 class EntityNumberIndexer : public Indexer {
 public:
     EntityNumberIndexer(const pybind11::list& triples, const string& order);
-    py::dict entityIdMap();
-    py::dict relationIdMap();
-    py::list indexes();
-    py::list entities();
-    py::list relations();
+    pybind11::dict entityIdMap();
+    pybind11::dict relationIdMap();
+    pybind11::list indexes();
+    pybind11::list entities();
+    pybind11::list relations();
     shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() override;
     shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() override;
     shared_ptr<vector<TripleIndex>> getIndexes() override;

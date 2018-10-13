@@ -1,7 +1,9 @@
+#include "entity_number_indexer.h"
+
 #include <vector>
 #include <memory>
 
-#include "entity_number_indexer.h"
+namespace py = pybind11;
 
 namespace kgekit {
 
