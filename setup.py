@@ -37,7 +37,7 @@ class CMakeBuild(build_ext):
         for ext in self.extensions:
             self.build_extension(ext)
 
-    def copy_test_file(self, src_file):
+    def copy_test_file(self, ext, src_file):
 
         '''
         Copy ``src_file`` to `tests/bin` directory, ensuring parent directory
@@ -47,7 +47,7 @@ class CMakeBuild(build_ext):
         '''
         # Create directory if needed
         dest_dir = os.path.join(os.path.dirname(
-            os.path.abspath(__file__)), 'tests', 'bin')
+            os.path.abspath(__file__)), ext.name, 'tests', 'bin')
         if dest_dir != "" and not os.path.exists(dest_dir):
             print("creating directory {}".format(dest_dir))
             os.makedirs(dest_dir)
@@ -90,11 +90,8 @@ class CMakeBuild(build_ext):
         subprocess.check_call(['cmake', '--build', '.'] + build_args,
                               cwd=self.build_temp)
         # Copy *_test file to tests directory
-        test_bin = os.path.join(self.build_temp, 'src', 'kgekit', 'kgekit_test')
-        self.copy_test_file(test_bin)
-        # print(os.path.join(os.path.dirname(__file__), 'src', 'kgekit', 'kgekit_py_test*'))
-        # test_lib = glob.glob(os.path.join(os.path.dirname(__file__), 'src', 'kgekit', 'kgekit_py_test*'))
-        # self.copy_test_file(test_lib)
+        test_bin = os.path.join(self.build_temp, 'kgekit', 'kgekit_test')
+        self.copy_test_file(ext, test_bin)
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
@@ -104,8 +101,8 @@ setup(name='kgekit',
       author='Erick Guan',
       author_email='fantasticfears@gmail.com',
       license='MIT',
-      packages=find_packages('src'),
-      package_dir={'': 'src'},
+      packages=find_packages(),
+    #   package_dir={'': 'src'},
       cmdclass=dict(build_ext=CMakeBuild),
       ext_modules=[CMakeExtension('kgekit')],
       test_suite='tests',

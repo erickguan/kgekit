@@ -38,7 +38,7 @@ protected:
     return make_shared<T>(content, "hrt");
   }
 private:
-  std::string path = "tests/fixtures/triple.txt";
+  std::string path = "kgekit/tests/fixtures/triple.txt";
   py::scoped_interpreter guard{};
 };
 

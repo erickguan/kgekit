@@ -1,5 +1,4 @@
 #include <pybind11/pybind11.h>
-#define PYBIND11_HAS_OPTIONAL
 #include <pybind11/stl.h>
 #include "kgekit.h"
 #include "entity_number_indexer.h"
@@ -7,16 +6,7 @@
 #include "translation.h"
 
 namespace py = pybind11;
-namespace pybind11 {
-namespace detail {
 
-template<typename T> struct type_caster<kgekit::optional<T>>
-    : public optional_caster<kgekit::optional<T>> {};
-
-template<> struct type_caster<kgekit::nullopt_t>
-    : public void_caster<kgekit::nullopt_t> {};
-}
-}
 /*
  * The naming convention of this file is to help mix with Python code.
  */
