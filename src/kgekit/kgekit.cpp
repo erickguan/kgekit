@@ -1,4 +1,5 @@
 #include <pybind11/pybind11.h>
+#define PYBIND11_HAS_OPTIONAL
 #include <pybind11/stl.h>
 #include "kgekit.h"
 #include "entity_number_indexer.h"
