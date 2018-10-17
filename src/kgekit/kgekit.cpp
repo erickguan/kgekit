@@ -7,14 +7,14 @@
 #include "translation.h"
 
 namespace py = pybind11;
-namespace py {
+namespace pybind11 {
 namespace detail {
 
-template<typename T> struct type_caster<std::experimental::optional<T>>
-    : public optional_caster<std::experimental::optional<T>> {};
+template<typename T> struct type_caster<kgekit::optional<T>>
+    : public optional_caster<kgekit::optional<T>> {};
 
-template<> struct type_caster<std::experimental::nullopt_t>
-    : public void_caster<std::experimental::nullopt_t> {};
+template<> struct type_caster<kgekit::nullopt_t>
+    : public void_caster<kgekit::nullopt_t> {};
 }
 }
 /*

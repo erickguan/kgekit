@@ -29,10 +29,12 @@ using std::experimental::make_optional;
 using std::experimental::string_view;
 #elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 9
 using std::experimental::optional;
+using std::experimental::nullopt_t;
 using std::experimental::make_optional;
 using std::experimental::string_view;
 #else
 using std::optional;
+using std::experimental::nullopt_t;
 using std::make_optional;
 using std::string_view;
 #endif
