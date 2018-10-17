@@ -7,6 +7,16 @@
 #include "translation.h"
 
 namespace py = pybind11;
+namespace py {
+namespace detail {
+
+template<typename T> struct type_caster<std::experimental::optional<T>>
+    : public optional_caster<std::experimental::optional<T>> {};
+
+template<> struct type_caster<std::experimental::nullopt_t>
+    : public void_caster<std::experimental::nullopt_t> {};
+}
+}
 /*
  * The naming convention of this file is to help mix with Python code.
  */
