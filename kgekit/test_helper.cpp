@@ -17,14 +17,14 @@ PYBIND11_EMBEDDED_MODULE(kgekit_testing, m) {
       .def("__repr__", &kgekit::Triple::repr)
       .def("__eq__", &kgekit::Triple::operator==)
       .def_readwrite("head", &kgekit::Triple::head)
-      .def_readwrite("relation", &kgekit::Triple::tail)
+      .def_readwrite("relation", &kgekit::Triple::relation)
       .def_readwrite("tail", &kgekit::Triple::tail);
   py::class_<kgekit::TripleIndex>(m, "TripleIndex")
       .def(py::init<>())
-      .def(py::init<uint32_t, uint32_t, uint32_t>())
+      .def(py::init<int32_t, int32_t, int32_t>())
       .def("__repr__", &kgekit::TripleIndex::repr)
       .def("__eq__", &kgekit::TripleIndex::operator==)
       .def_readwrite("head", &kgekit::TripleIndex::head)
-      .def_readwrite("relation", &kgekit::TripleIndex::tail)
+      .def_readwrite("relation", &kgekit::TripleIndex::relation)
       .def_readwrite("tail", &kgekit::TripleIndex::tail);
 }

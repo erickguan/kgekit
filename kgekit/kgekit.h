@@ -41,9 +41,6 @@ using std::string_view;
 
 namespace internal {
 
-namespace fs = std::experimental::filesystem;
-
-void assert_good_file(fs::path filename);
 void assert_triple_order(const string& order);
 const auto kBufferSize = 128;
 
@@ -54,11 +51,11 @@ const auto kBufferSize = 128;
  * So they are exported to Python.
  */
 struct TripleIndex {
-    uint32_t head = 0;
-    uint32_t relation = 0;
-    uint32_t tail = 0;
+    int32_t head = -1;
+    int32_t relation = -1;
+    int32_t tail = -1;
     TripleIndex() = default;
-    TripleIndex(uint32_t h, uint32_t r, uint32_t t) : head(h), relation(r), tail(t) {}
+    TripleIndex(int32_t h, int32_t r, int32_t t) : head(h), relation(r), tail(t) {}
     bool operator==(const TripleIndex& rhs) const
     {
         return rhs.head == head && rhs.relation == relation && rhs.tail == tail;
@@ -66,7 +63,7 @@ struct TripleIndex {
     string repr() const
     {
         char buffer[internal::kBufferSize];
-        sprintf(buffer, "(%ul, %ul, %ul)", head, relation, tail);
+        sprintf(buffer, "(%d, %d, %d)", head, relation, tail);
         return string(buffer);
     }
 };
