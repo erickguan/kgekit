@@ -18,4 +18,7 @@ def validate(triples):
             print(k,v)
 
 if __name__ == '__main__':
-    validate(kgekit.io.read_triples(sys.argv[1], "hrt", " "))
+    triples, num_failed = kgekit.io.read_triples(sys.argv[1], "hrt", " ")
+    if num_failed > 0:
+        input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
+    validate(triples)
