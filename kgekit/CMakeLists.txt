@@ -106,10 +106,13 @@ function(_pybind11_add_lto_flags target_name prefer_thin_lto)
     endif()
 endfunction()
 
+find_package(Sanitizers)
+
 add_executable(kgekit_test ${TEST_SOURCES} ${PY_SOURCES} ${SOURCES})
 target_compile_features(kgekit_test PUBLIC cxx_std_17)
 target_link_libraries(kgekit_test PUBLIC Catch2::Catch PRIVATE kgekit_structs pybind11::pybind11 pybind11::embed pybind11::module)
 _pybind11_add_lto_flags(kgekit_test 1)
+add_sanitizers(kgekit_test)
 
 enable_testing()
 add_test(COMMAND bin/kgekit_test WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}/tests)
