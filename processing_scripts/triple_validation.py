@@ -9,13 +9,15 @@ def validate_10_relations(triples):
         h, r, t = kgekit.data.unpack(t)
         entities_relation[h].add(r)
         entities_relation[t].add(r)
-    entities_relation = dict((k, len(v)) for k, v in entities_relation.iteritems())
     deficit_entities = []
-    for k, v in entities_relation:
-        deficit_entities.append(k) if v < 10 else next
-    if len(deficit_entities) > 0:
+    for k, v in entities_relation.items():
+        deficit_entities.append(k) if len(v) < 10 else next
+    num_deficits = len(deficit_entities)
+    if num_deficits > 0:
         print(deficit_entities)
-        raise RuntimeError("Validation failed on some entities without sufficient relations")
+        print("------")
+        print(entities_relation)
+        raise RuntimeError(str(num_deficits) + " deficit entities found. Validation failed on some entities without sufficient relations")
 
 def validate_reverse(triples):
     mapping = defaultdict(list)
@@ -28,6 +30,7 @@ def validate_reverse(triples):
         reverse_triples.append(list(k) + v) if len(v) > 1 else next
     if len(reverse_triples) > 0:
         print(reverse_triples)
+        raise RuntimeError(str(len(reverse_triples)) + " reverse triples found.")
 
 
 def validate(triples):
