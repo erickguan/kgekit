@@ -145,7 +145,7 @@ void EntityNumberIndexer::buildIndex()
                 break;
             case 'r':
                 if (relation2id_->find(triple->relation) == relation2id_->end()) {
-                    idx = (*relation2id_)[triple->relation] = relation2id_->size();
+                    idx = (*relation2id_)[triple->relation] = relations_->size();
                     relations_->push_back(triple->relation);
                 } else {
                     idx = relation2id_->at(triple->relation);
