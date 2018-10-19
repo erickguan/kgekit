@@ -1,12 +1,10 @@
 package me.erickguan.kgekit.cli;
 
 import me.erickguan.kgekit.transformer.FileTransformer;
-import me.erickguan.kgekit.transformer.MatchingStrategy;
+import me.erickguan.kgekit.transformer.LabelMatchingStrategy;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,7 +38,7 @@ public class ExtractLabel implements Runnable {
                                                               labelOutputFilePath,
                                                               null,
                                                               null,
-                                                              new MatchingStrategy());
+                                                              new LabelMatchingStrategy());
             transfromer.transform();
         } catch (IOException e) {
             System.err.println("Failed to transform." + e.getMessage());

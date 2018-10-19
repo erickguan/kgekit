@@ -31,8 +31,8 @@ subprojects {
             doFirst {
                 options.compilerArgs = [
                         '--module-path', classpath.asPath,
-                        '--add-modules', 'junit',
-                        '--add-reads', "$moduleName=junit",
+                        '--add-modules', 'org.junit.jupiter.api',
+                        '--add-reads', "$moduleName=org.junit.jupiter.api",
                         '--patch-module', "$moduleName=" + files(sourceSets.test.java.srcDirs).asPath,
                 ]
                 classpath = files()
@@ -45,11 +45,12 @@ subprojects {
                 jvmArgs = [
                         '--module-path', classpath.asPath,
                         '--add-modules', 'ALL-MODULE-PATH',
-                        '--add-reads', "$moduleName=junit",
+                        '--add-reads', "$moduleName=org.junit.jupiter.api",
                         '--patch-module', "$moduleName=" + files(sourceSets.test.java.outputDir).asPath,
                 ]
                 classpath = files()
             }
+            useJUnitPlatform()
         }
 
         jar {

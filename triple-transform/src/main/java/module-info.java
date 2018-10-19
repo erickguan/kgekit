@@ -1,4 +1,4 @@
-module me.erickguan.kgekit.utils {
+module me.erickguan.kgekit.transition {
     exports me.erickguan.kgekit.transformer;
     exports me.erickguan.kgekit.writer;
     requires rdf4j.rio.api;

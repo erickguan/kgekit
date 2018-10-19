@@ -5,6 +5,7 @@ import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 
@@ -15,9 +16,13 @@ public class CountingTripleStrategy extends TransformStrategy {
 
     @Override
     public void transform(Transformer transformer) throws IOException {
-        Model model = getModel(transformer.getTripleInputStream());
-        Model stmts = gatherStatement(model);
+        var stmts = getStatements(transformer.getTripleInputStream());
         writeTriples(transformer.getTripleOutputStream(), stmts);
+    }
+
+    public Model getStatements(InputStream stream) throws IOException {
+        Model model = getModel(stream);
+        return gatherStatement(model);
     }
 
     private Model pullSubjectStatements(Model model, Resource value) {
@@ -43,7 +48,7 @@ public class CountingTripleStrategy extends TransformStrategy {
         HashMap<Resource, Integer> map = new HashMap<>();
         for (Resource subject : model.subjects()) {
             Model stmts = model.filter(subject, null, null);
-            if (stmts.predicates().size() <= numberOfLink) {
+            if (stmts.predicates().size() < numberOfLink) {
                 continue;
             }
             for (Statement stmt : stmts) {
@@ -57,7 +62,7 @@ public class CountingTripleStrategy extends TransformStrategy {
         HashMap<Value, Integer> map = new HashMap<>();
         for (Value object : model.objects()) {
             Model stmts = model.filter(null, null, object);
-            if (stmts.predicates().size() <= numberOfLink) {
+            if (stmts.predicates().size() < numberOfLink) {
                 continue;
             }
             for (Statement stmt : stmts) {

@@ -1,30 +1,61 @@
 package me.erickguan.kgekit.transformer;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 
 public class FileTransformer implements Transformer {
+    public FileTransformer(String triplePath,
+                           String tripleOutputPath,
+                           TransformStrategy strategy) throws InvalidPathException {
+        this(triplePath, tripleOutputPath, null, null, null, null, strategy);
+    }
+
+    public FileTransformer(String triplePath,
+                           String tripleOutputPath,
+                           String labelPath,
+                           String labelOutputPath,
+                           TransformStrategy strategy) throws InvalidPathException {
+        this(triplePath, tripleOutputPath, labelPath, labelOutputPath, null, null, strategy);
+    }
+
     public FileTransformer(String triplePath,
                            String tripleOutputPath,
                            String labelPath,
                            String labelOutputPath,
                            String literalPath,
                            String literalOutputPath,
-                           TransformStrategy strategy) throws FileNotFoundException {
-        this.tripleInputStream = openInputStream(triplePath);
-        this.tripleOutputStream = openOutputStream(tripleOutputPath);
-        this.labelInputStream = openInputStream(labelPath);
-        this.labelOutputStream = openOutputStream(labelOutputPath);
-        this.literalInputStream = openInputStream(literalPath);
-        this.literalOutputStream = openOutputStream(literalOutputPath);
+                           TransformStrategy strategy) throws InvalidPathException {
+        this.tripleInputPath = triplePath;
+        this.tripleOutputPath = tripleOutputPath;
+        this.labelInputPath = labelPath;
+        this.labelOutputPath = labelOutputPath;
+        this.literalInputPath = literalPath;
+        this.literalOutputPath = literalOutputPath;
         this.strategy = strategy;
     }
 
-    private FileInputStream openInputStream(String path) throws FileNotFoundException {
-        return path == null ? null : new FileInputStream(new File(path));
+    private InputStream openInputStream(String pathStr) throws IOException {
+        if (pathStr == null) {
+            throw new InvalidPathException("", "Path is empty");
+        }
+        var path = Paths.get(pathStr);
+        if (!Files.exists(path)) {
+            throw new FileNotFoundException();
+        }
+        return Files.newInputStream(path);
     }
 
-    private FileOutputStream openOutputStream(String path) throws FileNotFoundException {
-        return path == null ? null : new FileOutputStream(new File(path));
+    private OutputStream openOutputStream(String pathStr) throws IOException {
+        if (pathStr == null) {
+            throw new InvalidPathException("", "Path is empty");
+        }
+        var path = Paths.get(pathStr);
+        return Files.newOutputStream(path);
     }
 
     @Override
@@ -33,40 +64,40 @@ public class FileTransformer implements Transformer {
     }
 
     @Override
-    public FileInputStream getTripleInputStream() {
-        return tripleInputStream;
+    public InputStream getTripleInputStream() throws IOException {
+        return openInputStream(tripleInputPath);
     }
 
     @Override
-    public FileOutputStream getTripleOutputStream() {
-        return tripleOutputStream;
+    public OutputStream getTripleOutputStream() throws IOException {
+        return openOutputStream(tripleOutputPath);
     }
 
     @Override
-    public FileInputStream getLabelInputStream() {
-        return labelInputStream;
+    public InputStream getLabelInputStream() throws IOException {
+        return openInputStream(labelInputPath);
     }
 
     @Override
-    public FileOutputStream getLabelOutputStream() {
-        return labelOutputStream;
+    public OutputStream getLabelOutputStream() throws IOException {
+        return openOutputStream(labelOutputPath);
     }
 
     @Override
-    public FileInputStream getLiteralInputStream() {
-        return literalInputStream;
+    public InputStream getLiteralInputStream() throws IOException {
+        return openInputStream(literalInputPath);
     }
 
     @Override
-    public FileOutputStream getLiteralOutputStream() {
-        return literalOutputStream;
+    public OutputStream getLiteralOutputStream()  throws IOException {
+        return openOutputStream(literalOutputPath);
     }
 
-    private final FileInputStream tripleInputStream;
-    private final FileOutputStream tripleOutputStream;
-    private final FileInputStream labelInputStream;
-    private final FileOutputStream labelOutputStream;
-    private final FileInputStream literalInputStream;
-    private final FileOutputStream literalOutputStream;
+    private final String tripleInputPath;
+    private final String tripleOutputPath;
+    private final String labelInputPath;
+    private final String labelOutputPath;
+    private final String literalInputPath;
+    private final String literalOutputPath;
     private TransformStrategy strategy;
 }

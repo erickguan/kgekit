@@ -1,16 +1,16 @@
 package me.erickguan.kgekit.transformer;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.IOException;
 
 public interface Transformer {
     void transform() throws IOException;
 
-    FileInputStream getTripleInputStream();
-    FileOutputStream getTripleOutputStream();
-    FileInputStream getLabelInputStream();
-    FileOutputStream getLabelOutputStream();
-    FileInputStream getLiteralInputStream();
-    FileOutputStream getLiteralOutputStream();
+    InputStream getTripleInputStream() throws IOException;
+    OutputStream getTripleOutputStream() throws IOException;
+    InputStream getLabelInputStream() throws IOException;
+    OutputStream getLabelOutputStream() throws IOException;
+    InputStream getLiteralInputStream() throws IOException;
+    OutputStream getLiteralOutputStream() throws IOException;
 }

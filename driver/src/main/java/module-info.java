@@ -1,4 +1,4 @@
-open module me.erickguan.kgekit.cli {
-    requires me.erickguan.kgekit.utils;
+open module me.erickguan.kgekit.app {
+    requires me.erickguan.kgekit.transition;
     requires info.picocli;
 }

@@ -3,6 +3,8 @@ package me.erickguan.kgekit.writer;
 import org.eclipse.rdf4j.common.io.IndentingWriter;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.datatypes.XMLDatatypeUtil;
+import org.eclipse.rdf4j.model.impl.SimpleIRI;
+import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
 import org.eclipse.rdf4j.model.util.Literals;
 import org.eclipse.rdf4j.model.vocabulary.RDF;
 import org.eclipse.rdf4j.model.vocabulary.XMLSchema;
@@ -120,8 +122,8 @@ public class SimpleRDFWriter extends AbstractRDFWriter implements RDFWriter {
             wrapLine(true);
 
             // Write new predicate
-            writePredicate(pred);
-            wrapLine(true);
+            boolean writeSpace = writePredicate(pred);
+            wrapLine(writeSpace);
 
             writeValue(obj);
             writer.writeEOL();
@@ -143,17 +145,21 @@ public class SimpleRDFWriter extends AbstractRDFWriter implements RDFWriter {
         return;
     }
 
-    protected void writePredicate(IRI predicate)
+    protected boolean writePredicate(IRI predicate)
             throws IOException
     {
         if (predicate.equals(RDF.TYPE)) {
             // Write short-cut for rdf:type
             writer.write("a");
-        }
-        else {
+        } else if (predicate.equals(labelIRI)) {
+            return false;
+        } else {
             writeURI(predicate);
         }
+        return true;
     }
+    private static ValueFactory factory = SimpleValueFactory.getInstance();
+    private static IRI labelIRI = factory.createIRI("http://www.w3.org/2004/02/skos/core#prefLabel");
 
     /**
      * Writes a value, optionally shortening it if it is an {@link IRI} and has a namespace definition that is
