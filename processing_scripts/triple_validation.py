@@ -12,7 +12,7 @@ def validate_10_relations(triples):
         entities_relation[t].add(r)
     deficit_entities = []
     for k, v in entities_relation.items():
-        deficit_entities.append(kgekit.translation.get_triple_from_id(k)) if len(v) < 10 else next
+        deficit_entities.append(kgekit.translation.get_entity_from_id(k)) if len(v) < 10 else next
     num_deficits = len(deficit_entities)
     if num_deficits > 0:
         print(deficit_entities)
