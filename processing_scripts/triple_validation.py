@@ -4,7 +4,7 @@ import kgekit.io
 import kgekit.data
 import kgekit.translation
 
-def validate_10_relations(triples):
+def validate_10_relations(triples, indexer):
     entities_relation = defaultdict(set)
     for t in triples:
         h, r, t = kgekit.data.unpack(t)
@@ -12,7 +12,7 @@ def validate_10_relations(triples):
         entities_relation[t].add(r)
     deficit_entities = []
     for k, v in entities_relation.items():
-        deficit_entities.append(kgekit.translation.get_entity_from_id(k)) if len(v) < 10 else next
+        deficit_entities.append(kgekit.translation.get_entity_from_id(indexer, k)) if len(v) < 10 else next
     num_deficits = len(deficit_entities)
     if num_deficits > 0:
         print(deficit_entities)
@@ -20,7 +20,7 @@ def validate_10_relations(triples):
         print(entities_relation)
         raise RuntimeError(str(num_deficits) + " deficit entities found. Validation failed on some entities without sufficient relations")
 
-def validate_reverse(triples):
+def validate_reverse(triples, indexer):
     mapping = defaultdict(list)
     for t in indexes:
         h, r, t = kgekit.data.unpack(t)
@@ -37,8 +37,8 @@ def validate_reverse(triples):
 def validate(triples):
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
-    validate_10_relations(indexes)
-    validate_reverse(indexes)
+    validate_10_relations(indexes, indexer)
+    validate_reverse(indexes, indexer)
 
 if __name__ == '__main__':
     triples, num_failed = kgekit.io.read_triples(sys.argv[1], "hrt", " ")
