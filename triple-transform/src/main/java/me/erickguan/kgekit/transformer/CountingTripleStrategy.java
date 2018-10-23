@@ -6,6 +6,8 @@ import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -35,41 +37,41 @@ public class CountingTripleStrategy extends TransformStrategy {
 
     private Model gatherStatement(Model model) {
         Model stmts = new LinkedHashModel();
-        for (HashMap.Entry<Resource, Integer> subjEntry : this.getSubjects(model).entrySet()) {
-            stmts.addAll(pullSubjectStatements(model, subjEntry.getKey()));
+        for (Resource subjEntry : this.getSubjects(model)) {
+            stmts.addAll(pullSubjectStatements(model, subjEntry));
         }
-        for (HashMap.Entry<Value, Integer> objEntry : this.getObjects(model).entrySet()) {
-            stmts.addAll(pullObjectStatements(model, objEntry.getKey()));
+        for (Value objEntry : this.getObjects(model)) {
+            stmts.addAll(pullObjectStatements(model, objEntry));
         }
         return stmts;
     }
 
-    private HashMap<Resource, Integer> getSubjects(Model model) {
-        HashMap<Resource, Integer> map = new HashMap<>();
+    /*
+     * Make sure a subject has 10 relations
+     */
+    private ArrayList<Resource> getSubjects(Model model) {
+        var subjects = new ArrayList<Resource>();
         for (Resource subject : model.subjects()) {
             Model stmts = model.filter(subject, null, null);
-            if (stmts.predicates().size() < numberOfLink) {
-                continue;
-            }
-            for (Statement stmt : stmts) {
-                map.merge(stmt.getSubject(), 1, Integer::sum);
+            if (stmts.predicates().size() >= numberOfLink) {
+                subjects.add(subject);
             }
         }
-        return map;
+        return subjects;
     }
 
-    private HashMap<Value, Integer> getObjects(Model model) {
-        HashMap<Value, Integer> map = new HashMap<>();
+    /*
+     * Make sure a object has 10 relations
+     */
+    private ArrayList<Value> getObjects(Model model) {
+        var objects = new ArrayList<Value>();
         for (Value object : model.objects()) {
             Model stmts = model.filter(null, null, object);
-            if (stmts.predicates().size() < numberOfLink) {
-                continue;
-            }
-            for (Statement stmt : stmts) {
-                map.merge(stmt.getObject(), 1, Integer::sum);
+            if (stmts.predicates().size() >= numberOfLink) {
+                objects.add(object);
             }
         }
-        return map;
+        return objects;
     }
 
     private int numberOfLink;
