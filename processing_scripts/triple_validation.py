@@ -2,6 +2,7 @@ import sys
 from collections import defaultdict
 import kgekit.io
 import kgekit.data
+import kgekit.translation
 
 def validate_10_relations(triples):
     entities_relation = defaultdict(set)
@@ -11,7 +12,7 @@ def validate_10_relations(triples):
         entities_relation[t].add(r)
     deficit_entities = []
     for k, v in entities_relation.items():
-        deficit_entities.append(k) if len(v) < 10 else next
+        deficit_entities.append(kgekit.translation.get_triple_from_id(k)) if len(v) < 10 else next
     num_deficits = len(deficit_entities)
     if num_deficits > 0:
         print(deficit_entities)
