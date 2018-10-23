@@ -22,13 +22,17 @@ class MainTest(unittest.TestCase):
         self.assertEqual(kgekit.io.read_triples(self.triple_filename, "hrt", ' '),
                 ([kgekit.Triple("/m/entity1", "/produced_by", "/m/entity2"),
                     kgekit.Triple("/m/entity2", "/country", "/m/entity3"),
-                    kgekit.Triple("/m/entity1", "/produced_in", "/m/entity3")], 0))
+                    kgekit.Triple("/m/entity1", "/produced_in", "/m/entity3"),
+                    kgekit.Triple("/m/entity3", "/produced_in", "/m/entity4"),
+                    kgekit.Triple("/m/entity1", "/country", "/m/entity4")], 0))
         self.assertEqual(kgekit.io.read_triples(self.triple_filename, "htr", ' '),
                 ([kgekit.Triple("/m/entity1", "/m/entity2", "/produced_by"),
                     kgekit.Triple("/m/entity2", "/m/entity3", "/country"),
-                    kgekit.Triple("/m/entity1", "/m/entity3", "/produced_in")], 0)) # different order
+                    kgekit.Triple("/m/entity1", "/m/entity3", "/produced_in"),
+                    kgekit.Triple("/m/entity3", "/m/entity4", "/produced_in"),
+                    kgekit.Triple("/m/entity1", "/m/entity4", "/country")], 0)) # different order
         self.assertEqual(kgekit.io.read_triples(self.triple_filename, "hrt", '\t'),
-                ([], 3)) # can't parse
+                ([], 5)) # can't parse
         with self.assertRaises(FileNotFoundError):
             kgekit.io.read_triples("", "hrt", ' ') # wrong file
         with self.assertRaises(RuntimeError):
