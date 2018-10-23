@@ -11,7 +11,7 @@ def validate_10_relations(triples, getEntityFromId):
         entities_relation[t].add(r)
     deficit_entities = []
     for k, v in entities_relation.items():
-        deficit_entities.append(getEntityFromId(indexer, k)) if len(v) < 10 else next
+        deficit_entities.append(getEntityFromId(k)) if len(v) < 10 else next
     num_deficits = len(deficit_entities)
     if num_deficits > 0:
         print(deficit_entities)
