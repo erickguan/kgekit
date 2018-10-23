@@ -2,7 +2,6 @@ import sys
 from collections import defaultdict
 import kgekit.io
 import kgekit.data
-import kgekit.translation
 
 def validate_10_relations(triples, getEntityFromId):
     entities_relation = defaultdict(set)
