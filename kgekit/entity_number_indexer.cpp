@@ -158,4 +158,47 @@ void EntityNumberIndexer::buildIndex()
     }
 }
 
+optional<string> EntityNumberIndexer::getEntityFromId(uint32_t id)
+{
+    auto entities = getEntities();
+    if (id >= entities->size()) {
+        return {};
+    } else {
+        return { (*entities)[id] };
+    }
+}
+
+optional<string> EntityNumberIndexer::getRelationFromId(uint32_t id)
+{
+    auto relations = getRelations();
+    if (id >= relations->size()) {
+        return {};
+    } else {
+        return { (*relations)[id] };
+    }
+}
+
+optional<uint32_t> EntityNumberIndexer::getIdFromEntity(const string& entity)
+{
+    auto entity2id = getEntityIdMap();
+    const auto entity_id = entity2id->find(entity);
+    if (entity_id != entity2id->end()) {
+        return { entity_id->second };
+    } else {
+        return {};
+    }
+}
+
+optional<uint32_t> EntityNumberIndexer::getIdFromRelation(const string& relation)
+{
+    auto relation2id = getRelationIdMap();
+    const auto relation_id = relation2id->find(relation);
+    if (relation_id != relation2id->end()) {
+        return { relation_id->second };
+    } else {
+        return {};
+    }
+}
+
+
 } // namespace kgekit

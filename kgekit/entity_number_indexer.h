@@ -9,7 +9,6 @@
 #include <pybind11/pytypes.h>
 #include <pybind11/cast.h>
 #include "kgekit.h"
-#include "indexer.h"
 
 namespace kgekit {
 
@@ -19,7 +18,7 @@ using std::string;
 using std::make_shared;
 using std::unordered_map;
 
-class EntityNumberIndexer : public Indexer {
+class EntityNumberIndexer {
 public:
     EntityNumberIndexer(const pybind11::list& triples, const string& order);
     pybind11::dict entityIdMap();
@@ -27,11 +26,15 @@ public:
     pybind11::list indexes();
     pybind11::list entities();
     pybind11::list relations();
-    shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap() override;
-    shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap() override;
-    shared_ptr<vector<TripleIndex>> getIndexes() override;
-    shared_ptr<vector<string>> getEntities() override;
-    shared_ptr<vector<string>> getRelations() override;
+    shared_ptr<unordered_map<string, uint32_t>> getEntityIdMap();
+    shared_ptr<unordered_map<string, uint32_t>> getRelationIdMap();
+    shared_ptr<vector<TripleIndex>> getIndexes();
+    shared_ptr<vector<string>> getEntities();
+    shared_ptr<vector<string>> getRelations();
+    optional<string> getEntityFromId(uint32_t id);
+    optional<string> getRelationFromId(uint32_t id);
+    optional<uint32_t> getIdFromEntity(const string& entity);
+    optional<uint32_t> getIdFromRelation(const string& relation);
     bool isIndexBuilt() const; // public for testing
 private:
     void buildIndex();

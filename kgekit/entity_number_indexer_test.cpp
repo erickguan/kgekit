@@ -54,4 +54,37 @@ TEST_CASE_METHOD(IndexerTestsFixture, "returns indexes", "[indexing]")
             "relations were inserted."));
 }
 
+TEST_CASE_METHOD(IndexerTestsFixture, "gets entity from id", "[indexing]")
+{
+    auto indexer = getIndexer<EntityNumberIndexer>();
+    REQUIRE_THAT(indexer->getEntityFromId(1),
+                 Predicate<optional<string>>(
+                     [](const auto& res) { return *res == "/m/entity2"; }));
+}
+
+TEST_CASE_METHOD(IndexerTestsFixture, "gets relation from id", "[indexing]")
+{
+    auto indexer = getIndexer<EntityNumberIndexer>();
+    REQUIRE(indexer->getEntities()->size() != 0);
+    REQUIRE_THAT(indexer->getRelationFromId(1),
+                 Predicate<optional<string>>(
+                     [](const auto& res) { return *res == "/country"; }));
+}
+
+TEST_CASE_METHOD(IndexerTestsFixture, "gets entity id from string", "[indexing]")
+{
+    auto indexer = getIndexer<EntityNumberIndexer>();
+    REQUIRE_THAT(indexer->getIdFromEntity("/m/entity1"),
+                 Predicate<optional<uint32_t>>(
+                     [](const auto& res) { return *res == 0; }));
+}
+
+TEST_CASE_METHOD(IndexerTestsFixture, "gets relation id from string", "[indexing]")
+{
+    auto indexer = getIndexer<EntityNumberIndexer>();
+    REQUIRE_THAT(indexer->getIdFromRelation("/produced_by"),
+                 Predicate<optional<uint32_t>>(
+                     [](const auto& res) { return *res == 0; }));
+}
+
 } // namespace kgekit

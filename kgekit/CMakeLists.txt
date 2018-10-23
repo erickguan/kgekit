@@ -22,9 +22,9 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
     set(FS_LIBRARY stdc++fs)
 endif()
 
-set(SOURCES kgekit.h kgekit_impl.cpp translation.cpp indexer.h translation.h)
+set(SOURCES kgekit.h kgekit_impl.cpp)
 set(PY_SOURCES kgekit.cpp entity_number_indexer.cpp)
-set(TEST_SOURCES test_helper.cpp kgekit_impl_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h translation_test.cpp translation.h test_helper.h)
+set(TEST_SOURCES test_helper.cpp kgekit_impl_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h test_helper.h)
 
 add_library(kgekit_impl ${SOURCES})
 target_compile_features(kgekit_impl PUBLIC cxx_std_17)
