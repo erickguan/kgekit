@@ -24,7 +24,11 @@ public class CountingTripleStrategy extends TransformStrategy {
 
     public Model getStatements(InputStream stream) throws IOException {
         Model model = getModel(stream);
-        return gatherStatement(model);
+        var size = model.size();
+        do {
+            model = gatherStatement(model);
+        } while (size != model.size());
+        return model;
     }
 
     private Model pullSubjectStatements(Model model, Resource value) {
