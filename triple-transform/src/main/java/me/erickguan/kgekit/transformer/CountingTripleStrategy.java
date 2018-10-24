@@ -25,8 +25,8 @@ public class CountingTripleStrategy extends TransformStrategy {
                 incomingRels = new LinkedList<>();
                 outgoingRels = new LinkedList<>();
             }
-            LinkedList<AbstractMap.SimpleImmutableEntry<Integer, IRI>> incomingRels;
-            LinkedList<AbstractMap.SimpleImmutableEntry<Integer, IRI>> outgoingRels;
+            LinkedList<Integer> incomingRels;
+            LinkedList<Integer> outgoingRels;
         }
         /*
          * A mapping system from Id to Resource+Value.
@@ -73,10 +73,12 @@ public class CountingTripleStrategy extends TransformStrategy {
             plucked = new boolean[size];
 
             for (var stmt : model) {
-                var outNode = graph[valueIds.get(stmt.getSubject().toString())];
-                outNode.outgoingRels.add(new AbstractMap.SimpleImmutableEntry<>(valueIds.get(stmt.getObject().toString()), stmt.getPredicate()));
-                var inNode = graph[valueIds.get(stmt.getObject().toString())];
-                inNode.incomingRels.add(new AbstractMap.SimpleImmutableEntry<>(valueIds.get(stmt.getSubject().toString()), stmt.getPredicate())) ;
+                var subjId = valueIds.get(stmt.getSubject().toString());
+                var objId = valueIds.get(stmt.getObject().toString());
+                var outNode = graph[subjId];
+                outNode.outgoingRels.add(objId);
+                var inNode = graph[objId];
+                inNode.incomingRels.add(subjId);
             }
         }
 
@@ -101,8 +103,7 @@ public class CountingTripleStrategy extends TransformStrategy {
                 }
                 visited[t] = true;
 
-                for (var v: graph[t].outgoingRels) {
-                    var obj = v.getKey();
+                for (var obj: graph[t].outgoingRels) {
                     if (!visited[obj]) {
                         queue.add(obj);
                     }
@@ -111,8 +112,7 @@ public class CountingTripleStrategy extends TransformStrategy {
                         weight[obj]--;
                     }
                 }
-                for (var v: graph[t].incomingRels) {
-                    var obj = v.getKey();
+                for (var obj: graph[t].incomingRels) {
                     if (!visited[obj]) {
                         queue.add(obj);
                     }
@@ -169,12 +169,7 @@ public class CountingTripleStrategy extends TransformStrategy {
 
     public Model getStatements(InputStream stream) throws IOException {
         Model model = getModel(stream);
-        var size = model.size();
-        while (true) {
-            model = gatherStatement(model);
-            if (size == model.size()) { break; }
-        }
-        return model;
+        return gatherStatement(model);
     }
 
     private Model gatherStatement(Model model) {
@@ -185,18 +180,18 @@ public class CountingTripleStrategy extends TransformStrategy {
     private Model getCountStatements(Model model, Set<Resource> resources, Set<Value> values) {
         var res = new LinkedHashModel();
         for (var subj : resources) {
-            Model entities = model.filter(subj, null, null);
-            for (var ent : entities) {
-                if (values.contains(ent.getObject())) {
-                    res.add(ent);
+            Model stmts = model.filter(subj, null, null);
+            for (var stmt : stmts) {
+                if (values.contains(stmt.getObject())) {
+                    res.add(stmt);
                 }
             }
         }
         for (var obj : values) {
-            Model entities = model.filter(null, null, obj);
-            for (var ent : entities) {
-                if (resources.contains(ent.getSubject())) {
-                    res.add(ent);
+            Model stmts = model.filter(null, null, obj);
+            for (var stmt : stmts) {
+                if (resources.contains(stmt.getSubject())) {
+                    res.add(stmt);
                 }
             }
         }
