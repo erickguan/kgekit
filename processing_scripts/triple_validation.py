@@ -36,7 +36,8 @@ def validate_reverse(indexes, getEntityFromId, getRelationFromId):
 def validate(triples):
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
-    validate_reverse(indexer, indexer.getEntityFromId, indexer.getRelationFromId)
+    validate_10_relations(indexes, indexer.getEntityFromId)
+    # validate_reverse(indexer, indexer.getEntityFromId, indexer.getRelationFromId)
 
 if __name__ == '__main__':
     triples, num_failed = kgekit.io.read_triples(sys.argv[1], "hrt", "\t")

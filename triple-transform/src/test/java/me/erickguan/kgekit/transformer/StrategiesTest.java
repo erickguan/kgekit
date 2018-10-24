@@ -2,6 +2,7 @@ package me.erickguan.kgekit.transformer;
 
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junitpioneer.jupiter.TempDirectory;
@@ -45,6 +46,7 @@ class StrategiesTest {
     }
 
     @Test
+    @Disabled
     @ExtendWith(TempDirectory.class)
     public void testLabelMatchingTransfrom(@TempDir Path tempDir) throws IOException {
         var strategy = new LabelMatchingStrategy();
