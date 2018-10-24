@@ -5,8 +5,8 @@ import kgekit.data
 
 def validate_10_relations(triples, getEntityFromId):
     entities_relation = defaultdict(set)
-    for t in triples:
-        h, r, t = kgekit.data.unpack(t)
+    for triple in triples:
+        h, r, t = kgekit.data.unpack(triple)
         entities_relation[h].add((t,r))
         entities_relation[t].add((h,r))
     deficit_entities = []
@@ -21,8 +21,8 @@ def validate_10_relations(triples, getEntityFromId):
 
 def validate_reverse(indexes, getEntityFromId, getRelationFromId):
     mapping = defaultdict(list)
-    for t in indexes:
-        h, r, t = kgekit.data.unpack(t)
+    for triple in indexes:
+        h, r, t = kgekit.data.unpack(triple)
         entity_pair = frozenset([h,t])
         mapping[entity_pair].append((h,r,t))
     reverse_triples = []
