@@ -50,22 +50,23 @@ def remove10(filename, out_filename):
         input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
-    entities_relation = _ent_rels(triples)
+    entities_relation = _ent_rels(indexes)
     removed_ents = 0
     removed_triples = 0
-    with open(filename, 'r') as f:
-        data = f.read()
+    original = set(indexes)
+    toDeleted = set()
     for ent, pairs in entities_relation.items():
         if len(pairs) < 10:
             removed_ents += 1
             for other_ent, rel in pairs:
-                triple = indexer.getEntityFromId(ent) + seperator + indexer.getRelationFromId(rel) + seperator + indexer.getEntityFromId(other_ent) + "\n"
-                data = data.replace(triple, '')
+                toDeleted.add(kgekit.TripleIndex(ent, rel, other_ent))
                 removed_triples += 1
+
     print("Removed entities " + removed_ents)
     print("Removed triples " + removed_triples)
     with open(out_filename, 'w') as f:
-        f.write(data)
+        for idx in original - toDeleted:
+            f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
 
 
 if __name__ == '__main__':
