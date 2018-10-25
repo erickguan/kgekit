@@ -104,7 +104,7 @@ def remove_reverse(filename, out_filename):
     to_deleted = set()
     for reverses in reverse_triples:
         sampled = random.sample(reverses, 1)
-        to_deleted.add(sampled)
+        to_deleted.add(sampled[0])
 
     new_set = original - to_deleted
     removed_reverse = len(original) - len(new_set)
