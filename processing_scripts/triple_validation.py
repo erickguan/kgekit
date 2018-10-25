@@ -62,8 +62,8 @@ def remove10(filename, out_filename):
                 toDeleted.add(kgekit.TripleIndex(ent, rel, other_ent))
                 removed_triples += 1
 
-    print("Removed entities " + removed_ents)
-    print("Removed triples " + removed_triples)
+    print("Removed entities " + str(removed_ents))
+    print("Removed triples " + str(removed_triples))
     with open(out_filename, 'w') as f:
         for idx in original - toDeleted:
             f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
