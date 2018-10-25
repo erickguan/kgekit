@@ -14,9 +14,6 @@
 <2015â€“16_Syed_Mushtaq_Ali_Trophy_Group_A>	skos:prefLabel	"2015â€“16 Syed Mushtaq Ali Trophy Group A"@eng .
 <Armchair_Science>	skos:prefLabel	"Armchair Science"@eng .
 <Valiente_(2012_TV_series)>	skos:prefLabel	"Valiente (2012 TV series)"@eng .
-<fake9.>	skos:prefLabel	"fake9" .
-<fake0.>	skos:prefLabel	"fake0"@fr .
-<d1.>	skos:prefLabel	"aw"@fr .
 <Solar_eclipse_of_November_14,_2050>	skos:prefLabel	"Solar eclipse of November 14, 2050"@eng .
 <de/Caught_in_the_Act_(Film)>	skos:prefLabel	"Caught in the Act (Film)"@eng .
 <Imperator_torosus>	skos:prefLabel	"Imperator torosus"@eng .

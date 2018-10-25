@@ -1,2 +1,15 @@
-fake0. "fake0"@fr
-d1. "aw"@fr
+yagoTheme_yagoLiteralFacts hasGloss "This file is part of the ontology YAGO3. It is licensed under a Creative-Commons Attribution License by the YAGO team at the Max Planck Institute for Informatics/Germany. See http://yago-knowledge.org for all details. This file was generated on 2017-06-19 T 08:01:29.0837. All facts of YAGO that contain literals (except labels) CORE"
+Administrative_Office_of_the_United_States_Courts "Administrative Office of the United States Courts"@eng
+ar/Ø±ØºØ¯_Ø³Ù„Ø§Ù…Ø© "Ø±ØºØ¯ Ø³Ù„Ø§Ù…Ø©"@eng
+de/Heinrich_Eweler "Heinrich Eweler"@eng
+2015â€“16_Syed_Mushtaq_Ali_Trophy_Group_A "2015â€“16 Syed Mushtaq Ali Trophy Group A"@eng
+Armchair_Science "Armchair Science"@eng
+Valiente_(2012_TV_series) "Valiente (2012 TV series)"@eng
+Solar_eclipse_of_November_14,_2050 "Solar eclipse of November 14, 2050"@eng
+de/Caught_in_the_Act_(Film) "Caught in the Act (Film)"@eng
+Imperator_torosus "Imperator torosus"@eng
+Carlos_Eduardo_GutiÃ©rrez "Carlos Eduardo GutiÃ©rrez"@eng
+Dr._Chester_Hunt_Office "Dr. Chester Hunt Office"@eng
+Bhaba_Pagla "Bhaba Pagla"@eng
+1930_Peruvian_Primera_DivisiÃ³n "1930 Peruvian Primera DivisiÃ³n"@eng
+de/Hioki_Eki "Hioki Eki"@eng

@@ -1,7 +1,7 @@
 package me.erickguan.kgekit.cli;
 
 import me.erickguan.kgekit.transformer.FileTransformer;
-import me.erickguan.kgekit.transformer.LabelMatchingStrategy;
+import me.erickguan.kgekit.transformer.DirectStrategy;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
@@ -13,9 +13,6 @@ import java.nio.file.Paths;
 @Command(name="extractLabel", description="Extract labels from files.")
 public class ExtractLabel implements Runnable {
 
-    @Option(names = "--triple_file", required = true, description = "triple file location")
-    String tripleFilePath;
-
     @Option(names = "--label_file", required = true, description = "label file location")
     String labelFilePath;
 
@@ -23,22 +20,18 @@ public class ExtractLabel implements Runnable {
     String labelOutputFilePath;
 
     public void run() {
-        Path path = Paths.get(tripleFilePath);
-        if (!Files.exists(path)) {
-            System.err.println("Can't find triple file at " + tripleFilePath);
-        }
-        path = Paths.get(labelFilePath);
+        var path = Paths.get(labelFilePath);
         if (!Files.exists(path)) {
             System.err.println("Can't find label file at " + labelFilePath);
         }
         try {
-            FileTransformer transfromer = new FileTransformer(tripleFilePath,
+            FileTransformer transfromer = new FileTransformer(null,
                                                               null,
                                                               labelFilePath,
                                                               labelOutputFilePath,
                                                               null,
                                                               null,
-                                                              new LabelMatchingStrategy());
+                                                              new DirectStrategy());
             transfromer.transform();
         } catch (IOException e) {
             System.err.println("Failed to transform." + e.getMessage());

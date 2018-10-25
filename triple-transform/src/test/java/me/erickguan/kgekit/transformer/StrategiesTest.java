@@ -46,13 +46,12 @@ class StrategiesTest {
     }
 
     @Test
-    @Disabled
     @ExtendWith(TempDirectory.class)
     public void testLabelMatchingTransfrom(@TempDir Path tempDir) throws IOException {
-        var strategy = new LabelMatchingStrategy();
+        var strategy = new DirectStrategy();
         var outputPath = tempDir.resolve("tripleLabelOut.txt");
         var transformer = new FileTransformer(
-                triplePath,
+                null,
                 null,
                 tripleLabelPath,
                 outputPath.toString(),
