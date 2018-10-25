@@ -52,7 +52,6 @@ def remove10(filename, out_filename):
     indexes = indexer.indexes()
     entities_relation = _ent_rels(indexes)
     removed_ents = 0
-    removed_triples = 0
     original = set(indexes)
     toDeleted = set()
     for ent, pairs in entities_relation.items():
@@ -60,12 +59,14 @@ def remove10(filename, out_filename):
             removed_ents += 1
             for other_ent, rel in pairs:
                 toDeleted.add(kgekit.TripleIndex(ent, rel, other_ent))
-                removed_triples += 1
+                toDeleted.add(kgekit.TripleIndex(other_ent, rel, ent))
+    new_set = original - toDeleted
+    removed_triples = len(original) - len(new_set)
 
     print("Removed entities " + str(removed_ents))
     print("Removed triples " + str(removed_triples))
     with open(out_filename, 'w') as f:
-        for idx in original - toDeleted:
+        for idx in new_set:
             f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
 
 
