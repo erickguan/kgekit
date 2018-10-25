@@ -31,15 +31,19 @@ def validate_10_relations(triples, getEntityFromId):
         print(entities_relation)
         raise RuntimeError(str(num_deficits) + " deficit entities found. Validation failed on some entities without sufficient relations")
 
-def validate_reverse(indexes, getEntityFromId, getRelationFromId):
+def _get_reverse_triples(triples):
     mapping = defaultdict(list)
     for triple in indexes:
         h, r, t = kgekit.data.unpack(triple)
         entity_pair = frozenset([h,t])
-        mapping[entity_pair].append((h,r,t))
+        mapping[entity_pair].append(triple)
     reverse_triples = []
     for k,v in mapping.items():
         reverse_triples.append(v) if len(v) > 1 else next
+    return reverse_triples
+
+def validate_reverse(indexes, getEntityFromId, getRelationFromId):
+    reverse_triples = _get_reverse_triples(indexes)
     if len(reverse_triples) > 0:
         print(reverse_triples)
         raise RuntimeError(str(len(reverse_triples)) + " reverse triples found.")
@@ -76,11 +80,30 @@ def remove10(filename, out_filename):
             f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
 
 
+def remove_reverse(filename, out_filename):
+    seperator = " "
+    triples, num_failed = kgekit.io.read_triples(filename, "hrt", seperator)
+    if num_failed > 0:
+        input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
+    indexer = kgekit.EntityNumberIndexer(triples, "hrt")
+    indexes = indexer.indexes()
+    reverse_triples = _get_reverse_triples(indexes)
+    print(reverse_triples)
+    # print("Removed entities " + str(removed_ents))
+    # print("Removed triples " + str(removed_triples))
+    # with open(out_filename, 'w') as f:
+    #     for idx in new_set:
+    #         f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
+
+
+
 if __name__ == '__main__':
     if 'validate' == sys.argv[1]:
         triples, num_failed = kgekit.io.read_triples(sys.argv[2], "hrt", " ")
         if num_failed > 0:
             input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
         validate(triples)
-    if 'remove_10' == sys.argv[1]:
+    elif 'remove_10' == sys.argv[1]:
         remove10(sys.argv[2], sys.argv[3])
+    elif 'remove_reverse' == sys.argv[1]:
+        remove_reverse(sys.argv[2], sys.argv[3])
