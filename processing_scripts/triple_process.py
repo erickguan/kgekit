@@ -31,9 +31,9 @@ def validate_10_relations(triples, getEntityFromId):
         print(entities_relation)
         raise RuntimeError(str(num_deficits) + " deficit entities found. Validation failed on some entities without sufficient relations")
 
-def _get_reverse_triples(triples):
+def _get_reverse_triples(triple_indexes):
     mapping = defaultdict(list)
-    for triple in indexes:
+    for triple in triple_indexes:
         h, r, t = kgekit.data.unpack(triple)
         entity_pair = frozenset([h,t])
         mapping[entity_pair].append(triple)
