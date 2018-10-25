@@ -56,7 +56,7 @@ def validate(triples):
     validate_10_relations(indexes, indexer.getEntityFromId)
     validate_reverse(indexes, indexer.getEntityFromId, indexer.getRelationFromId)
 
-def _write_triple(out_filename, new_set, indexer):
+def _write_triple(out_filename, new_set, indexer, seperator):
     with open(out_filename, 'w') as f:
         for idx in new_set:
             f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
@@ -81,7 +81,7 @@ def remove10(filename, out_filename):
 
     print("Removed entities " + str(removed_ents))
     print("Removed triples " + str(removed_triples))
-    _write_triple(out_filename, new_set, indexer)
+    _write_triple(out_filename, new_set, indexer, seperator)
 
 
 def remove_reverse(filename, out_filename):
@@ -109,7 +109,7 @@ def remove_reverse(filename, out_filename):
     new_set = original - to_deleted
     removed_reverse = len(original) - len(new_set)
     print("Removed reverse " + str(removed_reverse))
-    _write_triple(out_filename, new_set, indexer)
+    _write_triple(out_filename, new_set, indexer, seperator)
 
 
 if __name__ == '__main__':
