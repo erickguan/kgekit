@@ -3,7 +3,7 @@ from collections import defaultdict
 import kgekit.io
 import kgekit.data
 
-def _ent_rels(triples):
+def _get_ent_rels(triples):
     entities_relation = defaultdict(set)
     for triple in triples:
         h, r, t = kgekit.data.unpack(triple)
@@ -11,8 +11,16 @@ def _ent_rels(triples):
         entities_relation[t].add((h,r))
     return entities_relation
 
+def _get_deficit_ents(triples):
+    ent_rels = _get_ent_rels(triples)
+    deficit_entities = []
+    for k, v in ent_rels.items():
+        deficit_entities.append(k) if len(v) < 10 else next
+    return frozenset(deficit_entities)
+
+
 def validate_10_relations(triples, getEntityFromId):
-    entities_relation = _ent_rels(triples)
+    entities_relation = _get_ent_rels(triples)
     deficit_entities = []
     for k, v in entities_relation.items():
         deficit_entities.append(getEntityFromId(k)) if len(v) < 10 else next
@@ -41,7 +49,7 @@ def validate(triples):
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
     validate_10_relations(indexes, indexer.getEntityFromId)
-    validate_reverse(indexer, indexer.getEntityFromId, indexer.getRelationFromId)
+    validate_reverse(indexes, indexer.getEntityFromId, indexer.getRelationFromId)
 
 def remove10(filename, out_filename):
     seperator = " "
@@ -50,16 +58,14 @@ def remove10(filename, out_filename):
         input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
-    entities_relation = _ent_rels(indexes)
-    removed_ents = 0
+    ents = _get_deficit_ents(indexes)
+    removed_ents = len(ents)
     original = set(indexes)
     toDeleted = set()
-    for ent, pairs in entities_relation.items():
-        if len(pairs) < 10:
-            removed_ents += 1
-            for other_ent, rel in pairs:
-                toDeleted.add(kgekit.TripleIndex(ent, rel, other_ent))
-                toDeleted.add(kgekit.TripleIndex(other_ent, rel, ent))
+    for triple in indexes:
+        h, r, t = kgekit.data.unpack(triple)
+        if h in ents or t in ents:
+            toDeleted.add(triple)
     new_set = original - toDeleted
     removed_triples = len(original) - len(new_set)
 
