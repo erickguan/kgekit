@@ -48,12 +48,16 @@ def validate_reverse(indexes, getEntityFromId, getRelationFromId):
         print(reverse_triples)
         raise RuntimeError(str(len(reverse_triples)) + " reverse triples found.")
 
-
 def validate(triples):
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
     validate_10_relations(indexes, indexer.getEntityFromId)
     validate_reverse(indexes, indexer.getEntityFromId, indexer.getRelationFromId)
+
+def _write_triple(out_filename, new_set, indexer):
+    with open(out_filename, 'w') as f:
+        for idx in new_set:
+            f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
 
 def remove10(filename, out_filename):
     seperator = " "
@@ -65,19 +69,17 @@ def remove10(filename, out_filename):
     ents = _get_deficit_ents(indexes)
     removed_ents = len(ents)
     original = set(indexes)
-    toDeleted = set()
+    to_deleted = set()
     for triple in indexes:
         h, r, t = kgekit.data.unpack(triple)
         if h in ents or t in ents:
-            toDeleted.add(triple)
-    new_set = original - toDeleted
+            to_deleted.add(triple)
+    new_set = original - to_deleted
     removed_triples = len(original) - len(new_set)
 
     print("Removed entities " + str(removed_ents))
     print("Removed triples " + str(removed_triples))
-    with open(out_filename, 'w') as f:
-        for idx in new_set:
-            f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
+    _write_triple(out_filename, new_set, indexer)
 
 
 def remove_reverse(filename, out_filename):
@@ -87,14 +89,25 @@ def remove_reverse(filename, out_filename):
         input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
+    original = frozenset(indexes)
     reverse_triples = _get_reverse_triples(indexes)
     print(reverse_triples)
-    # print("Removed entities " + str(removed_ents))
-    # print("Removed triples " + str(removed_triples))
-    # with open(out_filename, 'w') as f:
-    #     for idx in new_set:
-    #         f.write(indexer.getEntityFromId(idx.head) + seperator + indexer.getRelationFromId(idx.relation) + seperator + indexer.getEntityFromId(idx.tail) + "\n")
 
+    # maybe saved it somewhere
+    freqs = defaultdict(int)
+    for reverses in reverse_triples:
+        for r in reverses:
+            freqs[r.relation] += 1
+
+    to_deleted = set()
+    for reverses in reverse_triples:
+        sampled = random.sample(reverses, 1)
+        to_deleted.add(sampled)
+
+    new_set = original - to_deleted
+    removed_reverse = len(original) - len(new_set)
+    print("Removed reverse " + str(removed_reverse))
+    _write_triple(out_filename, new_set, indexer)
 
 
 if __name__ == '__main__':
