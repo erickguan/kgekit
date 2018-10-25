@@ -2,6 +2,8 @@ import sys
 from collections import defaultdict
 import kgekit.io
 import kgekit.data
+import random
+
 
 def _get_ent_rels(triples):
     entities_relation = defaultdict(set)
@@ -91,13 +93,13 @@ def remove_reverse(filename, out_filename):
     indexes = indexer.indexes()
     original = frozenset(indexes)
     reverse_triples = _get_reverse_triples(indexes)
-    print(reverse_triples)
 
     # maybe saved it somewhere
     freqs = defaultdict(int)
     for reverses in reverse_triples:
         for r in reverses:
             freqs[r.relation] += 1
+    print(freqs)
 
     to_deleted = set()
     for reverses in reverse_triples:
