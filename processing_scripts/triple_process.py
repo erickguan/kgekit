@@ -108,7 +108,7 @@ def remove_reverse(filename, out_filename):
 
     new_set = original - to_deleted
     removed_reverse = len(original) - len(new_set)
-    print("Removed reverse " + str(removed_reverse))
+    print("Removed reverse triples " + str(removed_reverse))
     _write_triple(out_filename, new_set, indexer, seperator)
 
 
