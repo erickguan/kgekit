@@ -3,18 +3,19 @@ package me.erickguan.kgekit.transformer;
 import org.eclipse.rdf4j.model.*;
 import org.eclipse.rdf4j.model.Value;
 import org.eclipse.rdf4j.model.impl.LinkedHashModel;
-import org.eclipse.rdf4j.model.impl.SimpleValueFactory;
-import org.eclipse.rdf4j.model.util.Models;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Array;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
 public class CountingTripleStrategy extends TransformStrategy {
+    Logger logger = LoggerFactory.getLogger(CountingTripleStrategy.class);
+
     /*
      * Graph is directed without loop. We need to calculate the sum of indegree and outdegree of
      * all vertices.
@@ -125,6 +126,8 @@ public class CountingTripleStrategy extends TransformStrategy {
             for (var i = 0; i < graph.length; ++i) {
                 assert visited[i];
                 if (weight[i] >= numCount) {
+                    var key = (resourceMap[i] != null ? resourceMap[i].toString() : valueMap[i].toString());
+                    logger.debug("i=" + i + ", " + key + "=" + weight[i]);
                     plucked[i] = true;
                 }
             }
@@ -133,6 +136,7 @@ public class CountingTripleStrategy extends TransformStrategy {
         HashSet<Resource> getResources() {
             if (!searched) {
                 countValue(numberOfLink);
+                searched = true;
             }
             var res = new HashSet<Resource>();
             for (var i = 0; i < graph.length; ++i) {
@@ -146,6 +150,7 @@ public class CountingTripleStrategy extends TransformStrategy {
         HashSet<Value> getValues() {
             if (!searched) {
                 countValue(numberOfLink);
+                searched = true;
             }
             var res = new HashSet<Value>();
             for (var i = 0; i < graph.length; ++i) {

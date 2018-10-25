@@ -40,7 +40,7 @@ def validate(triples):
     # validate_reverse(indexer, indexer.getEntityFromId, indexer.getRelationFromId)
 
 if __name__ == '__main__':
-    triples, num_failed = kgekit.io.read_triples(sys.argv[1], "hrt", " ")
+    triples, num_failed = kgekit.io.read_triples(sys.argv[1], "hrt", "\t")
     if num_failed > 0:
         input("Failed reading " + str(num_failed) + " triple(s). Press Enter to continue...")
     validate(triples)
