@@ -30,3 +30,9 @@ def read_triples(filename, triple_order="hrt", delimiter='\t'):
         num_none = len(indexes) - len(filtered)
         return filtered, num_none
 
+def read_labels(filename, delimiter='\t'):
+    """read label files. Format: ent label"""
+    _assert_good_file(filename)
+    with open(filename) as f:
+        labels = [l.rstrip().split(delimiter) for l in f]
+        return labels

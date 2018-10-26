@@ -5,6 +5,7 @@ import kgekit.io
 class MainTest(unittest.TestCase):
     triple_index_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'triple_index.txt')
     triple_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'triple.txt')
+    label_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'labels.txt')
 
     def test_read_triple_indexes(self):
         self.assertEqual(kgekit.io.read_triple_indexes(self.triple_index_filename, "hrt", ' '),
@@ -37,6 +38,9 @@ class MainTest(unittest.TestCase):
             kgekit.io.read_triples("", "hrt", ' ') # wrong file
         with self.assertRaises(RuntimeError):
             kgekit.io.read_triples(self.triple_filename, "hrr", ' ') # wrong order
+
+    def test_labels(self):
+        self.assertEqual(kgekit.io.read_labels(self.label_filename, ' '), [["aa", '"eng"@eng'], ["bb", '"fr"@fr']])
 
 
 if __name__ == '__main__':
