@@ -5,7 +5,7 @@ def strip_labels(filename):
     labels = []
     with open(filename) as f, open('processed_labels.txt', 'w') as f1:
         for l in f:
-            if l[0] == '#':
+            if l.startswith('#'):
                 next
             l = l.replace(" .", '')
             l = l.replace(">\tskos:prefLabel\t", ' ')
