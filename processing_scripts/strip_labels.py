@@ -10,6 +10,7 @@ def strip_labels(filename):
             l = l.replace(" .", '')
             l = l.replace(">\tskos:prefLabel\t", ' ')
             l = l.replace("<", '')
+            l = l.replace(">\trdfs:label\t", ' ')
             f1.write(l)
 
 if __name__ == '__main__':

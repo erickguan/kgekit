@@ -10,7 +10,7 @@ def match_triple_labels(triple_filename):
     chained_triple = chain([(t.head, t.tail) for t in triples])
     entities = frozenset(chained_triple)
     labels = kgekit.io.read_labels(triple_filename, ' ')
-    filtered_labels = list(dropwhile(lambda x: x[0] in entities, labels))
+    filtered_labels = list(dropwhile(lambda x: x[0] not in entities, labels))
     return filtered_labels
 
 if __name__ == '__main__':
