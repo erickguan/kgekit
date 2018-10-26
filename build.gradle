@@ -64,3 +64,6 @@ subprojects {
 
 // end::run[]
 
+tasks.withType(JavaExec) {
+    jvmArgs = ['-Xms512m', '-Xmx20G']
+}
