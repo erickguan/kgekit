@@ -2,6 +2,9 @@
 
 from pathlib import Path
 import kgekit
+import kgekit.triple_index_pb2 as triple_pb
+
+DEFAULT_DELIMITER=' '
 
 def _assert_good_file(filename):
     path = Path(filename)
@@ -12,7 +15,7 @@ def _assert_triple_order(order):
     if frozenset(order) != frozenset('hrt'):
         raise RuntimeError("Wrong triple order.")
 
-def read_triple_indexes(filename, triple_order="hrt", delimiter='\t'):
+def read_triple_indexes(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER):
     _assert_good_file(filename)
     _assert_triple_order(triple_order)
     with open(filename) as f:
@@ -21,7 +24,7 @@ def read_triple_indexes(filename, triple_order="hrt", delimiter='\t'):
         num_none = len(indexes) - len(filtered)
         return filtered, num_none
 
-def read_triples(filename, triple_order="hrt", delimiter='\t'):
+def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER):
     _assert_good_file(filename)
     _assert_triple_order(triple_order)
     with open(filename) as f:
@@ -36,3 +39,29 @@ def read_labels(filename, delimiter='\t'):
     with open(filename) as f:
         labels = [l.rstrip().split(delimiter) for l in f]
         return labels
+
+def write_index_translation(translation_filename, entity_ids, relation_ids, delimiter=DEFAULT_DELIMITER):
+    """write triples into a translation file."""
+    translation = triple_pb.Translation()
+    entities = []
+    for name, index in entity_ids.items():
+        translation.entities[name] = index
+    relations = []
+    for name, index in relation_ids.items():
+        translation.relations[name] = index
+    with open(translation_filename, "wb") as f:
+        f.write(translation.SerializeToString())
+
+def write_triples(filename, triples, delimiter=DEFAULT_DELIMITER):
+    """write triples to file."""
+    with open(filename, 'w') as f:
+        for t in triples:
+            line = t.serialize(delimiter)
+            f.write(line + "\n")
+
+def read_translation(filename):
+    """Returns protobuf mapcontainer. Read from translation file."""
+    translation = triple_pb.Translation()
+    with open(filename, "rb") as f:
+        translation.ParseFromString(f.read())
+    return (translation.entities, translation.relations)

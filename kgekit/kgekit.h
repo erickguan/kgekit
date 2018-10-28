@@ -17,6 +17,8 @@
 #include <optional>
 #endif
 
+#include <fmt/format.h>
+
 namespace kgekit {
 
 using std::string;
@@ -48,7 +50,7 @@ const auto kBufferSize = 128;
 
 /*
  * Low level data structure are smaller to manuplate in C++.
- * So they are exported to Python.
+ * So they are exported to Python. They have to be concreate so we can bind them.
  */
 struct TripleIndex {
     int32_t head = -1;
@@ -62,9 +64,11 @@ struct TripleIndex {
     }
     string repr() const
     {
-        char buffer[internal::kBufferSize];
-        sprintf(buffer, "(%d, %d, %d)", head, relation, tail);
-        return string(buffer);
+        return fmt::format("({0}, {1}, {2})", head, relation, tail);
+    }
+    string serialize(const string& delimiter) const
+    {
+        return fmt::format("{0}{3}{1}{3}{2}", head, relation, tail, delimiter);
     }
 };
 
@@ -80,7 +84,11 @@ struct Triple {
     }
     string repr() const
     {
-        return "(" + head + ", " + relation + ", " + tail + ")";
+        return fmt::format("({0}, {1}, {2})", head, relation, tail);
+    }
+    string serialize(const string& delimiter) const
+    {
+        return fmt::format("{0}{3}{1}{3}{2}", head, relation, tail, delimiter);
     }
 };
 

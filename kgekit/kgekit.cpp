@@ -19,6 +19,7 @@ PYBIND11_MODULE(_kgekit, m) {
         .def(py::init<const std::string&, const std::string&, const std::string&>())
         .def("__repr__", &kgekit::Triple::repr)
         .def("__eq__", &kgekit::Triple::operator==)
+        .def("serialize", &kgekit::Triple::serialize)
         .def_readwrite("head", &kgekit::Triple::head)
         .def_readwrite("relation", &kgekit::Triple::relation)
         .def_readwrite("tail", &kgekit::Triple::tail);
@@ -27,6 +28,7 @@ PYBIND11_MODULE(_kgekit, m) {
         .def(py::init<int32_t, int32_t, int32_t>())
         .def("__repr__", &kgekit::TripleIndex::repr)
         .def("__eq__", &kgekit::TripleIndex::operator==)
+        .def("serialize", &kgekit::TripleIndex::serialize)
         .def_readwrite("head", &kgekit::TripleIndex::head)
         .def_readwrite("relation", &kgekit::TripleIndex::relation)
         .def_readwrite("tail", &kgekit::TripleIndex::tail);

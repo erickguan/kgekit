@@ -1,0 +1,6 @@
+syntax = "proto3";
+
+message Translation {
+    map<string, uint32> entities = 1;
+    map<string, uint32> relations = 2;
+}
