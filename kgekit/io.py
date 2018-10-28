@@ -33,7 +33,7 @@ def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER):
         num_none = len(indexes) - len(filtered)
         return filtered, num_none
 
-def read_labels(filename, delimiter='\t'):
+def read_labels(filename, delimiter=DEFAULT_DELIMITER):
     """read label files. Format: ent label"""
     _assert_good_file(filename)
     with open(filename) as f:
