@@ -1,4 +1,5 @@
-global-include CMakeLists.txt
+include CMakeLists
+recursive-include kgekit CMakeLists.txt
 recursive-include kgekit *.cpp
 recursive-include kgekit *.h
 recursive-include kgekit *.proto

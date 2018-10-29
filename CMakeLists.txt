@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.2)
 
-include("cmake/HunterGate.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/HunterGate.cmake")
 HunterGate(
     URL "https://github.com/ruslo/hunter/archive/v0.23.38.tar.gz"
     SHA1 "ffd013590c9f87b505a350887973af5bd8b68e4c"
