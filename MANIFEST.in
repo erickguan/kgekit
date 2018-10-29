@@ -1,8 +1,13 @@
-include CMakeLists
-recursive-include kgekit CMakeLists.txt
-recursive-include kgekit *.cpp
-recursive-include kgekit *.h
-recursive-include kgekit *.proto
-exclude *_pb2.py
+include CMakeLists.txt
+graft kgekit
 graft externals
 graft cmake
+include processing_scripts/*.py
+
+prune kgekit/tests
+prune kgekit/__pycache__
+global-exclude .DS_Store
+global-exclude *_pb2.py
+global-exclude *.pyc
+global-exclude *.so
+prune cmake-build-debug
