@@ -1,0 +1,6 @@
+global-include CMakeLists.txt
+recursive-include kgekit *.cpp
+recursive-include kgekit *.h
+recursive-include kgekit *.proto
+exclude *_pb2.py
+graft externals

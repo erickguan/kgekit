@@ -95,7 +95,7 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
-      version='0.0.1',
+      version='0.0.3',
       description='kgekit tools',
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',
@@ -106,4 +106,12 @@ setup(name='kgekit',
       cmdclass=dict(build_ext=CMakeBuild),
       ext_modules=[CMakeExtension('kgekit')],
       test_suite='tests',
-      zip_safe=False)
+      zip_safe=False,
+      classifiers=[
+        'Development Status :: 2 - Pre-Alpha',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Developers',
+        'Programming Language :: Python :: 3',
+      ],
+)
