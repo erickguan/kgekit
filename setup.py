@@ -95,7 +95,7 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
-      version='0.0.8',
+      version='0.0.9',
       description='kgekit tools',
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',
@@ -103,6 +103,10 @@ setup(name='kgekit',
       license='MIT',
       packages=find_packages(),
     #   package_dir={'': 'src'},
+      install_requires=[
+        'protobuf>=3',
+        'numpy>=1.10'
+      ],
       cmdclass=dict(build_ext=CMakeBuild),
       ext_modules=[CMakeExtension('kgekit')],
       test_suite='tests',
