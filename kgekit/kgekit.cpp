@@ -22,7 +22,19 @@ PYBIND11_MODULE(_kgekit, m) {
         .def("serialize", &kgekit::Triple::serialize)
         .def_readwrite("head", &kgekit::Triple::head)
         .def_readwrite("relation", &kgekit::Triple::relation)
-        .def_readwrite("tail", &kgekit::Triple::tail);
+        .def_readwrite("tail", &kgekit::Triple::tail)
+        .def(py::pickle(
+            [](const kgekit::Triple &p) { // __getstate__
+                return py::make_tuple(p.head, p.relation, p.tail);
+            },
+            [](py::tuple t) { // __setstate__
+                if (t.size() != 3) {
+                    throw std::runtime_error("Invalid state!");
+                }
+                return kgekit::Triple(t[0].cast<std::string>(), t[1].cast<std::string>(), t[2].cast<std::string>());
+            }
+        ));
+
     py::class_<kgekit::TripleIndex>(m, "TripleIndex")
         .def(py::init<>())
         .def(py::init<int32_t, int32_t, int32_t>())
@@ -31,7 +43,18 @@ PYBIND11_MODULE(_kgekit, m) {
         .def("serialize", &kgekit::TripleIndex::serialize)
         .def_readwrite("head", &kgekit::TripleIndex::head)
         .def_readwrite("relation", &kgekit::TripleIndex::relation)
-        .def_readwrite("tail", &kgekit::TripleIndex::tail);
+        .def_readwrite("tail", &kgekit::TripleIndex::tail)
+        .def(py::pickle(
+            [](const kgekit::TripleIndex &p) { // __getstate__
+                return py::make_tuple(p.head, p.relation, p.tail);
+            },
+            [](py::tuple t) { // __setstate__
+                if (t.size() != 3) {
+                    throw std::runtime_error("Invalid state!");
+                }
+                return kgekit::TripleIndex(t[0].cast<int32_t>(), t[1].cast<int32_t>(), t[2].cast<int32_t>());
+            }
+        ));
 
     m.def("get_triple_index", &kgekit::get_triple_index, "get triple index from a line",
           py::arg("line"),

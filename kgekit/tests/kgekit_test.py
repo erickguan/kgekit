@@ -1,5 +1,6 @@
 import unittest
 import kgekit
+import pickle
 
 class KgekitTest(unittest.TestCase):
     @classmethod
@@ -28,6 +29,11 @@ class KgekitTest(unittest.TestCase):
     def test_get_triple(self):
         self.assertEqual(kgekit.get_triple("/m/1 /m/2 /m/3", "hrt", ' '), kgekit.Triple("/m/1", "/m/2", "/m/3"))
         self.assertEqual(kgekit.get_triple("/m/1 /m/2 /m/3", "htr", ' '), kgekit.Triple("/m/1", "/m/3", "/m/2"))
+
+    def test_pickles(self):
+        self.assertEqual(pickle.loads(pickle.dumps(self.triple_index, 2)), self.triple_index)
+        self.assertEqual(pickle.loads(pickle.dumps(self.triple, 2)), self.triple)
+
 
 if __name__ == '__main__':
     unittest.main()
