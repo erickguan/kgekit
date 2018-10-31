@@ -95,14 +95,13 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
-      version='0.0.13',
+      version='0.0.14',
       description='kgekit tools',
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',
       author_email='fantasticfears@gmail.com',
       license='MIT',
       packages=find_packages(),
-    #   package_dir={'': 'src'},
       install_requires=[
         'protobuf>=3',
         'numpy>=1.10'

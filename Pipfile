@@ -10,6 +10,7 @@ numpy = "*"
 
 [dev-packages]
 pytest = "*"
+numpy = "*"
 
 [requires]
 python_version = "3.6"

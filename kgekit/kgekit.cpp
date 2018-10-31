@@ -1,7 +1,10 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
+
 #include "kgekit.h"
 #include "entity_number_indexer.h"
+#include "lcwa_no_throw_sampler.h"
+#include "bernoulli_corruptor.h"
 
 namespace py = pybind11;
 
@@ -67,16 +70,25 @@ PYBIND11_MODULE(_kgekit, m) {
           py::arg("delimiter"),
           py::arg("skip_checking_order") = false);
 
-    py::class_<kgekit::EntityNumberIndexer, std::shared_ptr<kgekit::EntityNumberIndexer>>(m, "EntityNumberIndexer")
+    py::class_<kgekit::EntityNumberIndexer>(m, "EntityNumberIndexer", "index from triples and translation between index and lists")
         .def(py::init<const py::list&, const std::string&>())
         .def("entityIdMap", &kgekit::EntityNumberIndexer::entityIdMap)
         .def("relationIdMap", &kgekit::EntityNumberIndexer::relationIdMap)
-        .def("indexes", &kgekit::EntityNumberIndexer::indexes)
-        .def("entities", &kgekit::EntityNumberIndexer::entities)
-        .def("relations", &kgekit::EntityNumberIndexer::relations)
+        .def("indexes", &kgekit::EntityNumberIndexer::indexes, "gets indexes from triples")
+        .def("entities", &kgekit::EntityNumberIndexer::entities, "gets entity list")
+        .def("relations", &kgekit::EntityNumberIndexer::relations, "gets relation list")
         .def("getEntityFromId", &kgekit::EntityNumberIndexer::getEntityFromId, "gets the entity name from id")
         .def("getRelationFromId", &kgekit::EntityNumberIndexer::getRelationFromId, "gets the relation name from id")
         .def("getIdFromEntity", &kgekit::EntityNumberIndexer::getIdFromEntity, "gets the entity id from name")
         .def("getIdFromRelation", &kgekit::EntityNumberIndexer::getIdFromRelation, "gets the entity name from id");
+
+    py::class_<kgekit::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
+        .def(py::init<const py::list&, int16_t, int16_t, bool>())
+        .def("numNegativeSamples", &kgekit::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
+        .def("sample", &kgekit::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("batch").noconvert(), "samples current batch");
+
+    py::class_<kgekit::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
+        .def(py::init<const py::list&>())
+        .def("getProbablityRelation", &kgekit::BernoulliCorruptor::getProbablityRelation, "gets the probablity pair of given relation");
 }
 

@@ -21,6 +21,8 @@ using std::unordered_map;
 class EntityNumberIndexer {
 public:
     EntityNumberIndexer(const pybind11::list& triples, const string& order);
+    EntityNumberIndexer(const EntityNumberIndexer&) = delete;
+    EntityNumberIndexer& operator=(const EntityNumberIndexer&) = delete;
     pybind11::dict entityIdMap();
     pybind11::dict relationIdMap();
     pybind11::list indexes();

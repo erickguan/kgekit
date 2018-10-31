@@ -12,23 +12,17 @@ def _assert_good_file(filename):
     if not (path.exists() and path.is_file()):
         raise FileNotFoundError("Can't find the triple file.")
 
-def read_triple_indexes(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER):
+def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgekit.get_triple):
     _assert_good_file(filename)
     assert_triple_order(triple_order)
     with open(filename) as f:
-        indexes = [kgekit.get_triple_index(l.rstrip('\n'), triple_order, delimiter, True) for l in f]
+        indexes = [read_fn(l.rstrip('\n'), triple_order, delimiter, True) for l in f]
         filtered = list(filter(None.__ne__, indexes))
         num_none = len(indexes) - len(filtered)
         return filtered, num_none
 
-def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER):
-    _assert_good_file(filename)
-    assert_triple_order(triple_order)
-    with open(filename) as f:
-        indexes = [kgekit.get_triple(l.rstrip('\n'), triple_order, delimiter, True) for l in f]
-        filtered = list(filter(None.__ne__, indexes))
-        num_none = len(indexes) - len(filtered)
-        return filtered, num_none
+def read_triple_indexes(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgekit.get_triple_index):
+    return read_triples(filename, triple_order, delimiter, read_fn)
 
 def read_labels(filename, delimiter=DEFAULT_DELIMITER):
     """read label files. Format: ent label"""
