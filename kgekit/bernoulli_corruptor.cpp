@@ -34,8 +34,8 @@ BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set)
     }
 
     for (auto i = 0; i < num_relations_; ++i) {
-        average_tails_per_head_[i] = triples_per_rel[i] / tails_per_rel[i].size();
-        average_heads_per_tail_[i] = triples_per_rel[i] / heads_per_rel[i].size();
+        average_tails_per_head_[i] = static_cast<float>(triples_per_rel[i]) / heads_per_rel[i].size();
+        average_heads_per_tail_[i] = static_cast<float>(triples_per_rel[i]) / tails_per_rel[i].size();
     }
 }
 
@@ -44,7 +44,11 @@ pair<float, float> BernoulliCorruptor::getProbablityRelation(const int32_t relat
     if (relation_id < 0 || relation_id >= num_relations_) {
         throw std::out_of_range("Relation id given to the BernoulliCorruptor is larger than it parsed from datasets.");
     }
-    return std::make_pair(average_heads_per_tail_[relation_id], average_tails_per_head_[relation_id]);
+    auto hpt = average_heads_per_tail_[relation_id];
+    auto tph = average_tails_per_head_[relation_id];
+    auto r1 = tph / (hpt+tph);
+    auto r2 = hpt / (hpt+tph);
+    return std::make_pair(r1, r2);
 }
 
 } // namespace kgekit
