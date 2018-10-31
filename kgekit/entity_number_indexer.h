@@ -8,6 +8,8 @@
 
 #include <pybind11/pytypes.h>
 #include <pybind11/cast.h>
+#include <boost/core/noncopyable.hpp>
+
 #include "kgekit.h"
 
 namespace kgekit {
@@ -18,11 +20,9 @@ using std::string;
 using std::make_shared;
 using std::unordered_map;
 
-class EntityNumberIndexer {
+class EntityNumberIndexer: private boost::noncopyable {
 public:
     EntityNumberIndexer(const pybind11::list& triples, const string& order);
-    EntityNumberIndexer(const EntityNumberIndexer&) = delete;
-    EntityNumberIndexer& operator=(const EntityNumberIndexer&) = delete;
     pybind11::dict entityIdMap();
     pybind11::dict relationIdMap();
     pybind11::list indexes();

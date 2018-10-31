@@ -6,14 +6,11 @@ namespace py = pybind11;
 
 namespace kgekit {
 
-LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int16_t num_negative_entity, int16_t num_negative_relation, bool bernoulli)
-    : num_negative_entity_(num_negative_entity), num_negative_relation_(num_negative_relation), bernoulli_(bernoulli)
+LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int16_t num_negative_entity, int16_t num_negative_relation, Strategy strategy)
+    : num_negative_entity_(num_negative_entity), num_negative_relation_(num_negative_relation)
 {
-    for (auto const& t : train_set) {
-        auto triple = t.cast<TripleIndex>();
-        // rest_head[make_pair(triple.relation, triple.tail)] = triple.head;
-        // rest_tail[make_pair(triple.head, triple.relation)] = triple.tail;
-        // rest_relation[make_pair(triple.head, triple.tail)] = triple.relation;
+    if (strategy == Strategy::Hash) {
+        sample_strategy_ = make_unique<LCWANoThrowSampler::HashSampleStrategy>(train_set, this);
     }
 }
 
@@ -32,6 +29,17 @@ void LCWANoThrowSampler::sample(py::array_t<int32_t, py::array::c_style | py::ar
             }
         }
     }
+}
+
+LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler)
+    : sampler_(sampler)
+{
+
+}
+
+void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& array, const py::list& batch)
+{
+
 }
 
 } // namespace kgekit

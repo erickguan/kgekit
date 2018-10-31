@@ -7,6 +7,9 @@ find_package(Catch2 CONFIG REQUIRED)
 hunter_add_package(range-v3)
 find_package(range-v3 CONFIG REQUIRED)
 
+hunter_add_package(Boost)
+find_package(Boost CONFIG REQUIRED)
+
 hunter_add_package(Protobuf)
 find_package(Protobuf CONFIG REQUIRED)
 
@@ -36,7 +39,7 @@ target_link_libraries(kgekit_impl PUBLIC kgekit_structs range-v3::range-v3 fmt::
 
 pybind11_add_module(kgekit SHARED ${PY_SOURCES})
 target_compile_features(kgekit PUBLIC cxx_std_17)
-target_link_libraries(kgekit PUBLIC kgekit_impl PRIVATE range-v3::range-v3)
+target_link_libraries(kgekit PUBLIC kgekit_impl PRIVATE range-v3::range-v3 Boost::boost)
 set_property(TARGET kgekit PROPERTY PREFIX _)
 
 # test target and helper, from pybind11 tools

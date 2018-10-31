@@ -83,7 +83,7 @@ PYBIND11_MODULE(_kgekit, m) {
         .def("getIdFromRelation", &kgekit::EntityNumberIndexer::getIdFromRelation, "gets the entity name from id");
 
     py::class_<kgekit::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
-        .def(py::init<const py::list&, int16_t, int16_t, bool>())
+        .def(py::init<const py::list&, int16_t, int16_t>())
         .def("numNegativeSamples", &kgekit::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
         .def("sample", &kgekit::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 

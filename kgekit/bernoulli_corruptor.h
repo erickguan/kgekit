@@ -6,6 +6,7 @@
 
 #include <pybind11/pytypes.h>
 #include <pybind11/stl.h>
+#include <boost/core/noncopyable.hpp>
 
 namespace kgekit {
 
@@ -15,7 +16,7 @@ using std::make_pair;
 
 namespace py = pybind11;
 
-class BernoulliCorruptor {
+class BernoulliCorruptor: private boost::noncopyable {
 public:
     BernoulliCorruptor(const py::list& train_set);
     /*

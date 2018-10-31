@@ -5,7 +5,11 @@ Knowledge Embedding Kit
 [![PyPI license](https://img.shields.io/pypi/l/kgekit.svg)](https://pypi.python.org/project/kgekit/)
 
 This library provides helpful functions and sampling for KGE learning.
-The Data processing part is strictly research-oriented.
+The data processing part is strictly research-oriented.
+
+Requirements:
+
+- C++17 compilers
 
 # Features
 
