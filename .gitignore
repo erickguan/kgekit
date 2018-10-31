@@ -18,3 +18,5 @@ bin/
 Testing
 tmp/
 *_pb2.py
+
+.settings
