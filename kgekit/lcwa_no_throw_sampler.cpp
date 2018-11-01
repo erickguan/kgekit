@@ -34,12 +34,18 @@ void LCWANoThrowSampler::sample(py::array_t<int32_t, py::array::c_style | py::ar
 LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler)
     : sampler_(sampler)
 {
-
+    for (auto const& t : triples) {
+        auto triple = t.cast<TripleIndex>();
+        rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
+        rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+        rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
+    }
 }
 
 void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& array, const py::list& batch)
 {
 
 }
+
 
 } // namespace kgekit

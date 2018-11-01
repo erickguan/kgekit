@@ -19,12 +19,15 @@ using std::make_unique;
 
 namespace py = pybind11;
 
+namespace internal {
 /*
  * Pack two int32_t values into a int64_t
  */
 inline int64_t _pack_value(int32_t a, int32_t b)
 {
     return (static_cast<int64_t>(a) << 32) + b;
+}
+
 }
 
 class LCWANoThrowSampler: private boost::noncopyable {

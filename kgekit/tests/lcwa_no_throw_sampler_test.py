@@ -11,7 +11,7 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
     def setUpClass(cls):
         cls.triple_index_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'corruptor_triple.txt')
         cls.triple_indexes, _ = kgekit.io.read_triple_indexes(cls.triple_index_filename, "hrt", ' ')
-        cls.sampler = kgekit.LCWANoThrowSampler(cls.triple_indexes, 2, 1, False)
+        cls.sampler = kgekit.LCWANoThrowSampler(cls.triple_indexes, 2, 1)
 
     def test_num_negative_samples(self):
         self.assertEqual(self.sampler.numNegativeSamples(), 3)
