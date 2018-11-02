@@ -57,12 +57,14 @@ private:
     private:
         int32_t generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func);
         int32_t generateCorruptTail(int32_t t, int32_t r, std::function<int32_t(void)> generate_random_func);
+        int32_t generateCorruptRelation(int32_t h, int32_t t, std::function<int32_t(void)> generate_random_func);
         LCWANoThrowSampler* sampler_;
 
         unordered_map<int64_t, unordered_set<int32_t>> rest_head_;
         unordered_map<int64_t, unordered_set<int32_t>> rest_tail_;
         unordered_map<int64_t, unordered_set<int32_t>> rest_relation_;
         int32_t max_entity_ = -1;
+        int32_t max_relation_ = -1;
     };
     unique_ptr<SampleStrategy> sample_strategy_;
 };

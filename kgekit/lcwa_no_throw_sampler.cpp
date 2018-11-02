@@ -32,6 +32,7 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
     for (auto const& t : triples) {
         auto triple = t.cast<TripleIndex>();
         max_entity_ = std::max(max_entity_, std::max(triple.head, triple.tail));
+        max_relation_ = std::max(max_relation_, triple.relation);
         rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
         rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
         rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
@@ -78,7 +79,14 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
                 tensor(i, j, 1) = r;
             }
         }
-    }
+        auto num_negative_relation_index_offset = sampler_->num_negative_entity_ + kNumNegativeEntityIndexOffset;
+         for (ssize_t j = kNumNegativeEntityIndexOffset; j < sampler_->num_negative_relation_ + kNumNegativeEntityIndexOffset; j++) {
+            for (ssize_t k = 0; k < tensor.shape(2); k++) {
+                tensor(i, j, 0) = h;
+                tensor(i, j, 2) = t;
+                tensor(i, j, 1) = generateCorruptRelation(h, t, gen_func);
+            }
+        }    }
 }
 
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func)
@@ -115,5 +123,21 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, i
     }
 }
 
+int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int32_t h, int32_t t, std::function<int32_t(void)> generate_random_func)
+{
+    auto k = internal::_pack_value(h, t);
+    auto gen_relation = generate_random_func();
+    if (rest_relation_[k].find(gen_relation) == rest_relation_[k].end()) {
+        return gen_relation;
+    } else {
+        for (auto i = 0; i < max_relation_; ++i) {
+            gen_relation = (gen_relation + 1) % max_relation_;
+            if (rest_relation_[k].find(gen_relation) == rest_relation_[k].end()) {
+                return gen_relation;
+            }
+        }
+        throw std::runtime_error("A triple seems to match all relations. It's almost impossible");
+    }
+}
 
 } // namespace kgekit
