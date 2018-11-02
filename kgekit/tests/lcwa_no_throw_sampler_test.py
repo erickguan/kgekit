@@ -19,9 +19,14 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
     def test_sample(self):
         batch_size = 2
         samples_per_batch = 3
-        samples = np.zeros((batch_size, 3, samples_per_batch), dtype=np.int32)
-        print(self.sampler.sample(samples, self.triple_indexes))
-        np.testing.assert_array_equal(samples, np.ones((batch_size, 3, samples_per_batch), dtype=np.int32))
+        samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
+        self.sampler.sample(samples, [[True for _ in self.triple_indexes], self.triple_indexes], 100)
+        np.testing.assert_array_equal(samples, np.array([
+            [
+                [0, 0, 1], [0, 0, 3], [0, 0, 3]
+            ], [
+                [0, 1, 3], [0, 1, 1], [0, 1, 2]
+        ]], dtype=np.int32))
 
 
 if __name__ == '__main__':

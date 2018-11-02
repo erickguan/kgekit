@@ -3,7 +3,9 @@
 #include <utility>
 #include <unordered_map>
 #include <unordered_set>
+#include <random>
 #include <memory>
+#include <functional>
 
 #include <boost/core/noncopyable.hpp>
 #include <pybind11/numpy.h>
@@ -39,25 +41,28 @@ public:
     LCWANoThrowSampler(const py::list& train_set, int16_t num_negative_entity, int16_t num_negative_relation, Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
     /* In place editing. Avoid copies for large elements */
-    void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& array, const py::list& batch);
+    void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& array, const py::list& batch, int64_t random_seed = std::random_device{}());
 private:
     Strategy Strategy_;
     int16_t num_negative_entity_;
     int16_t num_negative_relation_;
     struct SampleStrategy {
         virtual ~SampleStrategy() {};
-        virtual void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& array, const py::list& batch) = 0;
+        virtual void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& batch, int64_t random_seed) = 0;
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
         HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler);
-        void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& array, const py::list& batch) override;
+        void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& batch, int64_t random_seed) override;
     private:
+        int32_t generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func);
+        int32_t generateCorruptTail(int32_t t, int32_t r, std::function<int32_t(void)> generate_random_func);
         LCWANoThrowSampler* sampler_;
 
         unordered_map<int64_t, unordered_set<int32_t>> rest_head_;
         unordered_map<int64_t, unordered_set<int32_t>> rest_tail_;
         unordered_map<int64_t, unordered_set<int32_t>> rest_relation_;
+        int32_t max_entity_ = -1;
     };
     unique_ptr<SampleStrategy> sample_strategy_;
 };
