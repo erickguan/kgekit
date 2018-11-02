@@ -8,8 +8,8 @@ namespace py = pybind11;
 
 namespace kgekit {
 
-LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int16_t num_negative_entity, int16_t num_negative_relation, Strategy strategy)
-    : num_negative_entity_(num_negative_entity), num_negative_relation_(num_negative_relation)
+LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy)
+    : num_corrupt_entity_(num_corrupt_entity), num_corrupt_relation_(num_corrupt_relation)
 {
     if (strategy == Strategy::Hash) {
         sample_strategy_ = make_unique<LCWANoThrowSampler::HashSampleStrategy>(train_set, this);
@@ -18,10 +18,10 @@ LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int16_t num_ne
 
 int16_t LCWANoThrowSampler::numNegativeSamples() const
 {
-    return num_negative_entity_ + num_negative_relation_;
+    return num_corrupt_entity_ + num_corrupt_relation_;
 }
 
-void LCWANoThrowSampler::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& batch, int64_t random_seed)
+void LCWANoThrowSampler::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast> arr, const py::list& batch, int64_t random_seed)
 {
     sample_strategy_->sample(arr, batch, random_seed);
 }
@@ -37,8 +37,10 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
         rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
         rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
     }
+    /* We use that as modulor operator and index starts with 0 */
+    max_relation_++;
+    max_entity_++;
 }
-
 
 /* sample size: (len(batch_size), positive + negatives, 3) */
 void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& batch, int64_t random_seed)
@@ -67,26 +69,27 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
         /* negative samples */
         std::function<int32_t(void)> gen_func = [&]() -> int16_t { return random_engine() % max_entity_; };
         constexpr auto kNumNegativeEntityIndexOffset = 1;
-        for (ssize_t j = kNumNegativeEntityIndexOffset; j < sampler_->num_negative_entity_ + kNumNegativeEntityIndexOffset; j++) {
-            for (ssize_t k = 0; k < tensor.shape(2); k++) {
-                if (corrupt_head) {
-                    tensor(i, j, 0) = h;
-                    tensor(i, j, 2) = generateCorruptHead(h, r, gen_func);
-                } else {
-                    tensor(i, j, 0) = generateCorruptTail(t, r, gen_func);
-                    tensor(i, j, 2) = t;
-                }
-                tensor(i, j, 1) = r;
-            }
-        }
-        auto num_negative_relation_index_offset = sampler_->num_negative_entity_ + kNumNegativeEntityIndexOffset;
-         for (ssize_t j = kNumNegativeEntityIndexOffset; j < sampler_->num_negative_relation_ + kNumNegativeEntityIndexOffset; j++) {
-            for (ssize_t k = 0; k < tensor.shape(2); k++) {
+        for (ssize_t j = kNumNegativeEntityIndexOffset;
+            j < sampler_->num_corrupt_entity_ + kNumNegativeEntityIndexOffset;
+            ++j) {
+            if (corrupt_head) {
                 tensor(i, j, 0) = h;
+                tensor(i, j, 2) = generateCorruptHead(h, r, gen_func);
+            } else {
+                tensor(i, j, 0) = generateCorruptTail(t, r, gen_func);
                 tensor(i, j, 2) = t;
-                tensor(i, j, 1) = generateCorruptRelation(h, t, gen_func);
             }
-        }    }
+            tensor(i, j, 1) = r;
+        }
+        auto num_corrupt_relation_index_offset = sampler_->num_corrupt_entity_ + kNumNegativeEntityIndexOffset;
+        for (ssize_t j = num_corrupt_relation_index_offset;
+            j < sampler_->num_corrupt_relation_ + num_corrupt_relation_index_offset;
+            ++j) {
+            tensor(i, j, 0) = h;
+            tensor(i, j, 1) = generateCorruptRelation(h, t, gen_func);
+            tensor(i, j, 2) = t;
+        }
+    }
 }
 
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func)
@@ -102,14 +105,14 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, i
                 return gen_tail;
             }
         }
-        throw std::runtime_error("A triple seems to match all entities. It's almost impossible");
+        throw std::runtime_error(fmt::format("Can't find a corrupt head ({0}, {1}, ?)", h, r ));
     }
 }
 
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, int32_t r, std::function<int32_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(t, r);
-    auto gen_head = generate_random_func();
+    auto gen_head = generate_random_func() % max_entity_;
     if (rest_head_[k].find(gen_head) == rest_head_[k].end()) {
         return gen_head;
     } else {
@@ -119,14 +122,14 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, i
                 return gen_head;
             }
         }
-        throw std::runtime_error("A triple seems to match all entities. It's almost impossible");
+        throw std::runtime_error(fmt::format("Can't find a corrupt head (?, {0}, {1})", r, t));
     }
 }
 
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int32_t h, int32_t t, std::function<int32_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(h, t);
-    auto gen_relation = generate_random_func();
+    auto gen_relation = generate_random_func() % max_relation_;
     if (rest_relation_[k].find(gen_relation) == rest_relation_[k].end()) {
         return gen_relation;
     } else {
@@ -136,7 +139,7 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int32_t 
                 return gen_relation;
             }
         }
-        throw std::runtime_error("A triple seems to match all relations. It's almost impossible");
+        throw std::runtime_error(fmt::format("Can't find a corrupt relation ({0}, ?, {1}). Generated: {2}" , h, t, gen_relation));
     }
 }
 

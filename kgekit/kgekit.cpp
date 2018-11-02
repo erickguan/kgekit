@@ -84,8 +84,12 @@ PYBIND11_MODULE(_kgekit, m) {
         .def("getIdFromEntity", &kgekit::EntityNumberIndexer::getIdFromEntity, "gets the entity id from name")
         .def("getIdFromRelation", &kgekit::EntityNumberIndexer::getIdFromRelation, "gets the entity name from id");
 
+    py::enum_<kgekit::LCWANoThrowSampler::Strategy>(m, "LCWANoThrowSamplerStrategy", py::arithmetic())
+        .value("Hash", kgekit::LCWANoThrowSampler::Strategy::Hash)
+        .value("Offset", kgekit::LCWANoThrowSampler::Strategy::Offset);
+
     py::class_<kgekit::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
-        .def(py::init<const py::list&, int16_t, int16_t>())
+        .def(py::init<const py::list&, int16_t, int16_t, kgekit::LCWANoThrowSampler::Strategy>())
         .def("numNegativeSamples", &kgekit::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
         .def("sample", &kgekit::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("batch").noconvert(), py::arg("random_seed") = std::random_device{}(), "samples current batch");
 
