@@ -47,7 +47,7 @@ pair<float, float> BernoulliCorruptor::getProbablityRelation(const int32_t relat
     auto hpt = average_heads_per_tail_[relation_id];
     auto tph = average_tails_per_head_[relation_id];
     auto r1 = tph / (hpt+tph);
-    auto r2 = hpt / (hpt+tph);
+    auto r2 = 1.0 - r1;
     return std::make_pair(r1, r2);
 }
 
