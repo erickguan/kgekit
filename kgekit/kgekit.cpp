@@ -91,7 +91,7 @@ PYBIND11_MODULE(_kgekit, m) {
     py::class_<kgekit::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
         .def(py::init<const py::list&, int16_t, int16_t, kgekit::LCWANoThrowSampler::Strategy>())
         .def("numNegativeSamples", &kgekit::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
-        .def("sample", &kgekit::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("batch").noconvert(), py::arg("random_seed") = std::random_device{}(), "samples current batch");
+        .def("sample", &kgekit::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("corrupt_head_list").noconvert(), py::arg("batch").noconvert(), py::arg("random_seed") = std::random_device{}(), "samples current batch");
 
     py::class_<kgekit::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::list&>())

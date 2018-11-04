@@ -25,7 +25,7 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
         samples_per_batch = 1 + self.entity_sampler.numNegativeSamples()
         samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
         triple_indexes = self.triple_indexes[:batch_size]
-        self.entity_sampler.sample(samples, [[True, False], triple_indexes], 1000)
+        self.entity_sampler.sample(samples, [True, False], triple_indexes, 1000)
         np.testing.assert_array_equal(samples, np.array([
             [
                 [0, 1, 3], [0, 1, 2], [0, 1, 1]
@@ -39,7 +39,7 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
         samples_per_batch = 1 + self.relation_sampler.numNegativeSamples()
         samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
         triple_indexes = self.triple_indexes[:batch_size]
-        self.relation_sampler.sample(samples, [[True], triple_indexes], 100)
+        self.relation_sampler.sample(samples, [True], triple_indexes, 100)
         np.testing.assert_array_equal(samples, np.array([
             [
                 [0, 1, 3], [0, 0, 3]
@@ -51,7 +51,7 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
         samples_per_batch = 1 + self.combined_sampler.numNegativeSamples()
         samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
         triple_indexes = self.triple_indexes[:batch_size]
-        self.combined_sampler.sample(samples, [[True, False], triple_indexes], 100)
+        self.combined_sampler.sample(samples, [True, False], triple_indexes, 100)
         np.testing.assert_array_equal(samples, np.array([
             [
                 [0, 1, 3], [0, 1, 0], [0, 0, 3]
