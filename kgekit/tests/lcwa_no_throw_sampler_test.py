@@ -22,42 +22,42 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
 
     def test_entity_sample(self):
         batch_size = 2
-        samples_per_batch = 1 + self.entity_sampler.numNegativeSamples()
+        samples_per_batch = self.entity_sampler.numNegativeSamples()
         samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
         triple_indexes = self.triple_indexes[:batch_size]
         self.entity_sampler.sample(samples, [True, False], triple_indexes, 1000)
         np.testing.assert_array_equal(samples, np.array([
             [
-                [0, 1, 3], [0, 1, 2], [0, 1, 1]
+                [0, 1, 2], [0, 1, 1]
             ], [
-                [0, 0, 1], [1, 0, 1], [4, 0, 1]
+                [1, 0, 1], [4, 0, 1]
             ]
         ], dtype=np.int32))
 
     def test_relation_sample(self):
         batch_size = 1
-        samples_per_batch = 1 + self.relation_sampler.numNegativeSamples()
+        samples_per_batch = self.relation_sampler.numNegativeSamples()
         samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
         triple_indexes = self.triple_indexes[:batch_size]
         self.relation_sampler.sample(samples, [True], triple_indexes, 100)
         np.testing.assert_array_equal(samples, np.array([
             [
-                [0, 1, 3], [0, 0, 3]
+                [0, 0, 3]
             ]
         ], dtype=np.int32))
 
     def test_combined_sample(self):
         batch_size = 2
-        samples_per_batch = 1 + self.combined_sampler.numNegativeSamples()
+        samples_per_batch = self.combined_sampler.numNegativeSamples()
         samples = np.zeros((batch_size, samples_per_batch, 3), dtype=np.int32)
         triple_indexes = self.triple_indexes[:batch_size]
         self.combined_sampler.sample(samples, [True, False], triple_indexes, 100)
         np.testing.assert_array_equal(samples, np.array([
             [
-                [0, 1, 3], [0, 1, 0], [0, 0, 3]
+                [0, 1, 0], [0, 0, 3]
             ],
             [
-                [0, 0, 1], [2, 0, 1], [0, 1, 1]
+                [2, 0, 1], [0, 1, 1]
             ]
         ], dtype=np.int32))
 

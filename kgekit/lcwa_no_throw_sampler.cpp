@@ -42,7 +42,7 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
     max_entity_++;
 }
 
-/* sample size: (len(batch_size), positive + negatives, 3) */
+/* sample size: (len(batch_size), negatives, 3) */
 void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed)
 {
     /* IMPROVE: use determined seed may help with reproducible result. Yet here we are using random seed */
@@ -57,18 +57,10 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
         auto t = triple.tail;
         auto corrupt_head = corrupt_head_list[i].cast<bool>();
 
-        /*
-        * first sample is positive sample
-        */
-        tensor(i, 0, 0) = h;
-        tensor(i, 0, 1) = r;
-        tensor(i, 0, 2) = t;
-
         /* negative samples */
         std::function<int32_t(void)> gen_func = [&]() -> int16_t { return random_engine() % max_entity_; };
-        constexpr auto kNumNegativeEntityIndexOffset = 1;
-        for (ssize_t j = kNumNegativeEntityIndexOffset;
-            j < sampler_->num_corrupt_entity_ + kNumNegativeEntityIndexOffset;
+        for (ssize_t j = 0;
+            j < sampler_->num_corrupt_entity_;
             ++j) {
             if (corrupt_head) {
                 tensor(i, j, 0) = h;
@@ -79,7 +71,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
             }
             tensor(i, j, 1) = r;
         }
-        auto num_corrupt_relation_index_offset = sampler_->num_corrupt_entity_ + kNumNegativeEntityIndexOffset;
+        auto num_corrupt_relation_index_offset = sampler_->num_corrupt_entity_;
         for (ssize_t j = num_corrupt_relation_index_offset;
             j < sampler_->num_corrupt_relation_ + num_corrupt_relation_index_offset;
             ++j) {
