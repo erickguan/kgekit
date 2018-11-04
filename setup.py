@@ -113,7 +113,7 @@ setup(name='kgekit',
       include_package_data=True,
       classifiers=[
         'Development Status :: 2 - Pre-Alpha',
-        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)'
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
