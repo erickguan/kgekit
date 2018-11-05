@@ -38,7 +38,7 @@ public:
         Hash,
         Offset
     };
-    LCWANoThrowSampler(const py::list& train_set, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy=Strategy::Hash);
+    LCWANoThrowSampler(const py::list& train_set, int32_t max_entity, int32_t max_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
     /* In place editing. Avoid copies for large elements */
     void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast> arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed);
@@ -63,10 +63,12 @@ private:
         unordered_map<int64_t, unordered_set<int32_t>> rest_head_;
         unordered_map<int64_t, unordered_set<int32_t>> rest_tail_;
         unordered_map<int64_t, unordered_set<int32_t>> rest_relation_;
-        int32_t max_entity_ = -1;
-        int32_t max_relation_ = -1;
+        int32_t relation_cap_ = -1;
+        int32_t entity_cap_ = -1;
     };
     unique_ptr<SampleStrategy> sample_strategy_;
+    int32_t max_entity_ = -1;
+    int32_t max_relation_ = -1;
 };
 
 } // namespace kgekit

@@ -8,8 +8,8 @@ namespace py = pybind11;
 
 namespace kgekit {
 
-LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy)
-    : num_corrupt_entity_(num_corrupt_entity), num_corrupt_relation_(num_corrupt_relation)
+LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int32_t max_entity, int32_t max_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy)
+    : max_entity_(max_entity), max_relation_(max_relation), num_corrupt_entity_(num_corrupt_entity), num_corrupt_relation_(num_corrupt_relation)
 {
     if (strategy == Strategy::Hash) {
         sample_strategy_ = make_unique<LCWANoThrowSampler::HashSampleStrategy>(train_set, this);
@@ -31,15 +31,13 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
 {
     for (auto const& t : triples) {
         auto triple = t.cast<TripleIndex>();
-        max_entity_ = std::max(max_entity_, std::max(triple.head, triple.tail));
-        max_relation_ = std::max(max_relation_, triple.relation);
         rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
         rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
         rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
     }
     /* We use that as modulor operator and index starts with 0 */
-    max_relation_++;
-    max_entity_++;
+    relation_cap_ = sampler_->max_relation_ + 1;
+    entity_cap_ = sampler_->max_entity_ + 1;
 }
 
 /* sample size: (len(batch_size), negatives, 3) */
@@ -58,7 +56,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
         auto corrupt_head = corrupt_head_list[i].cast<bool>();
 
         /* negative samples */
-        std::function<int32_t(void)> gen_func = [&]() -> int16_t { return random_engine() % max_entity_; };
+        std::function<int32_t(void)> gen_func = [&]() -> int16_t { return random_engine() % sampler_->max_entity_; };
         for (ssize_t j = 0;
             j < sampler_->num_corrupt_entity_;
             ++j) {
@@ -85,12 +83,12 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(h, r);
-    auto gen_tail = generate_random_func();
+    auto gen_tail = generate_random_func() % entity_cap_;
     if (rest_tail_[k].find(gen_tail) == rest_tail_[k].end()) {
         return gen_tail;
     } else {
-        for (auto i = 0; i < max_entity_; ++i) {
-            gen_tail = (gen_tail + 1) % max_entity_;
+        for (auto i = 0; i < sampler_->max_entity_; ++i) {
+            gen_tail = (gen_tail + 1) % entity_cap_;
             if (rest_tail_[k].find(gen_tail) == rest_tail_[k].end()) {
                 return gen_tail;
             }
@@ -102,12 +100,12 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, i
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, int32_t r, std::function<int32_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(t, r);
-    auto gen_head = generate_random_func() % max_entity_;
+    auto gen_head = generate_random_func() % entity_cap_;
     if (rest_head_[k].find(gen_head) == rest_head_[k].end()) {
         return gen_head;
     } else {
-        for (auto i = 0; i < max_entity_; ++i) {
-            gen_head = (gen_head + 1) % max_entity_;
+        for (auto i = 0; i < sampler_->max_entity_; ++i) {
+            gen_head = (gen_head + 1) % entity_cap_;
             if (rest_head_[k].find(gen_head) == rest_head_[k].end()) {
                 return gen_head;
             }
@@ -119,12 +117,12 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, i
 int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int32_t h, int32_t t, std::function<int32_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(h, t);
-    auto gen_relation = generate_random_func() % max_relation_;
+    auto gen_relation = generate_random_func() % relation_cap_;
     if (rest_relation_[k].find(gen_relation) == rest_relation_[k].end()) {
         return gen_relation;
     } else {
-        for (auto i = 0; i < max_relation_; ++i) {
-            gen_relation = (gen_relation + 1) % max_relation_;
+        for (auto i = 0; i < sampler_->max_relation_; ++i) {
+            gen_relation = (gen_relation + 1) % relation_cap_;
             if (rest_relation_[k].find(gen_relation) == rest_relation_[k].end()) {
                 return gen_relation;
             }
