@@ -8,7 +8,7 @@ namespace py = pybind11;
 
 namespace kgekit {
 
-LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int32_t num_entity, int32_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy)
+LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int64_t num_entity, int64_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy)
     : num_entity_(num_entity), num_relation_(num_relation), num_corrupt_entity_(num_corrupt_entity), num_corrupt_relation_(num_corrupt_relation)
 {
     if (strategy == Strategy::Hash) {
@@ -21,7 +21,7 @@ int16_t LCWANoThrowSampler::numNegativeSamples() const
     return num_corrupt_entity_ + num_corrupt_relation_;
 }
 
-void LCWANoThrowSampler::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast> arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed)
+void LCWANoThrowSampler::sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast> arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed)
 {
     sample_strategy_->sample(arr, corrupt_head_list, batch, random_seed);
 }
@@ -38,7 +38,7 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
 }
 
 /* sample size: (len(batch_size), negatives, 3) */
-void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed)
+void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed)
 {
     /* IMPROVE: use determined seed may help with reproducible result. Yet here we are using random seed */
     std::mt19937_64 random_engine(random_seed);
@@ -53,7 +53,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
         auto corrupt_head = corrupt_head_list[i].cast<bool>();
 
         /* negative samples */
-        std::function<int32_t(void)> gen_func = [&]() -> int16_t { return random_engine() % sampler_->num_entity_; };
+        std::function<int64_t(void)> gen_func = [&]() -> int16_t { return random_engine() % sampler_->num_entity_; };
         for (ssize_t j = 0;
             j < sampler_->num_corrupt_entity_;
             ++j) {
@@ -77,7 +77,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int32_t, py::arr
     }
 }
 
-int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func)
+int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(h, r);
     auto gen_tail = generate_random_func() % sampler_->num_entity_;
@@ -94,7 +94,7 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int32_t h, i
     }
 }
 
-int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, int32_t r, std::function<int32_t(void)> generate_random_func)
+int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(t, r);
     auto gen_head = generate_random_func() % sampler_->num_entity_;
@@ -111,7 +111,7 @@ int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int32_t t, i
     }
 }
 
-int32_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int32_t h, int32_t t, std::function<int32_t(void)> generate_random_func)
+int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int64_t h, int64_t t, std::function<int64_t(void)> generate_random_func)
 {
     auto k = internal::_pack_value(h, t);
     auto gen_relation = generate_random_func() % sampler_->num_relation_;

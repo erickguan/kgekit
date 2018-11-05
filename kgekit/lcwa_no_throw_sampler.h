@@ -6,6 +6,7 @@
 #include <random>
 #include <memory>
 #include <functional>
+#include <cstdint>
 
 #include <boost/core/noncopyable.hpp>
 #include <pybind11/numpy.h>
@@ -22,11 +23,17 @@ using std::make_unique;
 namespace py = pybind11;
 
 namespace internal {
+
 /*
- * Pack two int32_t values into a int64_t
+ * Pack two int64_t values into a int64_t.
+ * Here assumes parameters are no larger than int32_t.
+ * The reason is that int128_t is not supported and time is limited.
  */
-inline int64_t _pack_value(int32_t a, int32_t b)
+inline int64_t _pack_value(int64_t a, int64_t b)
 {
+    if (a > INT32_MAX || b > INT32_MAX) {
+        throw std::runtime_error("Entry ID exceeds INT32_MAX");
+    }
     return (static_cast<int64_t>(a) << 32) + b;
 }
 
@@ -38,35 +45,35 @@ public:
         Hash,
         Offset
     };
-    LCWANoThrowSampler(const py::list& train_set, int32_t num_entity, int32_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy=Strategy::Hash);
+    LCWANoThrowSampler(const py::list& train_set, int64_t num_entity, int64_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
     /* In place editing. Avoid copies for large elements */
-    void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast> arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed);
+    void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast> arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed);
 private:
     Strategy Strategy_;
     int16_t num_corrupt_entity_;
     int16_t num_corrupt_relation_;
     struct SampleStrategy {
         virtual ~SampleStrategy() {};
-        virtual void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed) = 0;
+        virtual void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed) = 0;
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
         HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler);
-        void sample(py::array_t<int32_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed) override;
+        void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed) override;
     private:
-        int32_t generateCorruptHead(int32_t h, int32_t r, std::function<int32_t(void)> generate_random_func);
-        int32_t generateCorruptTail(int32_t t, int32_t r, std::function<int32_t(void)> generate_random_func);
-        int32_t generateCorruptRelation(int32_t h, int32_t t, std::function<int32_t(void)> generate_random_func);
+        int64_t generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func);
+        int64_t generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func);
+        int64_t generateCorruptRelation(int64_t h, int64_t t, std::function<int64_t(void)> generate_random_func);
         LCWANoThrowSampler* sampler_;
 
-        unordered_map<int64_t, unordered_set<int32_t>> rest_head_;
-        unordered_map<int64_t, unordered_set<int32_t>> rest_tail_;
-        unordered_map<int64_t, unordered_set<int32_t>> rest_relation_;
+        unordered_map<int64_t, unordered_set<int64_t>> rest_head_;
+        unordered_map<int64_t, unordered_set<int64_t>> rest_tail_;
+        unordered_map<int64_t, unordered_set<int64_t>> rest_relation_;
     };
     unique_ptr<SampleStrategy> sample_strategy_;
-    int32_t num_entity_ = -1;
-    int32_t num_relation_ = -1;
+    int64_t num_entity_ = -1;
+    int64_t num_relation_ = -1;
 };
 
 } // namespace kgekit
