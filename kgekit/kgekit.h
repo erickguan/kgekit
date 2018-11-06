@@ -46,6 +46,20 @@ namespace internal {
 void assert_triple_order(const string& order);
 const auto kBufferSize = 128;
 
+/*
+ * Pack two int64_t values into a int64_t.
+ * Here assumes parameters are no larger than int32_t.
+ * The reason is that int128_t is not supported and time is limited.
+ */
+inline int64_t _pack_value(int64_t a, int64_t b)
+{
+    if (a > INT32_MAX || b > INT32_MAX) {
+        throw std::runtime_error("Entry ID exceeds INT32_MAX");
+    }
+    return (static_cast<int64_t>(a) << 32) + b;
+}
+
+
 } // namespace internal
 
 /*

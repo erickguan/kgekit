@@ -7,6 +7,7 @@
 #include "entity_number_indexer.h"
 #include "lcwa_no_throw_sampler.h"
 #include "bernoulli_corruptor.h"
+#include "ranker.h"
 
 namespace py = pybind11;
 
@@ -96,5 +97,11 @@ PYBIND11_MODULE(_kgekit, m) {
     py::class_<kgekit::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::list&>())
         .def("getProbablityRelation", &kgekit::BernoulliCorruptor::getProbablityRelation, "gets the probablity pair of given relation");
+
+    py::class_<kgekit::Ranker>(m, "Ranker", "ranks the prediction")
+        .def(py::init<const py::list&, const py::list&, const py::list&>())
+        .def("rankHead", &kgekit::Ranker::rankHead, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test head prediction.")
+        .def("rankTail", &kgekit::Ranker::rankTail, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test tail prediction.")
+        .def("rankRelation", &kgekit::Ranker::rankRelation, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test relation prediction.");
 }
 

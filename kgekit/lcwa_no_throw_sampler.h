@@ -11,6 +11,8 @@
 #include <boost/core/noncopyable.hpp>
 #include <pybind11/numpy.h>
 
+#include "kgekit.h"
+
 namespace kgekit {
 
 using std::unordered_map;
@@ -21,23 +23,6 @@ using std::unique_ptr;
 using std::make_unique;
 
 namespace py = pybind11;
-
-namespace internal {
-
-/*
- * Pack two int64_t values into a int64_t.
- * Here assumes parameters are no larger than int32_t.
- * The reason is that int128_t is not supported and time is limited.
- */
-inline int64_t _pack_value(int64_t a, int64_t b)
-{
-    if (a > INT32_MAX || b > INT32_MAX) {
-        throw std::runtime_error("Entry ID exceeds INT32_MAX");
-    }
-    return (static_cast<int64_t>(a) << 32) + b;
-}
-
-}
 
 /*
  * PyTorch requires LongTensor for indicies so int64_t is used.
