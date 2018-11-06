@@ -16,8 +16,6 @@ find_package(Protobuf CONFIG REQUIRED)
 hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
 
-set(CMAKE_POSITION_INDEPENDENT_CODE ON)
-
 add_subdirectory(messages)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
@@ -36,6 +34,7 @@ set(TEST_SOURCES test_helper.cpp kgekit_impl_test.cpp entity_number_indexer_test
 
 add_library(kgekit_impl ${SOURCES})
 target_compile_features(kgekit_impl PUBLIC cxx_std_17)
+set_property(TARGET kgekit_impl PROPERTY POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(kgekit_impl PUBLIC kgekit_structs range-v3::range-v3 fmt::fmt)
 
 pybind11_add_module(kgekit SHARED ${PY_SOURCES})
@@ -118,6 +117,7 @@ find_package(Sanitizers)
 add_executable(kgekit_test ${TEST_SOURCES} ${PY_SOURCES} ${SOURCES})
 target_compile_features(kgekit_test PUBLIC cxx_std_17)
 target_link_libraries(kgekit_test PUBLIC Catch2::Catch PRIVATE kgekit_structs pybind11::pybind11 pybind11::embed pybind11::module fmt::fmt)
+set_property(TARGET kgekit_test PROPERTY POSITION_INDEPENDENT_CODE ON)
 _pybind11_add_lto_flags(kgekit_test 1)
 add_sanitizers(kgekit_test)
 
