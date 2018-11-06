@@ -53,7 +53,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int64_t, py::arr
         auto corrupt_head = corrupt_head_list[i].cast<bool>();
 
         /* negative samples */
-        std::function<int64_t(void)> gen_func = [&]() -> int16_t { return random_engine() % sampler_->num_entity_; };
+        std::function<int64_t(void)> gen_func = [&]() -> int64_t { return random_engine() % sampler_->num_entity_; };
         for (ssize_t j = 0;
             j < sampler_->num_corrupt_entity_;
             ++j) {

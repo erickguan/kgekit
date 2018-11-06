@@ -95,7 +95,7 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
-      version='0.0.20',
+      version='0.0.21',
       description='kgekit tools',
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',

@@ -39,6 +39,9 @@ inline int64_t _pack_value(int64_t a, int64_t b)
 
 }
 
+/*
+ * PyTorch requires LongTensor for indicies so int64_t is used.
+ */
 class LCWANoThrowSampler: private boost::noncopyable {
 public:
     enum class Strategy {
