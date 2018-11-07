@@ -95,7 +95,7 @@ class CMakeBuild(build_ext):
         print()  # Add an empty line for cleaner output
 
 setup(name='kgekit',
-      version='0.0.31',
+      version='0.1.0',
       description='knowledge representation tools',
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',
@@ -112,7 +112,7 @@ setup(name='kgekit',
       zip_safe=False,
       include_package_data=True,
       classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
 
         # Indicate who your project is intended for
