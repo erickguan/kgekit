@@ -6,10 +6,13 @@
 #include <cstdlib>
 #include <experimental/filesystem>
 
-#if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
-#include <experimental/string_view>
-#include <experimental/optional>
-#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 9
+// #if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
+// #include <experimental/string_view>
+// #include <experimental/optional>
+// #elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 7
+// #include <experimental/string_view>
+// #include <experimental/optional>
+#if __cplusplus <= 201703L
 #include <experimental/string_view>
 #include <experimental/optional>
 #else
@@ -25,15 +28,18 @@ using std::string;
 using std::vector;
 using std::array;
 
-#if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
+// #if defined(__clang__) && !defined(__apple_build_version__) && __clang_major__ < 7
+// using std::experimental::optional;
+// using std::experimental::make_optional;
+// using std::experimental::string_view;
+// #elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ < 7
+// using std::experimental::optional;
+// using std::experimental::nullopt_t;
+// using std::experimental::make_optional;
+// using std::experimental::string_view;
+#if __cplusplus <= 201703L
 using std::experimental::optional;
 using std::experimental::make_optional;
-using std::experimental::string_view;
-#elif defined(__GNUC__) && !defined(__clang__) && __GNUC__ <= 9
-using std::experimental::optional;
-using std::experimental::nullopt_t;
-using std::experimental::make_optional;
-using std::experimental::string_view;
 #else
 using std::optional;
 using std::nullopt_t;
