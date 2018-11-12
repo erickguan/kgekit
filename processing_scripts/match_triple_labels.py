@@ -21,11 +21,11 @@ def match_triple_labels(label_filename, translation_filename):
     labels = kgekit.io.read_labels(label_filename, ' ')
     t = Transform(entities)
     filtered_labels = dropwhile(t, labels)
-    filtered_labels = list(map(lambda l: (entities[l[0]], l[1]), filtered_labels))
+    filtered_labels = list(map(lambda l: " ".join((str(entities[l[0]]), l[1])), filtered_labels))
     return filtered_labels
 
 if __name__ == '__main__':
     labels = match_triple_labels(sys.argv[1], sys.argv[2])
     with open('matched_labels.txt', 'w') as f:
         for l in labels:
-            f.write(" ".join(l) + "\n")
+            f.write(l + "\n")
