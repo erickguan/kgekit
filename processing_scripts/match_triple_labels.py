@@ -8,8 +8,8 @@ from itertools import chain, dropwhile
 def match_triple_labels(label_filename, translation_filename):
     entities, _ = kgekit.io.read_translation(translation_filename)
     labels = kgekit.io.read_labels(label_filename, ' ')
-    filtered_labels = dropwhile(lambda x: x[0] not in entities, labels)
-    filtered_labels = list(map(lambda l: (entities[l[0]], l[1]), filtered_labels))
+    filtered_labels = dropwhile(lambda x: x[0] not in entities or len(x) != 2, labels)
+    filtered_labels = list(map(lambda l: (entities[l[0]], l[1] ), filtered_labels))
     return filtered_labels
 
 if __name__ == '__main__':
