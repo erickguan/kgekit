@@ -54,7 +54,7 @@ class MainTest(unittest.TestCase):
             kgekit.io.read_triples(self.triple_filename, "hrr", ' ') # wrong order
 
     def test_read_labels(self):
-        self.assertEqual(kgekit.io.read_labels(self.label_filename, ' '), [["aa", '"eng"@eng'], ["bb", '"fr"@fr']])
+        self.assertEqual(kgekit.io.read_labels(self.label_filename, ' '), [("aa", '"eng"@eng'), ("bb", '"fr"@fr'), ('Gyulai_FC', '"Gyulai FC"@eng')])
 
     def test_write_index_translation(self):
         translation_filepath = "translation.txt"

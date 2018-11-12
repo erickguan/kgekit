@@ -1,2 +1,3 @@
 aa "eng"@eng
 bb "fr"@fr
+Gyulai_FC "Gyulai FC"@eng

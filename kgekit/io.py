@@ -24,11 +24,15 @@ def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read
 def read_triple_indexes(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgekit.get_triple_index):
     return read_triples(filename, triple_order, delimiter, read_fn)
 
+def _label_processing(l, delimiter):
+    splits = l.rstrip().split(delimiter)
+    return (splits[0], delimiter.join(splits[1:]))
+
 def read_labels(filename, delimiter=DEFAULT_DELIMITER):
     """read label files. Format: ent label"""
     _assert_good_file(filename)
     with open(filename) as f:
-        labels = [l.rstrip().split(delimiter) for l in f]
+        labels = [_label_processing(l, delimiter) for l in f]
         return labels
 
 def write_index_translation(translation_filename, entity_ids, relation_ids, delimiter=DEFAULT_DELIMITER):

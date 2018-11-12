@@ -5,11 +5,23 @@ import kgekit.data
 import random
 from itertools import chain, dropwhile
 
+class Transform(object):
+    def __init__(self, entities):
+        self.entities = entities
+
+    def __call__(self, label):
+        if len(label) != 2:
+            print(label)
+            return True
+        name, _ = label
+        return name not in self.entities
+
 def match_triple_labels(label_filename, translation_filename):
     entities, _ = kgekit.io.read_translation(translation_filename)
     labels = kgekit.io.read_labels(label_filename, ' ')
-    filtered_labels = dropwhile(lambda x: x[0] not in entities or len(x) != 2, labels)
-    filtered_labels = list(map(lambda l: (entities[l[0]], l[1] ), filtered_labels))
+    t = Transform(entities)
+    filtered_labels = dropwhile(t, labels)
+    filtered_labels = list(map(lambda l: (entities[l[0]], l[1]), filtered_labels))
     return filtered_labels
 
 if __name__ == '__main__':
