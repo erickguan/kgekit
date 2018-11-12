@@ -10,6 +10,7 @@ def shuffled_split(filename):
         print("There is " + str(num_failed) + " failures.")
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
     indexes = indexer.indexes()
+    kgekit.io.write_index_translation('translation.protobuf', indexer.entityIdMap(), indexer.relationIdMap())
     indexes = kgekit.data.shuffle_triples(indexes)
     train, valid, test = kgekit.data.split_golden_set(indexes, 0.005, 0.005)
     kgekit.io.write_triples('train.txt', train)
