@@ -22,7 +22,7 @@ public:
     /*
     * tph, hpt are considered per relation basis.
     */
-   pair<float, float> getProbablityRelation(const int32_t relation_id);
+   float getProbablityRelation(const int32_t relation_id);
 private:
     py::list train_set_;
     vector<float> average_tails_per_head_;

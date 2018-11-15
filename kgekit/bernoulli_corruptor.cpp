@@ -39,16 +39,14 @@ BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set)
     }
 }
 
-pair<float, float> BernoulliCorruptor::getProbablityRelation(const int32_t relation_id)
+float BernoulliCorruptor::getProbablityRelation(const int32_t relation_id)
 {
     if (relation_id < 0 || relation_id >= num_relations_) {
         throw std::out_of_range("Relation id given to the BernoulliCorruptor is larger than it parsed from datasets.");
     }
     auto hpt = average_heads_per_tail_[relation_id];
     auto tph = average_tails_per_head_[relation_id];
-    auto r1 = tph / (hpt+tph);
-    auto r2 = 1.0 - r1;
-    return std::make_pair(r1, r2);
+    return tph / (hpt+tph);
 }
 
 } // namespace kgekit

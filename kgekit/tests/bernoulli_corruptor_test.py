@@ -22,11 +22,9 @@ class LCWANoThrowSamplerTest(unittest.TestCase):
 
         first_rel = self.corruptor.getProbablityRelation(0)
         second_rel = self.corruptor.getProbablityRelation(1)
-        self.assertAlmostEqual(first_rel[0], 1/2.5)
-        self.assertAlmostEqual(first_rel[1], 1.5/2.5)
+        self.assertAlmostEqual(first_rel, 1/2.5)
 
-        self.assertAlmostEqual(second_rel[0], 2/3.0)
-        self.assertAlmostEqual(second_rel[1], 1/3.0)
+        self.assertAlmostEqual(second_rel, 2/3.0)
 
 if __name__ == '__main__':
     unittest.main()
