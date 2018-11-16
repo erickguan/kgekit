@@ -29,7 +29,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 set(SOURCES kgekit.h kgekit_impl.cpp)
-set(PY_SOURCES kgekit.cpp entity_number_indexer.cpp lcwa_no_throw_sampler.cpp bernoulli_corruptor.cpp ranker.cpp)
+set(PY_SOURCES kgekit.cpp entity_number_indexer.cpp lcwa_no_throw_sampler.cpp bernoulli_corruptor.cpp ranker.cpp triple_expander.cpp)
 set(TEST_SOURCES test_helper.cpp kgekit_impl_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h test_helper.h)
 
 add_library(kgekit_impl ${SOURCES})

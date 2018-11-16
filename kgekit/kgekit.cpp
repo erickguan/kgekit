@@ -8,6 +8,7 @@
 #include "lcwa_no_throw_sampler.h"
 #include "bernoulli_corruptor.h"
 #include "ranker.h"
+#include "triple_expander.h"
 
 namespace py = pybind11;
 
@@ -72,6 +73,13 @@ PYBIND11_MODULE(_kgekit, m) {
           py::arg("order"),
           py::arg("delimiter"),
           py::arg("skip_checking_order") = false);
+
+    m.def("expand_triple_batch", &kgekit::expand_triple_batch, "expands triple batch",
+          py::arg("batch"),
+          py::arg("num_entity"),
+          py::arg("num_relation"),
+          py::arg("expand_entity"),
+          py::arg("expand_relation"));
 
     py::class_<kgekit::EntityNumberIndexer>(m, "EntityNumberIndexer", "index from triples and translation between index and lists")
         .def(py::init<const py::list&, const std::string&>())
