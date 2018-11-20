@@ -25,7 +25,7 @@ class RankerTest(unittest.TestCase):
         ranks = self.ranker.rankTail(np.array([
             0.001, 0.002, 0.003, 0.004, 0.005, 0.006, 0.007
         ], dtype=np.float32), kgekit.TripleIndex(4, 2, 3))
-        self.assertEqual(ranks, (5, 5))
+        self.assertEqual(ranks, (4, 4))
 
     def test_rank_relation(self):
         ranks = self.ranker.rankRelation(np.array([

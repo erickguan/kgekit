@@ -34,14 +34,14 @@ pair<int32_t, int32_t> _rank(pybind11::array_t<float>& arr, int64_t original, un
 {
     constexpr auto kEpsilon = 1e-6;
     auto r = arr.mutable_unchecked<1>(); // Will throw if ndim != 1 or flags.writeable is false
-    float actual = r(original);
+    float expected_best = r(original);
      // rank starts with 1
     int32_t rank = 1;
     int32_t filtered_rank = 1;
     for (ssize_t i = 0; i < r.shape(0); ++i) {
-        if (fabs(r(i) - actual) < kEpsilon) {
+        if (fabs(r(i) - expected_best) < kEpsilon) {
             continue;
-        } else if (r(i) < actual) {
+        } else if (r(i) < expected_best) {
             rank++;
             if (filters.find(i) == filters.end()) {
                 filtered_rank++;
@@ -58,7 +58,7 @@ pair<int32_t, int32_t> Ranker::rankHead(pybind11::array_t<float>& arr, const Tri
 
 pair<int32_t, int32_t> Ranker::rankTail(pybind11::array_t<float>& arr, const TripleIndex& triple)
 {
-    return _rank(arr, triple.head, rest_tail_[internal::_pack_value(triple.relation, triple.tail)]);
+    return _rank(arr, triple.tail, rest_tail_[internal::_pack_value(triple.head, triple.relation)]);
 }
 
 pair<int32_t, int32_t> Ranker::rankRelation(pybind11::array_t<float>& arr, const TripleIndex& triple)
