@@ -28,6 +28,7 @@ def _label_processing(l, delimiter):
     splits = l.rstrip().split(delimiter)
     return (splits[0], delimiter.join(splits[1:]))
 
+# TODO: This consumes around 26G memory. It will be nicer to have stream version.
 def read_labels(filename, delimiter=DEFAULT_DELIMITER):
     """read label files. Format: ent label"""
     _assert_good_file(filename)
