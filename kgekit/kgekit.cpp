@@ -110,6 +110,8 @@ PYBIND11_MODULE(_kgekit, m) {
         .def(py::init<const py::list&, const py::list&, const py::list&>())
         .def("rankHead", &kgekit::Ranker::rankHead, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test head prediction.")
         .def("rankTail", &kgekit::Ranker::rankTail, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test tail prediction.")
-        .def("rankRelation", &kgekit::Ranker::rankRelation, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test relation prediction.");
+        .def("rankRelation", &kgekit::Ranker::rankRelation, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test relation prediction.")
+        .def("exportState", &kgekit::Ranker::exportState)
+        .def(py::pickle(&kgekit::ranker_pickle_getstate, &kgekit::ranker_pickle_setstate));
 }
 

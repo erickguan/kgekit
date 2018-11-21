@@ -1,9 +1,39 @@
 import unittest
 import kgekit
 import pickle
-import os
+import os.path
 import numpy as np
 import pytest
+
+# I used this to test ranker pickle
+# import os
+# import pickle
+# import kgekit.io
+
+# prefix = os.path.join('kgekit', 'tests', 'fixtures')
+# train, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_train.txt'), "hrt", ' ')
+# valid, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_valid.txt'), "hrt", ' ')
+# test, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_test.txt'), "hrt", ' ')
+# ranker = kgekit.Ranker(train, valid, test)
+# ranker.exportState()
+
+def _compose_pair_state(rest_keys, entry_list):
+    s1 = frozenset(rest_keys)
+    s2 = frozenset([frozenset(l) for l in entry_list])
+    return frozenset([s1, s2])
+
+def _calc_state(state):
+    rest_heads, rest_tails, rest_relations = state
+    return frozenset([
+        _compose_pair_state(*rest_heads),
+        _compose_pair_state(*rest_tails),
+        _compose_pair_state(*rest_relations)
+    ])
+
+def _compare_state(orig_state, new_state):
+    s1 = _calc_state(orig_state)
+    s2 = _calc_state(new_state)
+    return s1.issubset(s2) and s2.issubset(s1)
 
 @pytest.mark.numpyfile
 class RankerTest(unittest.TestCase):
@@ -47,6 +77,18 @@ class RankerTest(unittest.TestCase):
             0.231, 0.562, 0.923, 0.344
         ], dtype=np.float32), kgekit.TripleIndex(3, 1, 5))
         self.assertEqual(ranks, (3, 2))
+
+    # This method has to be correct to ensure multiprocessing correctness
+    def test_pickle(self):
+        ranker_bytes = pickle.dumps(self.ranker)
+        state = self.ranker.exportState()
+        self.ranker = pickle.loads(ranker_bytes)
+
+        self.test_rank_head()
+        self.test_rank_relation()
+        self.test_rank_tail()
+
+        self.assertTrue(_compare_state(state, self.ranker.exportState()))
 
 if __name__ == '__main__':
     unittest.main()
