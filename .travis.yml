@@ -11,11 +11,11 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
+            - g++-8
             - cmake-data
             - cmake
       env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
     - name: "Python 3.7 - Xenial"
       python: "3.7"
       os: linux
@@ -25,16 +25,17 @@ matrix:
           sources:
             - ubuntu-toolchain-r-test
           packages:
-            - g++-7
+            - g++-8
             - cmake-data
             - cmake
       env:
-        - MATRIX_EVAL="CC=gcc-7 && CXX=g++-7"
+        - MATRIX_EVAL="CC=gcc-8 && CXX=g++-8"
 
 before_install:
   - eval "${MATRIX_EVAL}"
 
-script:
-  - pipenv --three
+install:
   - pipenv install --dev
+
+script:
   - pipenv run python -m pytest .
