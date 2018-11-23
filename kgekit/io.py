@@ -8,9 +8,15 @@ from kgekit.utils import assert_triple_order
 DEFAULT_DELIMITER=' '
 
 def _assert_good_file(filename):
-    path = Path(filename)
+    try:
+        path = Path(filename).resolve(strict=True)
+    except FileNotFoundError:
+        raise FileNotFoundError("Can't find triple file at path {}".format(filename))
+    except RuntimeError:
+        raise FileNotFoundError("Cyclic dependency when find triple file {}".format(filename))
+
     if not (path.exists() and path.is_file()):
-        raise FileNotFoundError("Can't find the triple file.")
+        raise FileNotFoundError("Can't find the triple file at {}.".format(path))
 
 def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgekit.get_triple):
     _assert_good_file(filename)
