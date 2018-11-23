@@ -36,6 +36,5 @@ before_install:
 
 script:
   - pipenv --three
-  - pipenv shell
   - pipenv install --dev
-  - python -m pytest .
+  - pipenv run python -m pytest .
