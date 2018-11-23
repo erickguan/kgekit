@@ -1,0 +1,14 @@
+language: python
+
+matrix:
+  include:
+  - name: "Python 3.6"
+    python: "3.6"
+  - name: "3.7"
+    python: "3.7"
+
+script:
+  - pipenv --three
+  - pipenv install --dev
+  - pipenv shell
+  - python -m pytest .
