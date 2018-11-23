@@ -35,8 +35,7 @@ before_install:
   - eval "${MATRIX_EVAL}"
 
 script:
-  - pip3 install pipenv
   - pipenv --three
-  - pipenv install --dev
   - pipenv shell
+  - pipenv install --dev
   - python -m pytest .
