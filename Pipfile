@@ -4,7 +4,7 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-kgekit = {editable = true, path = "."}
+kgekit = {editable = true,path = "."}
 protobuf = "*"
 numpy = "*"
 

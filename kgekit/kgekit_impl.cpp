@@ -2,8 +2,9 @@
 
 #include <vector>
 #include <unordered_set>
-#include <range/v3/all.hpp>
-#include <range/v3/view/split.hpp>
+#include <type_traits>
+
+#include <boost/algorithm/string.hpp>
 
 namespace kgekit {
 
@@ -24,45 +25,17 @@ void assert_triple_order(const string& order)
         throw std::invalid_argument("Order is not valid. It's not a valid triple shape.");
     }
 }
-} // namespace internal
 
-optional<TripleIndex> get_triple_index(const string& line, const string& order, const char delimiter, bool skip_checking_order)
-{
-    if (!skip_checking_order) {
-        try {
-            internal::assert_triple_order(order);
-        } catch (const std::invalid_argument& e) {
-            return {};
-        }
-    }
-    decltype(line.find(delimiter)) last_pos = 0;
-    TripleIndex triple;
+template<typename T>
+inline typename std::enable_if<!std::is_scalar_v<T>, const T&>::type
+_get_triple_element(const string& element) { return element; }
 
-    vector<string> view = line | ranges::view::split(delimiter);
+template<typename T>
+inline typename std::enable_if<std::is_scalar_v<T>, T>::type
+_get_triple_element(const string& element) { return static_cast<T>(std::stol(element)); }
 
-    for (auto i = 0; i < order.size(); ++i) {
-        if (i >= view.size()) { return {}; }
-        uint32_t idx = static_cast<uint32_t>(std::stoul(view[i]));
-
-        switch (order[i]) {
-        case 'h':
-            triple.head = idx;
-            break;
-        case 'r':
-            triple.relation = idx;
-            break;
-        case 't':
-            triple.tail = idx;
-            break;
-        default:
-            break;
-        }
-    }
-    return { triple };
-}
-
-
-optional<Triple> get_triple(
+template<typename TripleType>
+inline optional<TripleType> _get_triple_impl(
     const string& line,
     const string& order,
     const char delimiter,
@@ -76,14 +49,15 @@ optional<Triple> get_triple(
         }
     }
     decltype(line.find(delimiter)) last_pos = 0;
-    Triple triple;
+    TripleType triple;
 
-    vector<string> view = line | ranges::view::split(delimiter);
+    vector<string> splitted;
+    boost::split(splitted, line, [&](char c) { return c == delimiter; });
 
     for (auto i = 0; i < order.size(); ++i) {
-        if (i >= view.size()) { return {}; }
+        if (i >= splitted.size()) { return {}; }
 
-        auto& idx = view[i];
+        auto idx = _get_triple_element<decltype(triple.head)>(splitted[i]);
         switch (order[i]) {
         case 'h':
             triple.head = idx;
@@ -99,6 +73,28 @@ optional<Triple> get_triple(
         }
     }
     return { triple };
+
+}
+
+} // namespace internal
+
+optional<TripleIndex> get_triple_index(
+    const string& line,
+    const string& order,
+    const char delimiter,
+    bool skip_checking_order)
+{
+    return internal::_get_triple_impl<TripleIndex>(line, order, delimiter, skip_checking_order);
+}
+
+
+optional<Triple> get_triple(
+    const string& line,
+    const string& order,
+    const char delimiter,
+    bool skip_checking_order)
+{
+    return internal::_get_triple_impl<Triple>(line, order, delimiter, skip_checking_order);
 }
 
 } // namespace kgekit
