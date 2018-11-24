@@ -10,7 +10,7 @@ from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
 from setuptools.command.build_ext import build_ext
 from shutil import copyfile, copymode
-from setuptools import find_packages
+from setuptools import find_packages, setup, Command
 
 
 class CMakeExtension(Extension):
@@ -94,8 +94,20 @@ class CMakeBuild(build_ext):
         self.copy_test_file(ext, test_bin)
         print()  # Add an empty line for cleaner output
 
+
+class CleanCommand(Command):
+    """Custom clean command to tidy up the project root."""
+    user_options = []
+    def initialize_options(self):
+        pass
+    def finalize_options(self):
+        pass
+    def run(self):
+        os.system('rm -vrf ./build ./dist ./*.pyc ./*.tgz ./*.egg-info')
+
+
 setup(name='kgekit',
-      version='0.3.3',
+      version='0.3.5',
       description='knowledge representation tools',
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',
@@ -106,11 +118,10 @@ setup(name='kgekit',
         'protobuf>=3',
         'numpy>=1.10'
       ],
-      cmdclass=dict(build_ext=CMakeBuild),
+      cmdclass=dict(build_ext=CMakeBuild, clean=CleanCommand),
       ext_modules=[CMakeExtension('kgekit')],
       test_suite='tests',
       zip_safe=False,
-      include_package_data=True,
       classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
