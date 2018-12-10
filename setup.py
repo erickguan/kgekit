@@ -109,6 +109,8 @@ class CleanCommand(Command):
 setup(name='kgekit',
       version='0.3.5',
       description='knowledge representation tools',
+      long_description=open("README.md", "r").read(),
+      long_description_content_type="text/markdown",
       url='http://github.com/fantasticfears/kgekit',
       author='Erick Guan',
       author_email='fantasticfears@gmail.com',
