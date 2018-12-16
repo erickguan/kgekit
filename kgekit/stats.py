@@ -4,7 +4,8 @@ from itertools import groupby
 import kgekit.io
 
 ONE_TO_ONE_MARGIN_LINE = 1.5
-
+# Check this when modify:
+# https://gist.github.com/fantasticfears/f8053480ff1db6da83cb30e446ab2181
 def calculate_one_or_many(translation_filename, *triple_filenames):
     _, relations = kgekit.io.relationead_translation(translation_filename)
     relations = dict(relations)

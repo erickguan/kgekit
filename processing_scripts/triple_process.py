@@ -94,14 +94,16 @@ def remove_reverse(filename, out_filename):
     original = frozenset(indexes)
     reverse_triples = _get_reverse_triples(indexes)
 
-    # maybe saved it somewhere
+    # calculate frequences of all conflicted triples
     freqs = defaultdict(int)
     for reverses in reverse_triples:
+        # reverse is a list of conflicting triple of interest
         for r in reverses:
             freqs[r.relation] += 1
     print(freqs)
 
     to_deleted = set()
+    # choose one to remove
     for reverses in reverse_triples:
         sampled = random.sample(reverses, 1)
         to_deleted.add(sampled[0])

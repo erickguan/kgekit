@@ -18,17 +18,19 @@ def _assert_good_file(filename):
     if not (path.exists() and path.is_file()):
         raise FileNotFoundError("Can't find the triple file at {}.".format(path))
 
-def read_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgekit.get_triple):
+def read_triples(filename, read_fn=kgekit.get_triple, triple_order="hrt", delimiter=DEFAULT_DELIMITER, skip_first_line=False):
     _assert_good_file(filename)
     assert_triple_order(triple_order)
     with open(filename) as f:
+        if skip_first_line:
+            next(f)
         indexes = [read_fn(l.rstrip('\n'), triple_order, delimiter, True) for l in f]
         filtered = list(filter(None.__ne__, indexes))
         num_none = len(indexes) - len(filtered)
         return filtered, num_none
 
-def read_triple_indexes(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgekit.get_triple_index):
-    return read_triples(filename, triple_order, delimiter, read_fn)
+def read_triple_indexes(filename, read_fn=kgekit.get_triple_index, triple_order="hrt", delimiter=DEFAULT_DELIMITER, skip_first_line=False):
+    return read_triples(filename, read_fn, triple_order, delimiter, skip_first_line)
 
 def _label_processing(l, delimiter):
     splits = l.rstrip().split(delimiter)
@@ -67,3 +69,16 @@ def read_translation(filename):
     with open(filename, "rb") as f:
         translation.ParseFromString(f.read())
     return (translation.entities, translation.relations)
+
+def read_openke_translation(filename, delimiter='\t', entity_first=True):
+    """Returns map with entity or relations from plain text."""
+    result = {}
+    with open(filename, "r") as f:
+        _ = next(f) # pass the total entry number
+        for line in f:
+            line_slice = line.rstrip().split(delimiter)
+            if not entity_first:
+                line_slice = list(reversed(line_slice))
+            result[line_slice[0]] = line_slice[1]
+
+    return result
