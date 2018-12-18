@@ -78,8 +78,13 @@ struct TripleIndex {
     {
         return fmt::format("({0}, {1}, {2})", head, relation, tail);
     }
-    string serialize(const string& delimiter) const
+    string serialize(const string& delimiter, const string& order) const
     {
+        internal::assert_triple_order(order);
+        // TODO: fix this
+        if (order == "htr") {
+            return fmt::format("{0}{3}{1}{3}{2}", head, tail, relation, delimiter);
+        }
         return fmt::format("{0}{3}{1}{3}{2}", head, relation, tail, delimiter);
     }
 };
@@ -98,8 +103,13 @@ struct Triple {
     {
         return fmt::format("({0}, {1}, {2})", head, relation, tail);
     }
-    string serialize(const string& delimiter) const
+    string serialize(const string& delimiter, const string& order) const
     {
+        internal::assert_triple_order(order);
+        // TODO: fix this
+        if (order == "htr") {
+            return fmt::format("{0}{3}{1}{3}{2}", head, tail, relation, delimiter);
+        }
         return fmt::format("{0}{3}{1}{3}{2}", head, relation, tail, delimiter);
     }
 };
