@@ -2,4 +2,4 @@
 
 def assert_triple_order(order):
     if frozenset(order) != frozenset('hrt'):
-        raise RuntimeError("Wrong triple order.")
+        raise RuntimeError("Wrong triple order. Got order {}".format(order))
