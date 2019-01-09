@@ -111,7 +111,7 @@ shared_ptr<vector<string>> EntityNumberIndexer::getRelations()
 
 void EntityNumberIndexer::buildIndex()
 {
-    internal::assert_triple_order(order_);
+    detail::assert_triple_order(order_);
 
     entities_ = make_shared<vector<string>>();
     relations_ = make_shared<vector<string>>();

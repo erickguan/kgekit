@@ -10,4 +10,4 @@ set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/externals/sanitizers-cmake/cmake" ${C
 
 project(kgekit)
 
-add_subdirectory(kgekit)
+add_subdirectory(kgedata)

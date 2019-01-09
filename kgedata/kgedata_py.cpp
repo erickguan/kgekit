@@ -6,7 +6,7 @@
 #include "kgedata.h"
 #include "entity_number_indexer.h"
 #include "lcwa_no_throw_sampler.h"
-#include "bernoulli_corruptor.h"
+#include "corruptors.h"
 #include "ranker.h"
 #include "triple_expander.h"
 
@@ -16,52 +16,7 @@ namespace py = pybind11;
  * The naming convention of this file is to help mix with Python code.
  */
 PYBIND11_MODULE(kgedata, m) {
-    /*
-     * C++ data structure are properly binded to Python.
-     * For the list, it's easier to unwrapped in C++ so we will keep
-     * their wrapper from Python (pybind11).
-     */
-    py::class_<kgedata::Triple>(m, "Triple")
-        .def(py::init<>())
-        .def(py::init<const std::string&, const std::string&, const std::string&>())
-        .def("__repr__", &kgedata::Triple::repr)
-        .def("__eq__", &kgedata::Triple::operator==)
-        .def("serialize", &kgedata::Triple::serialize)
-        .def_readwrite("head", &kgedata::Triple::head)
-        .def_readwrite("relation", &kgedata::Triple::relation)
-        .def_readwrite("tail", &kgedata::Triple::tail)
-        .def(py::pickle(
-            [](const kgedata::Triple &p) { // __getstate__
-                return py::make_tuple(p.head, p.relation, p.tail);
-            },
-            [](py::tuple t) { // __setstate__
-                if (t.size() != 3) {
-                    throw std::runtime_error("Invalid state!");
-                }
-                return kgedata::Triple(t[0].cast<std::string>(), t[1].cast<std::string>(), t[2].cast<std::string>());
-            }
-        ));
-
-    py::class_<kgedata::TripleIndex>(m, "TripleIndex")
-        .def(py::init<>())
-        .def(py::init<int32_t, int32_t, int32_t>())
-        .def("__repr__", &kgedata::TripleIndex::repr)
-        .def("__eq__", &kgedata::TripleIndex::operator==)
-        .def("serialize", &kgedata::TripleIndex::serialize)
-        .def_readwrite("head", &kgedata::TripleIndex::head)
-        .def_readwrite("relation", &kgedata::TripleIndex::relation)
-        .def_readwrite("tail", &kgedata::TripleIndex::tail)
-        .def(py::pickle(
-            [](const kgedata::TripleIndex &p) { // __getstate__
-                return py::make_tuple(p.head, p.relation, p.tail);
-            },
-            [](py::tuple t) { // __setstate__
-                if (t.size() != 3) {
-                    throw std::runtime_error("Invalid state!");
-                }
-                return kgedata::TripleIndex(t[0].cast<int32_t>(), t[1].cast<int32_t>(), t[2].cast<int32_t>());
-            }
-        ));
+#include "kgedata_type.cpp"
 
     m.def("get_triple_index", &kgedata::get_triple_index, "get triple index from a line",
           py::arg("line"),
@@ -103,8 +58,13 @@ PYBIND11_MODULE(kgedata, m) {
         .def("sample", &kgedata::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("corrupt_head_list").noconvert(), py::arg("batch").noconvert(), py::arg("random_seed") = std::random_device{}(), "samples current batch");
 
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
-        .def(py::init<const py::list&>())
-        .def("getProbablityRelation", &kgedata::BernoulliCorruptor::getProbablityRelation, "gets the probablity pair of given relation");
+        .def(py::init<const py::list&, int32_t>())
+        .def(py::init<const py::list&, int32_t, int64_t>())
+        .def("make_random_choice", &kgedata::BernoulliCorruptor::make_random_choice, "gets the choice for given batch item");
+    py::class_<kgedata::UniformCorruptor>(m, "UniformCorruptor", "generates the uniform distribution of samples")
+        .def(py::init<>())
+        .def(py::init<int64_t>())
+        .def("make_random_choice", &kgedata::UniformCorruptor::make_random_choice, "gets the choice for given batch item");
 
     py::class_<kgedata::Ranker>(m, "Ranker", "ranks the prediction")
         .def(py::init<const py::list&, const py::list&, const py::list&>())

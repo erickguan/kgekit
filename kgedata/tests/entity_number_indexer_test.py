@@ -1,12 +1,13 @@
 import unittest
 import os
-import kgedata.io
+import kgekit.io
+import kgedata
 
 class EntityNumberIndexerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         triple_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'triple.txt')
-        t, _ = kgedata.io.read_triples(triple_filename, "hrt", ' ')
+        t, _ = kgekit.io.read_triples(triple_filename, triple_order="hrt", delimiter=' ')
         cls._indexer = kgedata.EntityNumberIndexer(t, "hrt")
 
     def test_attrs(self):

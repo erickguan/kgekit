@@ -14,7 +14,7 @@ foreach(proto_file ${KGEKIT_PROTOS})
 
   add_custom_command(
       OUTPUT ${generated_files}
-      COMMAND protobuf::protoc --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --python_out ${CMAKE_CURRENT_LIST_DIR}/.. -I ${CMAKE_CURRENT_SOURCE_DIR} ${proto_file_abs}
+      COMMAND protobuf::protoc --cpp_out ${CMAKE_CURRENT_BINARY_DIR} --python_out ${CMAKE_CURRENT_LIST_DIR}/../../kgekit -I ${CMAKE_CURRENT_SOURCE_DIR} ${proto_file_abs}
       COMMENT "Generating ${generated_files} from ${proto_file}"
       VERBATIM
   )

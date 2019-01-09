@@ -8,7 +8,7 @@ namespace kgedata
 
 using namespace Catch;
 
-namespace internal
+namespace detail
 {
 
 TEST_CASE("assert_triple_order", "[io]")
@@ -22,7 +22,7 @@ TEST_CASE("assert_triple_order", "[io]")
     REQUIRE_THROWS_AS(assert_triple_order("h"), std::invalid_argument);      // not too short order
 }
 
-} // namespace internal
+} // namespace detail
 
 TEST_CASE("TripleIndex", "[data]")
 {

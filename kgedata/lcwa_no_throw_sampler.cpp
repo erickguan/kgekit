@@ -31,9 +31,9 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
 {
     for (auto const& t : triples) {
         auto triple = t.cast<TripleIndex>();
-        rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
-        rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
+        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
+        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
     }
 }
 
@@ -79,7 +79,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(py::array_t<int64_t, py::arr
 
 int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func)
 {
-    auto k = internal::_pack_value(h, r);
+    auto k = detail::_pack_value(h, r);
     auto gen_tail = generate_random_func() % sampler_->num_entity_;
     if (rest_tail_[k].find(gen_tail) == rest_tail_[k].end()) {
         return gen_tail;
@@ -96,7 +96,7 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, i
 
 int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func)
 {
-    auto k = internal::_pack_value(t, r);
+    auto k = detail::_pack_value(t, r);
     auto gen_head = generate_random_func() % sampler_->num_entity_;
     if (rest_head_[k].find(gen_head) == rest_head_[k].end()) {
         return gen_head;
@@ -113,7 +113,7 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, i
 
 int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int64_t h, int64_t t, std::function<int64_t(void)> generate_random_func)
 {
-    auto k = internal::_pack_value(h, t);
+    auto k = detail::_pack_value(h, t);
     auto gen_relation = generate_random_func() % sampler_->num_relation_;
     if (rest_relation_[k].find(gen_relation) == rest_relation_[k].end()) {
         return gen_relation;

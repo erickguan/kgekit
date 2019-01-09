@@ -10,7 +10,7 @@ namespace kgedata {
 
 using std::vector;
 
-namespace internal {
+namespace detail {
 
 void assert_triple_order(const string& order)
 {
@@ -43,7 +43,7 @@ inline optional<TripleType> _get_triple_impl(
 {
     if (!skip_checking_order) {
         try {
-            internal::assert_triple_order(order);
+            detail::assert_triple_order(order);
         } catch (const std::invalid_argument& e) {
             return {};
         }
@@ -76,7 +76,7 @@ inline optional<TripleType> _get_triple_impl(
 
 }
 
-} // namespace internal
+} // namespace detail
 
 optional<TripleIndex> get_triple_index(
     const string& line,
@@ -84,7 +84,7 @@ optional<TripleIndex> get_triple_index(
     const char delimiter,
     bool skip_checking_order)
 {
-    return internal::_get_triple_impl<TripleIndex>(line, order, delimiter, skip_checking_order);
+    return detail::_get_triple_impl<TripleIndex>(line, order, delimiter, skip_checking_order);
 }
 
 
@@ -94,7 +94,7 @@ optional<Triple> get_triple(
     const char delimiter,
     bool skip_checking_order)
 {
-    return internal::_get_triple_impl<Triple>(line, order, delimiter, skip_checking_order);
+    return detail::_get_triple_impl<Triple>(line, order, delimiter, skip_checking_order);
 }
 
 } // namespace kgedata

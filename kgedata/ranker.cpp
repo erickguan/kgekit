@@ -10,23 +10,23 @@ Ranker::Ranker(const pybind11::list& train_triples, const pybind11::list& valid_
 {
     for (auto const& t : train_triples) {
         auto triple = t.cast<TripleIndex>();
-        rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
-        rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
+        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
+        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
     }
 
     for (auto const& t : valid_triples) {
         auto triple = t.cast<TripleIndex>();
-        rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
-        rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
+        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
+        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
     }
 
     for (auto const& t : test_triples) {
         auto triple = t.cast<TripleIndex>();
-        rest_head_[internal::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_tail_[internal::_pack_value(triple.head, triple.relation)].insert(triple.tail);
-        rest_relation_[internal::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
+        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
+        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
     }
 }
 
@@ -151,17 +151,17 @@ pair<int32_t, int32_t> _rank(pybind11::array_t<float>& arr, int64_t original, un
 
 pair<int32_t, int32_t> Ranker::rankHead(pybind11::array_t<float>& arr, const TripleIndex& triple)
 {
-    return _rank(arr, triple.head, rest_head_[internal::_pack_value(triple.relation, triple.tail)]);
+    return _rank(arr, triple.head, rest_head_[detail::_pack_value(triple.relation, triple.tail)]);
 }
 
 pair<int32_t, int32_t> Ranker::rankTail(pybind11::array_t<float>& arr, const TripleIndex& triple)
 {
-    return _rank(arr, triple.tail, rest_tail_[internal::_pack_value(triple.head, triple.relation)]);
+    return _rank(arr, triple.tail, rest_tail_[detail::_pack_value(triple.head, triple.relation)]);
 }
 
 pair<int32_t, int32_t> Ranker::rankRelation(pybind11::array_t<float>& arr, const TripleIndex& triple)
 {
-    return _rank(arr, triple.relation, rest_relation_[internal::_pack_value(triple.head, triple.tail)]);
+    return _rank(arr, triple.relation, rest_relation_[detail::_pack_value(triple.head, triple.tail)]);
 }
 
 pybind11::tuple ranker_pickle_getstate(const Ranker& ranker)

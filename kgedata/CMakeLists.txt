@@ -26,7 +26,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 set(SOURCES kgedata.h kgedata.cpp)
-set(PY_SOURCES kgedata_py.cpp entity_number_indexer.cpp lcwa_no_throw_sampler.cpp bernoulli_corruptor.cpp ranker.cpp triple_expander.cpp)
+set(PY_SOURCES kgedata_py.cpp entity_number_indexer.cpp lcwa_no_throw_sampler.cpp corruptors.cpp ranker.cpp triple_expander.cpp)
 set(TEST_SOURCES test_helper.cpp kgedata_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h test_helper.h)
 
 add_library(kgedata_impl ${SOURCES})
@@ -37,7 +37,6 @@ target_link_libraries(kgedata_impl PUBLIC kgedata_structs fmt::fmt)
 pybind11_add_module(kgedata SHARED ${PY_SOURCES})
 target_compile_features(kgedata PUBLIC cxx_std_17)
 target_link_libraries(kgedata PUBLIC kgedata_impl PRIVATE Boost::boost)
-set_property(TARGET kgedata PROPERTY PREFIX _)
 
 # test target and helper, from pybind11 tools
 

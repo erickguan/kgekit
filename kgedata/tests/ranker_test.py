@@ -1,4 +1,5 @@
 import unittest
+import kgekit.io
 import kgedata
 import pickle
 import os.path
@@ -8,12 +9,12 @@ import pytest
 # I used this to test ranker pickle
 # import os
 # import pickle
-# import kgedata.io
+# import kgekit.io
 
 # prefix = os.path.join('kgedata', 'tests', 'fixtures')
-# train, _ = kgedata.io.read_triple_indexes(os.path.join(prefix, 'ranker_train.txt'), "hrt", ' ')
-# valid, _ = kgedata.io.read_triple_indexes(os.path.join(prefix, 'ranker_valid.txt'), "hrt", ' ')
-# test, _ = kgedata.io.read_triple_indexes(os.path.join(prefix, 'ranker_test.txt'), "hrt", ' ')
+# train, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_train.txt'), "hrt", ' ')
+# valid, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_valid.txt'), "hrt", ' ')
+# test, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_test.txt'), "hrt", ' ')
 # ranker = kgedata.Ranker(train, valid, test)
 # ranker.exportState()
 
@@ -40,9 +41,9 @@ class RankerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         prefix = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures')
-        cls.train, _ = kgedata.io.read_triple_indexes(os.path.join(prefix, 'ranker_train.txt'), "hrt", ' ')
-        cls.valid, _ = kgedata.io.read_triple_indexes(os.path.join(prefix, 'ranker_valid.txt'), "hrt", ' ')
-        cls.test, _ = kgedata.io.read_triple_indexes(os.path.join(prefix, 'ranker_test.txt'), "hrt", ' ')
+        cls.train, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_train.txt'), triple_order="hrt", delimiter=' ')
+        cls.valid, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_valid.txt'), triple_order="hrt", delimiter=' ')
+        cls.test, _ = kgekit.io.read_triple_indexes(os.path.join(prefix, 'ranker_test.txt'), triple_order="hrt", delimiter=' ')
         cls.ranker = kgedata.Ranker(cls.train, cls.valid, cls.test)
 
     def test_rank_head(self):
