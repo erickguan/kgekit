@@ -73,7 +73,7 @@ UniformCorruptor::UniformCorruptor(int64_t random_seed)
 void BernoulliCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& bat, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
 {
     auto r = arr.mutable_unchecked<1>();
-    auto batch = arr.unchecked<2>();
+    auto batch = bat.unchecked<2>();
     for (auto i = 0; i < batch.shape(0); ++i) {
         r(i) = distributions_[batch(i, 1)](random_engine_) == 0;
     }
