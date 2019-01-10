@@ -60,6 +60,7 @@ PYBIND11_MODULE(kgedata, m) {
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::list&, int32_t>())
         .def(py::init<const py::list&, int32_t, int64_t>())
+        .def("get_probability_relation", &kgedata::BernoulliCorruptor::get_probability_relation, "gets the probability for certain relation")
         .def("make_random_choice", &kgedata::BernoulliCorruptor::make_random_choice, "gets the choice for given batch item");
     py::class_<kgedata::UniformCorruptor>(m, "UniformCorruptor", "generates the uniform distribution of samples")
         .def(py::init<>())

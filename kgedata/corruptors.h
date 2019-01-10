@@ -35,8 +35,9 @@ public:
     /*
     * tph, hpt are considered per relation basis.
     */
-    array<double, 2> getProbabilityRelation(const int32_t relation_id);
+    double get_probability_relation(const int32_t relation_id) const;
 private:
+    array<double, 2> getProbabilityRelation(const int32_t relation_id) const;
     vector<float> average_tails_per_head_;
     vector<float> average_heads_per_tail_;
     vector<discrete_distribution<>> distributions_;

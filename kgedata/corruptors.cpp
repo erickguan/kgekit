@@ -45,14 +45,22 @@ BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set, int32_t num_re
     }
 }
 
-array<double, 2> BernoulliCorruptor::getProbabilityRelation(const int32_t relation_id)
+array<double, 2> BernoulliCorruptor::getProbabilityRelation(const int32_t relation_id) const
+{
+    auto hpt = average_heads_per_tail_[relation_id];
+    auto tph = average_tails_per_head_[relation_id];
+    return { tph, hpt };
+}
+
+double BernoulliCorruptor::get_probability_relation(const int32_t relation_id) const
 {
     if (relation_id < 0 || relation_id >= num_relations_) {
         throw std::out_of_range("Relation id given to the BernoulliCorruptor is larger than it parsed from datasets.");
     }
-    auto hpt = average_heads_per_tail_[relation_id];
-    auto tph = average_tails_per_head_[relation_id];
-    return { tph, hpt };
+    float hpt;
+    float tph;
+    std::tie(hpt, tph) = getProbabilityRelation(relation_id);
+    return tph / (hpt + tph);
 }
 
 UniformCorruptor::UniformCorruptor(int64_t random_seed)
