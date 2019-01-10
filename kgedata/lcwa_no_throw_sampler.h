@@ -36,19 +36,28 @@ public:
     LCWANoThrowSampler(const py::list& train_set, int64_t num_entity, int64_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
     /* In place editing. Avoid copies for large elements */
-    void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast> arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed=std::random_device{}());
+    void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
+                py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
+                const py::list& batch,
+                int64_t random_seed=std::random_device{}());
 private:
     Strategy Strategy_;
     int16_t num_corrupt_entity_;
     int16_t num_corrupt_relation_;
     struct SampleStrategy {
         virtual ~SampleStrategy() {};
-        virtual void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed) = 0;
+        virtual void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
+                            py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
+                            const py::list& batch,
+                            int64_t random_seed) = 0;
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
         HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler);
-        void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr, const py::list& corrupt_head_list, const py::list& batch, int64_t random_seed) override;
+        void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
+                    py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
+                    const py::list& batch,
+                    int64_t random_seed) override;
     private:
         int64_t generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func);
         int64_t generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func);
