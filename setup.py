@@ -107,7 +107,7 @@ class CleanCommand(Command):
 
 
 setup(name='kgekit',
-      version='0.5.0',
+      version='0.5.1',
       description='knowledge representation tools',
       long_description=open("README.md", "r").read(),
       long_description_content_type="text/markdown",

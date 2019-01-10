@@ -1,10 +1,13 @@
 include CMakeLists.txt
 graft kgekit
+graft kgedata
 graft externals
 graft cmake
 include processing_scripts/*.py
 
 prune kgekit/tests
+prune kgedata/tests
+prune kgedata/__pycache__
 prune kgekit/__pycache__
 global-exclude .DS_Store
 global-exclude *.pyc
