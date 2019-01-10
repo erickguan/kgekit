@@ -1,6 +1,6 @@
 #pragma once
 
-#include <array>
+#include <utility>
 #include <unordered_map>
 #include <vector>
 #include <random>
@@ -12,7 +12,8 @@
 namespace kgedata {
 
 using std::vector;
-using std::array;
+using std::make_pair;
+using std::pair;
 using std::discrete_distribution;
 
 namespace py = pybind11;
@@ -37,7 +38,7 @@ public:
     */
     double get_probability_relation(const int32_t relation_id) const;
 private:
-    array<double, 2> getProbabilityRelation(const int32_t relation_id) const;
+    pair<double, double> getProbabilityRelation(const int32_t relation_id) const;
     vector<float> average_tails_per_head_;
     vector<float> average_heads_per_tail_;
     vector<discrete_distribution<>> distributions_;

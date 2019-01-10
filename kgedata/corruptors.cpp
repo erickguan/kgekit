@@ -16,6 +16,7 @@ static const float kEqualProbability = 0.5;
 BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set, int32_t num_relations, int64_t random_seed)
     : Corruptor(random_seed), num_relations_(num_relations)
 {
+    distributions_.reserve(num_relations_);
     average_tails_per_head_.resize(num_relations_, 0.0);
     average_heads_per_tail_.resize(num_relations_, 0.0);
     vector<int32_t> triples_per_rel(num_relations_, 0);
@@ -34,18 +35,19 @@ BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set, int32_t num_re
             tails_per_rel[i].size() == kNoRelation ||
             heads_per_rel[i].size() == kNoRelation) {
             average_tails_per_head_[i] = average_heads_per_tail_[i] = kEqualProbability;
-            discrete_distribution<> d({kDefaultProbability, kDefaultProbability});
+            discrete_distribution d({kDefaultProbability, kDefaultProbability});
             distributions_.push_back(d);
         } else {
             average_tails_per_head_[i] = static_cast<float>(triples_per_rel[i]) / heads_per_rel[i].size();
             average_heads_per_tail_[i] = static_cast<float>(triples_per_rel[i]) / tails_per_rel[i].size();
             auto r = getProbabilityRelation(i);
-            distributions_.emplace_back(r.begin(), r.end());
+            discrete_distribution d({r.first, r.second});
+            distributions_.push_back(d);
         }
     }
 }
 
-array<double, 2> BernoulliCorruptor::getProbabilityRelation(const int32_t relation_id) const
+pair<double, double> BernoulliCorruptor::getProbabilityRelation(const int32_t relation_id) const
 {
     auto hpt = average_heads_per_tail_[relation_id];
     auto tph = average_tails_per_head_[relation_id];
