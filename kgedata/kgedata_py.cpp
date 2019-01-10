@@ -53,9 +53,11 @@ PYBIND11_MODULE(kgedata, m) {
         .value("Offset", kgedata::LCWANoThrowSampler::Strategy::Offset);
 
     py::class_<kgedata::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
-        .def(py::init<const py::list&, int64_t, int64_t, int16_t, int16_t, kgedata::LCWANoThrowSampler::Strategy>())
+        .def(py::init<const py::list&, int64_t, int64_t, int16_t, int16_t>())
+        .def(py::init<const py::list&, int64_t, int64_t, int16_t, int16_t, int64_t>())
+        .def(py::init<const py::list&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::LCWANoThrowSampler::Strategy>())
         .def("numNegativeSamples", &kgedata::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
-        .def("sample", &kgedata::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("corrupt_head_list").noconvert(), py::arg("batch").noconvert(), py::arg("random_seed") = std::random_device{}(), "samples current batch");
+        .def("sample", &kgedata::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("corrupt_head_list").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::list&, int32_t>())

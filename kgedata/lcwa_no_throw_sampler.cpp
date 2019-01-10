@@ -8,9 +8,22 @@ namespace py = pybind11;
 
 namespace kgedata {
 
-LCWANoThrowSampler::LCWANoThrowSampler(const py::list& train_set, int64_t num_entity, int64_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, Strategy strategy)
-    : num_entity_(num_entity), num_relation_(num_relation), num_corrupt_entity_(num_corrupt_entity), num_corrupt_relation_(num_corrupt_relation)
+LCWANoThrowSampler::LCWANoThrowSampler(
+    const py::list& train_set,
+    int64_t num_entity,
+    int64_t num_relation,
+    int16_t num_corrupt_entity,
+    int16_t num_corrupt_relation,
+    int64_t random_seed,
+    Strategy strategy)
+    : num_entity_(num_entity),
+    num_relation_(num_relation),
+    num_corrupt_entity_(num_corrupt_entity),
+    num_corrupt_relation_(num_corrupt_relation),
+    random_engine_(random_seed)
 {
+    /* https://codereview.stackexchange.com/posts/109518/revisions "Improved long-period generators based on linear recurrences modulo 2", F. Panneton, P. L'Ecuyer, M. Matsumoto in AVM TOMS Volume 32 Issue 1, March 2006 Pages 1-16 */
+    random_engine_.discard(700000);
     if (strategy == Strategy::Hash) {
         sample_strategy_ = make_unique<LCWANoThrowSampler::HashSampleStrategy>(train_set, this);
     }
@@ -23,10 +36,9 @@ int16_t LCWANoThrowSampler::numNegativeSamples() const
 
 void LCWANoThrowSampler::sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-    const py::list& batch,
-    int64_t random_seed)
+    const py::list& batch)
 {
-    sample_strategy_->sample(arr, corrupt_head_arr, batch, random_seed);
+    sample_strategy_->sample(arr, corrupt_head_arr, batch);
 }
 
 LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler)
@@ -44,13 +56,8 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
 void LCWANoThrowSampler::HashSampleStrategy::sample(
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-    const py::list& batch,
-    int64_t random_seed)
+    const py::list& batch)
 {
-    /* IMPROVE: use determined seed may help with reproducible result. Yet here we are using random seed */
-    std::mt19937_64 random_engine(random_seed);
-    /* https://codereview.stackexchange.com/posts/109518/revisions "Improved long-period generators based on linear recurrences modulo 2", F. Panneton, P. L'Ecuyer, M. Matsumoto in AVM TOMS Volume 32 Issue 1, March 2006 Pages 1-16 */
-    random_engine.discard(700000);
     auto tensor = arr.mutable_unchecked<3>(); // Will throw if ndim != 3 or flags.writeable is false
     auto corrupt_head = corrupt_head_arr.unchecked<1>();
     for (ssize_t i = 0; i < tensor.shape(0); i++) {
@@ -61,7 +68,7 @@ void LCWANoThrowSampler::HashSampleStrategy::sample(
         auto corrupt_head_flag = corrupt_head[i];
 
         /* negative samples */
-        std::function<int64_t(void)> gen_func = [&]() -> int64_t { return random_engine() % sampler_->num_entity_; };
+        std::function<int64_t(void)> gen_func = [&]() -> int64_t { return sampler_->random_engine_() % sampler_->num_entity_; };
         for (ssize_t j = 0;
             j < sampler_->num_corrupt_entity_;
             ++j) {
