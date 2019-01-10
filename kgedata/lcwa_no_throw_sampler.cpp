@@ -36,7 +36,7 @@ int16_t LCWANoThrowSampler::numNegativeSamples() const
 
 void LCWANoThrowSampler::sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-    const py::list& batch)
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
     sample_strategy_->sample(arr, corrupt_head_arr, batch);
 }
@@ -56,23 +56,22 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& tripl
 void LCWANoThrowSampler::HashSampleStrategy::sample(
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-    const py::list& batch)
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& bat)
 {
     auto tensor = arr.mutable_unchecked<3>(); // Will throw if ndim != 3 or flags.writeable is false
     auto corrupt_head = corrupt_head_arr.unchecked<1>();
+    auto batch = bat.unchecked<2>();
     for (ssize_t i = 0; i < tensor.shape(0); i++) {
-        auto triple = batch[i].cast<TripleIndex>();
-        auto h = triple.head;
-        auto r = triple.relation;
-        auto t = triple.tail;
-        auto corrupt_head_flag = corrupt_head[i];
+        auto h = batch(i, 0);
+        auto r = batch(i, 1);
+        auto t = batch(i, 2);
 
         /* negative samples */
         std::function<int64_t(void)> gen_func = [&]() -> int64_t { return sampler_->random_engine_() % sampler_->num_entity_; };
         for (ssize_t j = 0;
             j < sampler_->num_corrupt_entity_;
             ++j) {
-            if (corrupt_head_flag) {
+            if (corrupt_head[i]) {
                 tensor(i, j, 0) = h;
                 tensor(i, j, 2) = generateCorruptHead(h, r, gen_func);
             } else {

@@ -70,22 +70,20 @@ UniformCorruptor::UniformCorruptor(int64_t random_seed)
 {
 }
 
-void BernoulliCorruptor::make_random_choice(const py::list& batch, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
+void BernoulliCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& bat, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
 {
     auto r = arr.mutable_unchecked<1>();
-    auto i = 0;
-    for (const auto& e : batch) {
-        auto ele = e.cast<TripleIndex>();
-        r(i) = distributions_[ele.relation](random_engine_) == 0;
-        i++;
+    auto batch = arr.unchecked<2>();
+    for (auto i = 0; i < batch.shape(0); ++i) {
+        r(i) = distributions_[batch(i, 1)](random_engine_) == 0;
     }
 }
 
 
-void UniformCorruptor::make_random_choice(const py::list& batch, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
+void UniformCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
 {
     discrete_distribution<> d({kDefaultProbability, kDefaultProbability});
-    std::generate_n(arr.mutable_data(), batch.size(), [&]() { return d(random_engine_) == 0; });
+    std::generate_n(arr.mutable_data(), batch.shape(0), [&]() { return d(random_engine_) == 0; });
 }
 
 } // namespace kgedata
