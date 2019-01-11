@@ -33,12 +33,12 @@ public:
         Hash,
         Offset
     };
-    LCWANoThrowSampler(const IndexArray& train_set, int64_t num_entity, int64_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, int64_t random_seed=std::random_device{}(), Strategy strategy=Strategy::Hash);
+    LCWANoThrowSampler(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set, int64_t num_entity, int64_t num_relation, int16_t num_corrupt_entity, int16_t num_corrupt_relation, int64_t random_seed=std::random_device{}(), Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
     /* In place editing. Avoid copies for large elements */
-    void sample(IndexArray& arr,
+    void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
                 py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-                IndexArray& batch);
+                py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
 private:
     Strategy Strategy_;
     std::mt19937_64 random_engine_;
@@ -46,16 +46,16 @@ private:
     int16_t num_corrupt_relation_;
     struct SampleStrategy {
         virtual ~SampleStrategy() {};
-        virtual void sample(IndexArray& arr,
+        virtual void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
                             py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-                            IndexArray& batch) = 0;
+                            py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) = 0;
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
-        HashSampleStrategy(const IndexArray& triples, LCWANoThrowSampler* sampler);
-        void sample(IndexArray& arr,
+        HashSampleStrategy(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& triples, LCWANoThrowSampler* sampler);
+        void sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
                     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-                    IndexArray& batch) override;
+                    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) override;
     private:
         int64_t generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func);
         int64_t generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func);

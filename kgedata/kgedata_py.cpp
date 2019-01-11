@@ -53,15 +53,15 @@ PYBIND11_MODULE(kgedata, m) {
         .value("Offset", kgedata::LCWANoThrowSampler::Strategy::Offset);
 
     py::class_<kgedata::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
-        .def(py::init<const IndexArray&, int64_t, int64_t, int16_t, int16_t>())
-        .def(py::init<const IndexArray&, int64_t, int64_t, int16_t, int16_t, int64_t>())
-        .def(py::init<const IndexArray&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::LCWANoThrowSampler::Strategy>())
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t>())
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t>())
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::LCWANoThrowSampler::Strategy>())
         .def("numNegativeSamples", &kgedata::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
         .def("sample", &kgedata::LCWANoThrowSampler::sample, py::arg("arr").noconvert(), py::arg("corrupt_head_list").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
-        .def(py::init<const IndexArray&, int32_t>())
-        .def(py::init<const IndexArray&, int32_t, int64_t>())
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int32_t>())
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int32_t, int64_t>())
         .def("get_probability_relation", &kgedata::BernoulliCorruptor::get_probability_relation, "gets the probability for certain relation")
         .def("make_random_choice", &kgedata::BernoulliCorruptor::make_random_choice, "gets the choice for given batch item");
     py::class_<kgedata::UniformCorruptor>(m, "UniformCorruptor", "generates the uniform distribution of samples")

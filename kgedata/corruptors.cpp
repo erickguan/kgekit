@@ -13,7 +13,7 @@ static const int kDefaultProbability = 50;
 static const int kNoRelation = 0;
 static const float kEqualProbability = 0.5;
 
-BernoulliCorruptor::BernoulliCorruptor(const IndexArray& train_set, int32_t num_relations, int64_t random_seed)
+BernoulliCorruptor::BernoulliCorruptor(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set, int32_t num_relations, int64_t random_seed)
     : Corruptor(random_seed), num_relations_(num_relations)
 {
     distributions_.reserve(num_relations_);
@@ -73,7 +73,7 @@ UniformCorruptor::UniformCorruptor(int64_t random_seed)
 {
 }
 
-void BernoulliCorruptor::make_random_choice(IndexArray& bat, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
+void BernoulliCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& bat, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
 {
     auto r = arr.mutable_unchecked<1>();
     auto batch = bat.unchecked<2>();
@@ -83,7 +83,7 @@ void BernoulliCorruptor::make_random_choice(IndexArray& bat, py::array_t<bool, p
 }
 
 
-void UniformCorruptor::make_random_choice(IndexArray& batch, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
+void UniformCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
 {
     discrete_distribution<> d({kDefaultProbability, kDefaultProbability});
     std::generate_n(arr.mutable_data(), batch.shape(0), [&]() { return d(random_engine_) == 0; });
