@@ -5,6 +5,7 @@ import glob
 import sysconfig
 import platform
 import subprocess
+import kgekit
 
 from distutils.version import LooseVersion
 from setuptools import setup, find_packages, Extension
@@ -107,7 +108,7 @@ class CleanCommand(Command):
 
 
 setup(name='kgekit',
-      version='0.8.1',
+      version=kgekit.__version__,
       description='knowledge representation tools',
       long_description=open("README.md", "r").read(),
       long_description_content_type="text/markdown",
