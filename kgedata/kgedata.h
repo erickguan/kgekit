@@ -18,6 +18,7 @@
 #include <optional>
 #endif
 
+#include <pybind11/numpy.h>
 
 #include "common.h"
 
@@ -38,6 +39,8 @@ using std::nullopt_t;
 using std::make_optional;
 using std::string_view;
 #endif
+
+using IndexArray = pybind11::array_t<int64_t, py::array::c_style | py::array::forcecast>;
 
 namespace detail {
 
