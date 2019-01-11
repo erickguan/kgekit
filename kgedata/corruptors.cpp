@@ -13,7 +13,7 @@ static const int kDefaultProbability = 50;
 static const int kNoRelation = 0;
 static const float kEqualProbability = 0.5;
 
-BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set, int32_t num_relations, int64_t random_seed)
+BernoulliCorruptor::BernoulliCorruptor(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set, int32_t num_relations, int64_t random_seed)
     : Corruptor(random_seed), num_relations_(num_relations)
 {
     distributions_.reserve(num_relations_);
@@ -23,11 +23,14 @@ BernoulliCorruptor::BernoulliCorruptor(const py::list& train_set, int32_t num_re
     vector<unordered_set<int32_t>> tails_per_rel(num_relations_);
     vector<unordered_set<int32_t>> heads_per_rel(num_relations_);
 
-    for (auto const& t : train_set) {
-        auto triple = t.cast<TripleIndex>();
-        triples_per_rel[triple.relation]++;
-        tails_per_rel[triple.relation].insert(triple.tail);
-        heads_per_rel[triple.relation].insert(triple.head);
+    auto arr = train_set.unchecked<2>();
+    for (auto i = 0; i < arr.shape(0); ++i) {
+        auto head = arr(i, 0);
+        auto relation = arr(i, 1);
+        auto tail = arr(i, 2);
+        triples_per_rel[relation]++;
+        tails_per_rel[relation].insert(tail);
+        heads_per_rel[relation].insert(head);
     }
 
     for (auto i = 0; i < num_relations_; ++i) {

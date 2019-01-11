@@ -9,7 +9,7 @@ namespace py = pybind11;
 namespace kgedata {
 
 LCWANoThrowSampler::LCWANoThrowSampler(
-    const py::list& train_set,
+    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set,
     int64_t num_entity,
     int64_t num_relation,
     int16_t num_corrupt_entity,
@@ -41,14 +41,17 @@ void LCWANoThrowSampler::sample(py::array_t<int64_t, py::array::c_style | py::ar
     sample_strategy_->sample(arr, corrupt_head_arr, batch);
 }
 
-LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::list& triples, LCWANoThrowSampler* sampler)
+LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& triples, LCWANoThrowSampler* sampler)
     : sampler_(sampler)
 {
-    for (auto const& t : triples) {
-        auto triple = t.cast<TripleIndex>();
-        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
-        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
+    auto arr = triples.unchecked<2>();
+    for (auto i = 0; i < arr.shape(0); ++i) {
+        auto head = arr(i, 0);
+        auto relation = arr(i, 1);
+        auto tail = arr(i, 2);
+        rest_head_[detail::_pack_value(relation, tail)].insert(head);
+        rest_relation_[detail::_pack_value(head, tail)].insert(relation);
+        rest_tail_[detail::_pack_value(head, relation)].insert(tail);
     }
 }
 
