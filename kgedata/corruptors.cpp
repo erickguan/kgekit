@@ -13,8 +13,12 @@ static const int kDefaultProbability = 50;
 static const int kNoRelation = 0;
 static const float kEqualProbability = 0.5;
 
-BernoulliCorruptor::BernoulliCorruptor(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set, int32_t num_relations, int64_t random_seed)
-    : Corruptor(random_seed), num_relations_(num_relations)
+BernoulliCorruptor::BernoulliCorruptor(
+    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set,
+    int32_t num_relations,
+    int64_t num_negative_entity,
+    int64_t random_seed)
+    : Corruptor(num_negative_entity, random_seed), num_relations_(num_relations)
 {
     distributions_.reserve(num_relations_);
     average_tails_per_head_.resize(num_relations_, 0.0);
@@ -68,25 +72,64 @@ double BernoulliCorruptor::get_probability_relation(const int32_t relation_id) c
     return tph / (hpt + tph);
 }
 
-UniformCorruptor::UniformCorruptor(int64_t random_seed)
-    : Corruptor(random_seed)
+UniformCorruptor::UniformCorruptor(int64_t num_negative_entity, int64_t random_seed)
+    : Corruptor(num_negative_entity, random_seed)
 {
 }
 
-void BernoulliCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& bat, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
+py::array_t<bool, py::array::c_style | py::array::forcecast>
+BernoulliCorruptor::make_random_choice(
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
-    auto r = arr.mutable_unchecked<1>();
-    auto batch = bat.unchecked<2>();
-    for (auto i = 0; i < batch.shape(0); ++i) {
-        r(i) = distributions_[batch(i, 1)](random_engine_) == 0;
+    const auto num_batch = batch.shape(0);
+    const size_t size = num_batch * num_negative_entity_;
+    bool* data = new bool[size];
+    auto p = static_cast<int64_t (*)[detail::kNumTripleElements]>(batch.request().ptr);
+    for (size_t i = 0; i < num_batch; i++) {
+        for (auto j = 0; j < num_negative_entity_; ++j) {
+            auto rel = p[i][detail::kTripleRelationOffestInABatch];
+            *(data + i*num_negative_entity_ + j) = distributions_[rel](random_engine_) == 0;
+        }
     }
+
+    // Create a Python object that will free the allocated
+    // memory when destroyed:
+    py::capsule free_when_done(data, [](void* f) {
+        bool* data = reinterpret_cast<bool*>(f);
+        delete[] data;
+    });
+
+    return py::array_t<bool, py::array::c_style | py::array::forcecast>(
+        {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_negative_entity_)}, // shape
+        data, // the data pointer
+        free_when_done); // numpy array references this parent
 }
 
 
-void UniformCorruptor::make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch, py::array_t<bool, py::array::c_style | py::array::forcecast>& arr)
+py::array_t<bool, py::array::c_style | py::array::forcecast>
+UniformCorruptor::make_random_choice(
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
+    const auto num_batch = batch.shape(0);
+    const size_t size = num_batch * num_negative_entity_;
+    bool* data = new bool[size];
+
     discrete_distribution<> d({kDefaultProbability, kDefaultProbability});
-    std::generate_n(arr.mutable_data(), batch.shape(0), [&]() { return d(random_engine_) == 0; });
+    for (size_t i = 0; i < num_batch; i++) {
+        for (auto j = 0; j < num_negative_entity_; ++j) {
+            data[i*num_negative_entity_ + j] = d(random_engine_) == 0;
+        }
+    }
+
+    py::capsule free_when_done(data, [](void* f) {
+        bool* data = reinterpret_cast<bool*>(f);
+        delete[] data;
+    });
+
+    return py::array_t<bool, py::array::c_style | py::array::forcecast>(
+        {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_negative_entity_)}, // shape
+        data, // the data pointer
+        free_when_done); // numpy array references this parent
 }
 
 } // namespace kgedata

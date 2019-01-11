@@ -40,8 +40,7 @@ using std::string_view;
 
 namespace detail {
 
-void assert_triple_order(const string& order);
-const auto kBufferSize = 128;
+constexpr auto kBufferSize = 128;
 
 /*
  * Pack two int64_t values into a int64_t.

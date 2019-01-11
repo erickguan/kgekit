@@ -34,14 +34,17 @@ int16_t LCWANoThrowSampler::numNegativeSamples() const
     return num_corrupt_entity_ + num_corrupt_relation_;
 }
 
-void LCWANoThrowSampler::sample(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
+py::array_t<int64_t, py::array::c_style | py::array::forcecast>
+LCWANoThrowSampler::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
-    sample_strategy_->sample(arr, corrupt_head_arr, batch);
+    return sample_strategy_->sample(corrupt_head_arr, batch);
 }
 
-LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& triples, LCWANoThrowSampler* sampler)
+LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
+    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& triples,
+    LCWANoThrowSampler* sampler)
     : sampler_(sampler)
 {
     auto arr = triples.unchecked<2>();
@@ -56,42 +59,65 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(const py::array_t<int
 }
 
 /* sample size: (len(batch_size), negatives, 3) */
-void LCWANoThrowSampler::HashSampleStrategy::sample(
-    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& arr,
-    py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& bat)
+py::array_t<int64_t, py::array::c_style | py::array::forcecast>
+LCWANoThrowSampler::HashSampleStrategy::sample(
+    py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
-    auto tensor = arr.mutable_unchecked<3>(); // Will throw if ndim != 3 or flags.writeable is false
-    auto corrupt_head = corrupt_head_arr.unchecked<1>();
-    auto batch = bat.unchecked<2>();
-    for (ssize_t i = 0; i < tensor.shape(0); i++) {
-        auto h = batch(i, 0);
-        auto r = batch(i, 1);
-        auto t = batch(i, 2);
+    const auto num_batch = batch.shape(0);
+    auto num_corrupts = sampler_->num_corrupt_entity_+sampler_->num_corrupt_relation_;
+    const size_t size = num_batch * num_corrupts * detail::kNumTripleElements;
+    int64_t* data = new int64_t[size];
+
+    auto corrupt_head_flags_proxy = static_cast<bool*>(corrupt_head_flags.request().ptr);
+    auto batch_proxy = static_cast<int64_t*>(batch.request().ptr);
+
+    for (ssize_t i = 0; i < num_batch; i++) {
+        auto base_adr = batch_proxy + i*detail::kNumTripleElements;
+        auto h = *base_adr;
+        auto r = *(base_adr+1);
+        auto t = *(base_adr+2);
 
         /* negative samples */
         std::function<int64_t(void)> gen_func = [&]() -> int64_t { return sampler_->random_engine_() % sampler_->num_entity_; };
-        for (ssize_t j = 0;
+        ssize_t j = 0;
+        auto corrupt_base_adr = corrupt_head_flags_proxy + i*sampler_->num_corrupt_entity_;
+        auto batch_base_adr = data + i*num_corrupts*detail::kNumTripleElements;
+        for (;
             j < sampler_->num_corrupt_entity_;
             ++j) {
-            if (corrupt_head[i]) {
-                tensor(i, j, 0) = h;
-                tensor(i, j, 2) = generateCorruptHead(h, r, gen_func);
+            auto base_adr = batch_base_adr + j*detail::kNumTripleElements;
+            if (*(corrupt_base_adr+j)) {
+                *base_adr = h;
+                *(base_adr+detail::kTripleTailOffestInABatch) = generateCorruptHead(h, r, gen_func);
             } else {
-                tensor(i, j, 0) = generateCorruptTail(t, r, gen_func);
-                tensor(i, j, 2) = t;
+                *base_adr = generateCorruptTail(t, r, gen_func);
+                *(base_adr+detail::kTripleTailOffestInABatch) = t;
             }
-            tensor(i, j, 1) = r;
+            *(base_adr+detail::kTripleRelationOffestInABatch) = r;
         }
-        auto num_corrupt_relation_index_offset = sampler_->num_corrupt_entity_;
-        for (ssize_t j = num_corrupt_relation_index_offset;
-            j < sampler_->num_corrupt_relation_ + num_corrupt_relation_index_offset;
-            ++j) {
-            tensor(i, j, 0) = h;
-            tensor(i, j, 1) = generateCorruptRelation(h, t, gen_func);
-            tensor(i, j, 2) = t;
+
+        batch_base_adr = data +
+            i*num_corrupts*detail::kNumTripleElements +
+            sampler_->num_corrupt_entity_*detail::kNumTripleElements;
+        for (; j < num_corrupts; ++j) {
+            auto base_adr = batch_base_adr + j*detail::kNumTripleElements;
+            *base_adr = h;
+            *(base_adr+detail::kTripleRelationOffestInABatch) = generateCorruptRelation(h, t, gen_func);
+            *(base_adr+detail::kTripleTailOffestInABatch) = t;
         }
     }
+
+    py::capsule free_when_done(data, [](void* f) {
+        int64_t* data = reinterpret_cast<int64_t*>(f);
+        delete[] data;
+    });
+
+    return py::array_t<int64_t, py::array::c_style | py::array::forcecast>(
+        {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+        data, // the data pointer
+        free_when_done); // numpy array references this parent
+
 }
 
 int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func)
