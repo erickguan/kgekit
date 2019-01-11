@@ -36,11 +36,11 @@ protected:
 class BernoulliCorruptor : public Corruptor, private boost::noncopyable {
 public:
     BernoulliCorruptor(
-        const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set,
+        const py::array_t<int64_t>& train_set,
         int32_t num_relations,
         int64_t num_negative_entity,
         int64_t random_seed = std::random_device{}());
-    py::array_t<bool, py::array::c_style | py::array::forcecast>
+    py::array_t<bool, py::array::c_style>
     make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
     /*
     * tph, hpt are considered per relation basis.
@@ -57,7 +57,8 @@ private:
 class UniformCorruptor : public Corruptor, private boost::noncopyable {
 public:
     UniformCorruptor(int64_t num_negative_entity, int64_t random_seed = std::random_device{}());
-    py::array_t<bool, py::array::c_style | py::array::forcecast> make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
+    py::array_t<bool, py::array::c_style>
+    make_random_choice(py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
 };
 
 } // namespace kgedata

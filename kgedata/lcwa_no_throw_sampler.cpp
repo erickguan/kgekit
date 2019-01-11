@@ -9,7 +9,7 @@ namespace py = pybind11;
 namespace kgedata {
 
 LCWANoThrowSampler::LCWANoThrowSampler(
-    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set,
+    const py::array_t<int64_t>& train_set,
     int64_t num_entity,
     int64_t num_relation,
     int16_t num_corrupt_entity,
@@ -34,7 +34,7 @@ int16_t LCWANoThrowSampler::numNegativeSamples() const
     return num_corrupt_entity_ + num_corrupt_relation_;
 }
 
-py::array_t<int64_t, py::array::c_style | py::array::forcecast>
+py::array_t<int64_t, py::array::c_style>
 LCWANoThrowSampler::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
@@ -43,7 +43,7 @@ LCWANoThrowSampler::sample(
 }
 
 LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
-    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& triples,
+    const py::array_t<int64_t>& triples,
     LCWANoThrowSampler* sampler)
     : sampler_(sampler)
 {
@@ -59,7 +59,7 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
 }
 
 /* sample size: (len(batch_size), negatives, 3) */
-py::array_t<int64_t, py::array::c_style | py::array::forcecast>
+py::array_t<int64_t, py::array::c_style>
 LCWANoThrowSampler::HashSampleStrategy::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
@@ -97,9 +97,6 @@ LCWANoThrowSampler::HashSampleStrategy::sample(
             *(base_adr+detail::kTripleRelationOffestInABatch) = r;
         }
 
-        batch_base_adr = data +
-            i*num_corrupts*detail::kNumTripleElements +
-            sampler_->num_corrupt_entity_*detail::kNumTripleElements;
         for (; j < num_corrupts; ++j) {
             auto base_adr = batch_base_adr + j*detail::kNumTripleElements;
             *base_adr = h;
@@ -113,14 +110,14 @@ LCWANoThrowSampler::HashSampleStrategy::sample(
         delete[] data;
     });
 
-    return py::array_t<int64_t, py::array::c_style | py::array::forcecast>(
+    return py::array_t<int64_t, py::array::c_style>(
         {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
         data, // the data pointer
         free_when_done); // numpy array references this parent
 
 }
 
-int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func)
+int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func)
 {
     auto k = detail::_pack_value(h, r);
     auto gen_tail = generate_random_func() % sampler_->num_entity_;
@@ -137,7 +134,7 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, i
     }
 }
 
-int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func)
+int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, int64_t r, const std::function<int64_t(void)>& generate_random_func)
 {
     auto k = detail::_pack_value(t, r);
     auto gen_head = generate_random_func() % sampler_->num_entity_;
@@ -154,7 +151,7 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, i
     }
 }
 
-int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int64_t h, int64_t t, std::function<int64_t(void)> generate_random_func)
+int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int64_t h, int64_t t, const std::function<int64_t(void)>& generate_random_func)
 {
     auto k = detail::_pack_value(h, t);
     auto gen_relation = generate_random_func() % sampler_->num_relation_;

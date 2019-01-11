@@ -3,6 +3,7 @@ import os
 import kgekit.io
 import kgedata
 import pytest
+import numpy as np
 
 class MainTest(unittest.TestCase):
     @classmethod
@@ -33,6 +34,19 @@ class MainTest(unittest.TestCase):
             kgekit.io.read_triple_indexes("", triple_order="hrt", delimiter=' ') # wrong file
         with self.assertRaises(RuntimeError):
             kgekit.io.read_triple_indexes(self.triple_index_filename, triple_order="hrr", delimiter=' ') # wrong order
+
+    def test_read_triple_indexes_numpy(self):
+        np.testing.assert_equal(kgekit.io.read_triple_indexes_numpy(self.triple_index_filename, triple_order="hrt", delimiter=' ')[0],
+                np.array([[1, 2, 3], [9, 1, 3]], dtype=np.int64))
+        np.testing.assert_equal(kgekit.io.read_triple_indexes_numpy(self.triple_index_filename, triple_order="htr", delimiter=' ')[0],
+                np.array([[1, 3, 2], [9, 3, 1]], dtype=np.int64))
+        arr, num_failed = kgekit.io.read_triple_indexes_numpy(self.triple_index_filename, triple_order="hrt", delimiter='\t')
+        np.testing.assert_equal(arr, np.array([], dtype=np.int64)) # can't parse
+        self.assertEqual(num_failed, 2)
+        with self.assertRaises(FileNotFoundError):
+            kgekit.io.read_triple_indexes_numpy("", triple_order="hrt", delimiter=' ') # wrong file
+        with self.assertRaises(RuntimeError):
+            kgekit.io.read_triple_indexes_numpy(self.triple_index_filename, triple_order="hrr", delimiter=' ') # wrong order
 
     def test_read_triple(self):
         self.assertEqual(kgekit.io.read_triples(self.triple_filename, triple_order="hrt", delimiter=' '),

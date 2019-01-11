@@ -34,7 +34,7 @@ public:
         Offset
     };
     LCWANoThrowSampler(
-        const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set,
+        const py::array_t<int64_t>& train_set,
         int64_t num_entity,
         int64_t num_relation,
         int16_t num_corrupt_entity,
@@ -43,7 +43,7 @@ public:
         Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
     /* In place editing. Avoid copies for large elements */
-    py::array_t<int64_t, py::array::c_style | py::array::forcecast> sample(
+    py::array_t<int64_t, py::array::c_style> sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
         py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
 private:
@@ -53,20 +53,20 @@ private:
     int16_t num_corrupt_relation_;
     struct SampleStrategy {
         virtual ~SampleStrategy() {};
-        virtual py::array_t<int64_t, py::array::c_style | py::array::forcecast> sample(
+        virtual py::array_t<int64_t, py::array::c_style> sample(
             py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
             py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) = 0;
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
-        HashSampleStrategy(const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& triples, LCWANoThrowSampler* sampler);
-        py::array_t<int64_t, py::array::c_style | py::array::forcecast> sample(
+        HashSampleStrategy(const py::array_t<int64_t>& triples, LCWANoThrowSampler* sampler);
+        py::array_t<int64_t, py::array::c_style> sample(
             py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
             py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) override;
     private:
-        int64_t generateCorruptHead(int64_t h, int64_t r, std::function<int64_t(void)> generate_random_func);
-        int64_t generateCorruptTail(int64_t t, int64_t r, std::function<int64_t(void)> generate_random_func);
-        int64_t generateCorruptRelation(int64_t h, int64_t t, std::function<int64_t(void)> generate_random_func);
+        int64_t generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func);
+        int64_t generateCorruptTail(int64_t t, int64_t r, const std::function<int64_t(void)>& generate_random_func);
+        int64_t generateCorruptRelation(int64_t h, int64_t t, const std::function<int64_t(void)>& generate_random_func);
         LCWANoThrowSampler* sampler_;
 
         unordered_map<int64_t, unordered_set<int64_t>> rest_head_;

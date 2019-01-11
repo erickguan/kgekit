@@ -14,7 +14,7 @@ static const int kNoRelation = 0;
 static const float kEqualProbability = 0.5;
 
 BernoulliCorruptor::BernoulliCorruptor(
-    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_set,
+    const py::array_t<int64_t>& train_set,
     int32_t num_relations,
     int64_t num_negative_entity,
     int64_t random_seed)
@@ -77,17 +77,17 @@ UniformCorruptor::UniformCorruptor(int64_t num_negative_entity, int64_t random_s
 {
 }
 
-py::array_t<bool, py::array::c_style | py::array::forcecast>
+py::array_t<bool, py::array::c_style>
 BernoulliCorruptor::make_random_choice(
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
     const auto num_batch = batch.shape(0);
     const size_t size = num_batch * num_negative_entity_;
     bool* data = new bool[size];
-    auto p = static_cast<int64_t (*)[detail::kNumTripleElements]>(batch.request().ptr);
+    auto p = static_cast<int64_t*>(batch.request().ptr);
     for (size_t i = 0; i < num_batch; i++) {
+        auto rel = *(p + i*detail::kNumTripleElements + detail::kTripleRelationOffestInABatch);
         for (auto j = 0; j < num_negative_entity_; ++j) {
-            auto rel = p[i][detail::kTripleRelationOffestInABatch];
             *(data + i*num_negative_entity_ + j) = distributions_[rel](random_engine_) == 0;
         }
     }
@@ -99,14 +99,14 @@ BernoulliCorruptor::make_random_choice(
         delete[] data;
     });
 
-    return py::array_t<bool, py::array::c_style | py::array::forcecast>(
+    return py::array_t<bool, py::array::c_style>(
         {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_negative_entity_)}, // shape
         data, // the data pointer
         free_when_done); // numpy array references this parent
 }
 
 
-py::array_t<bool, py::array::c_style | py::array::forcecast>
+py::array_t<bool, py::array::c_style>
 UniformCorruptor::make_random_choice(
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
@@ -126,7 +126,7 @@ UniformCorruptor::make_random_choice(
         delete[] data;
     });
 
-    return py::array_t<bool, py::array::c_style | py::array::forcecast>(
+    return py::array_t<bool, py::array::c_style>(
         {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_negative_entity_)}, // shape
         data, // the data pointer
         free_when_done); // numpy array references this parent

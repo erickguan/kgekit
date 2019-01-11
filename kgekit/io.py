@@ -1,7 +1,7 @@
 """IO functions"""
 
 from pathlib import Path
-import kgekit
+import kgekit.data
 import kgedata
 import kgekit.triple_index_pb2 as triple_pb
 from kgekit.utils import assert_triple_order
@@ -32,6 +32,14 @@ def read_triples(filename, read_fn=kgedata.get_triple, triple_order="hrt", delim
 
 def read_triple_indexes(filename, read_fn=kgedata.get_triple_index, triple_order="hrt", delimiter=DEFAULT_DELIMITER, skip_first_line=False):
     return read_triples(filename, read_fn, triple_order, delimiter, skip_first_line)
+
+def read_triple_indexes_numpy(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, skip_first_line=False):
+    indexes, num_failed = read_triple_indexes(
+        filename,
+        triple_order=triple_order,
+        delimiter=delimiter,
+        skip_first_line=skip_first_line)
+    return kgekit.data.pack_triples_numpy(indexes), num_failed
 
 def _label_processing(l, delimiter):
     splits = l.rstrip().split(delimiter)
