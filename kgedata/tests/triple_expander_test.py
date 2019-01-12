@@ -7,7 +7,7 @@ import pytest
 class TripleExpanderTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.batch = [kgedata.TripleIndex(1,0,2), kgedata.TripleIndex(0,1,2)]
+        cls.batch = np.array([[1,0,2], [0,1,2]], dtype=np.int64)
         cls.num_entity = 3
         cls.num_relation = 2
 

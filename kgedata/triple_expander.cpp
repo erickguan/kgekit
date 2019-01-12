@@ -2,10 +2,8 @@
 
 namespace kgedata {
 
-namespace py = pybind11;
-
-pair<py::array_t<int64_t>, py::list> expand_triple_batch(
-    const py::list& batch,
+pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
+    py::array_t<bool, py::array::c_style | py::array::forcecast>& batch,
     int64_t num_entity,
     int64_t num_relation,
     bool expand_entity,
@@ -23,40 +21,67 @@ pair<py::array_t<int64_t>, py::list> expand_triple_batch(
         num_relation = 0;
     }
 
-    py::array_t<int64_t, py::array::c_style> arr({static_cast<py::ssize_t>(batch.size() * num_expands), static_cast<py::ssize_t>(3)});
-    auto r = arr.mutable_unchecked<2>();
-    auto base_offset = 0;
+    ssize_t batch_size = batch.size() * num_expands;
+    const size_t size = batch_size * detail::kNumTripleElements;
+    int64_t* data = new int64_t[size];
+    auto p = static_cast<int64_t*>(batch.request().ptr);
     py::list split_points;
-    for (auto const& t : batch) {
-        auto triple_index = t.cast<TripleIndex>();
+
+    auto base_offset = 0;
+    for (auto i = 0; i < batch.size(); ++i) {
         py::tuple splits(4);
-        splits[0] = base_offset;
+        auto adr = p + i*detail::kNumTripleElements;
+        auto head = *adr;
+        auto relation = *(adr + detail::kTripleRelationOffestInABatch);
+        auto tail = *(adr + detail::kTripleTailOffestInABatch);
+
         /* link prediction on head */
-        for (auto i_head = 0; i_head < num_entity; ++i_head) {
-            r(base_offset + i_head, 0) = i_head;
-            r(base_offset + i_head, 1) = triple_index.relation;
-            r(base_offset + i_head, 2) = triple_index.tail;
+        splits[0] = base_offset;
+        auto base_adr = data + i*base_offset*detail::kNumTripleElements;
+        for (auto i = 0; i < num_entity; ++i) {
+            auto data_adr = base_adr + i*detail::kNumTripleElements;
+            *data_adr = i;
+            *(data_adr + detail::kTripleRelationOffestInABatch) = relation;
+            *(data_adr + detail::kTripleTailOffestInABatch) = tail;
         }
+
         base_offset += num_entity;
-        splits[1] = base_offset;
+        base_adr = data + i*base_offset*detail::kNumTripleElements;
         /* link prediction on tail */
-        for (auto i_tail = 0; i_tail < num_entity; ++i_tail) {
-            r(base_offset + i_tail, 0) = triple_index.head;
-            r(base_offset + i_tail, 1) = triple_index.relation;
-            r(base_offset + i_tail, 2) = i_tail;
+        splits[1] = base_offset;
+        for (auto i = 0; i < num_entity; ++i) {
+            auto data_adr = base_adr + i*detail::kNumTripleElements;
+            *data_adr = head;
+            *(data_adr + detail::kTripleRelationOffestInABatch) = relation;
+            *(data_adr + detail::kTripleTailOffestInABatch) = i;
         }
+
         base_offset += num_entity;
-        splits[2] = base_offset;
+        base_adr = data + i*base_offset*detail::kNumTripleElements;
         /* link prediction on relation */
-        for (auto i_relation = 0; i_relation < num_relation; ++i_relation) {
-            r(base_offset + i_relation, 0) = triple_index.head;
-            r(base_offset + i_relation, 1) = i_relation;
-            r(base_offset + i_relation, 2) = triple_index.tail;
+        splits[2] = base_offset;
+        for (auto i = 0; i < num_relation; ++i) {
+            auto data_adr = base_adr + i*detail::kNumTripleElements;
+            *data_adr = head;
+            *(data_adr + detail::kTripleRelationOffestInABatch) = i;
+            *(data_adr + detail::kTripleTailOffestInABatch) = tail;
         }
         base_offset += num_relation;
         splits[3] = base_offset;
         split_points.append(splits);
     }
+
+    // Create a Python object that will free the allocated
+    // memory when destroyed:
+    py::capsule free_when_done(data, [](void* f) {
+        int64_t* data = reinterpret_cast<int64_t*>(f);
+        delete[] data;
+    });
+
+    auto arr = py::array_t<int64_t, py::array::c_style>(
+        {batch_size, static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+        data, // the data pointer
+        free_when_done); // numpy array references this parent
     return make_pair(arr, split_points);
 }
 
