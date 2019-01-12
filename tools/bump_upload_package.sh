@@ -6,4 +6,4 @@ cd $DIR
 git add kgekit/__init__.py
 git commit -m "version bump"
 python3 setup.py sdist
-twine upload -s -i 76407351 -u fantasticfears dist/kgekit-$VERSION.tar.gz
+twine upload --verbose -s -i 76407351 -u fantasticfears dist/kgekit-$VERSION.tar.gz
