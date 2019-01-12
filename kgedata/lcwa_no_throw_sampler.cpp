@@ -37,9 +37,10 @@ int16_t LCWANoThrowSampler::numNegativeSamples() const
 py::array_t<int64_t, py::array::c_style>
 LCWANoThrowSampler::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+    bool nested_batch)
 {
-    return sample_strategy_->sample(corrupt_head_arr, batch);
+    return sample_strategy_->sample(corrupt_head_arr, batch, nested_batch);
 }
 
 LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
@@ -62,7 +63,8 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
 py::array_t<int64_t, py::array::c_style>
 LCWANoThrowSampler::HashSampleStrategy::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
-    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+    bool nested_batch)
 {
     const auto num_batch = batch.shape(0);
     auto num_corrupts = sampler_->num_corrupt_entity_+sampler_->num_corrupt_relation_;
@@ -110,11 +112,17 @@ LCWANoThrowSampler::HashSampleStrategy::sample(
         delete[] data;
     });
 
-    return py::array_t<int64_t, py::array::c_style>(
-        {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
-        data, // the data pointer
-        free_when_done); // numpy array references this parent
-
+    if (nested_batch) {
+        return py::array_t<int64_t, py::array::c_style>(
+            {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+            data, // the data pointer
+            free_when_done); // numpy array references this parent
+    } else {
+        return py::array_t<int64_t, py::array::c_style>(
+            {static_cast<ssize_t>(num_batch*num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+            data, // the data pointer
+            free_when_done); // numpy array references this parent
+    }
 }
 
 int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func)

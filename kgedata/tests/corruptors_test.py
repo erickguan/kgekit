@@ -6,6 +6,8 @@ import os
 import numpy as np
 import pytest
 
+pytestmark = pytest.mark.random_order(disabled=True)
+
 @pytest.mark.numpyfile
 class CorruptorsTest(unittest.TestCase):
     @classmethod

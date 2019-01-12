@@ -45,7 +45,8 @@ public:
     /* In place editing. Avoid copies for large elements */
     py::array_t<int64_t, py::array::c_style> sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-        py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
+        py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+        bool nested_batch=false);
 private:
     Strategy Strategy_;
     std::mt19937_64 random_engine_;
@@ -55,14 +56,16 @@ private:
         virtual ~SampleStrategy() {};
         virtual py::array_t<int64_t, py::array::c_style> sample(
             py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-            py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) = 0;
+            py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+            bool nested_batch) = 0;
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
         HashSampleStrategy(const py::array_t<int64_t>& triples, LCWANoThrowSampler* sampler);
         py::array_t<int64_t, py::array::c_style> sample(
             py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
-            py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) override;
+            py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+            bool nested_batch) override;
     private:
         int64_t generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func);
         int64_t generateCorruptTail(int64_t t, int64_t r, const std::function<int64_t(void)>& generate_random_func);

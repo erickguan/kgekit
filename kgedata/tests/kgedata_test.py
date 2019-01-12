@@ -1,6 +1,9 @@
 import unittest
 import kgedata
 import pickle
+import pytest
+
+pytestmark = pytest.mark.random_order(disabled=True)
 
 class KgekitTest(unittest.TestCase):
     @classmethod
