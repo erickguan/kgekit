@@ -42,7 +42,6 @@ public:
         int64_t random_seed=std::random_device{}(),
         Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
-    /* In place editing. Avoid copies for large elements */
     py::array_t<int64_t, py::array::c_style> sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
         py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
@@ -76,6 +75,25 @@ private:
     unique_ptr<SampleStrategy> sample_strategy_;
     int64_t num_entity_ = -1;
     int64_t num_relation_ = -1;
+};
+
+class CWASampler: private boost::noncopyable {
+public:
+    CWASampler(
+        const py::array_t<int64_t>& train_set,
+        int64_t num_entity,
+        int64_t num_relation,
+        bool corrupt_entity,
+        bool corrupt_relation);
+    py::array_t<int64_t, py::array::c_style> sample(
+        py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
+        py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
+private:
+    int64_t num_entity_ = -1;
+    int64_t num_relation_ = -1;
+    bool corrupt_entity_ = true;
+    bool corrupt_relation_ = false;
+
 };
 
 } // namespace kgedata

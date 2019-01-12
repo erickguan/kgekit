@@ -5,7 +5,7 @@
 
 #include "kgedata.h"
 #include "entity_number_indexer.h"
-#include "lcwa_no_throw_sampler.h"
+#include "negative_samplers.h"
 #include "corruptors.h"
 #include "ranker.h"
 #include "triple_expander.h"
@@ -58,6 +58,10 @@ PYBIND11_MODULE(kgedata, m) {
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::LCWANoThrowSampler::Strategy>())
         .def("numNegativeSamples", &kgedata::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
         .def("sample", &kgedata::LCWANoThrowSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
+
+    py::class_<kgedata::CWASampler>(m, "CWASampler", "CWASampler returns a negative batch based on a per triple basis corruption head flag. Supports flags for corrupt entity & relation too.")
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, bool, bool>())
+        .def("sample", &kgedata::CWASampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int32_t, int64_t>())

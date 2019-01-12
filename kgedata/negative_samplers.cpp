@@ -1,4 +1,4 @@
-#include "lcwa_no_throw_sampler.h"
+#include "negative_samplers.h"
 
 #include <algorithm>
 
@@ -165,6 +165,79 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int64_t 
         }
         throw std::runtime_error(fmt::format("Can't find a corrupt relation ({0}, ?, {1}). Generated: {2}" , h, t, gen_relation));
     }
+}
+
+CWASampler::CWASampler(
+        const py::array_t<int64_t>& train_set,
+        int64_t num_entity,
+        int64_t num_relation,
+        bool corrupt_entity,
+        bool corrupt_relation)
+    : num_entity_(num_entity), num_relation_(num_relation),
+    corrupt_entity_(corrupt_entity), corrupt_relation_(corrupt_relation)
+{
+}
+
+py::array_t<int64_t, py::array::c_style>
+CWASampler::sample(
+    py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
+{
+    const auto num_batch = batch.shape(0);
+    auto num_corrupts = (corrupt_entity_ ? num_entity_ : 0) + (corrupt_relation_ ? num_relation_ : 0);
+
+    const size_t size = num_batch * num_corrupts * detail::kNumTripleElements;
+    int64_t* data = new int64_t[size];
+
+    auto corrupt_head_flags_proxy = static_cast<bool*>(corrupt_head_flags.request().ptr);
+    auto batch_proxy = static_cast<int64_t*>(batch.request().ptr);
+
+    for (ssize_t i = 0; i < num_batch; i++) {
+        auto base_adr = batch_proxy + i*detail::kNumTripleElements;
+        auto h = *base_adr;
+        auto r = *(base_adr+1);
+        auto t = *(base_adr+2);
+
+        /* negative samples */
+        auto corrupt_adr = corrupt_head_flags_proxy + i;
+        auto batch_base_adr = data + i*num_corrupts*detail::kNumTripleElements;
+        if (corrupt_entity_) {
+            if (*corrupt_adr) {
+                for (auto id = 0; id < num_entity_; ++id) {
+                    auto base_adr = batch_base_adr + id*detail::kNumTripleElements;
+                    *base_adr = id++;
+                    *(base_adr+detail::kTripleRelationOffestInABatch) = r;
+                    *(base_adr+detail::kTripleTailOffestInABatch) = t;
+                }
+            } else {
+                for (auto id = 0; id < num_entity_; ++id) {
+                    auto base_adr = batch_base_adr + id*detail::kNumTripleElements;
+                    *base_adr = h;
+                    *(base_adr+detail::kTripleRelationOffestInABatch) = r;
+                    *(base_adr+detail::kTripleTailOffestInABatch) = id++;
+                }
+            }
+            batch_base_adr += num_entity_*detail::kNumTripleElements;
+        }
+        if (corrupt_relation_) {
+            for (auto id = 0; id < num_relation_; ++id) {
+                auto base_adr = batch_base_adr + id*detail::kNumTripleElements;
+                *base_adr = h;
+                *(base_adr+detail::kTripleRelationOffestInABatch) = id++;
+                *(base_adr+detail::kTripleTailOffestInABatch) = t;
+            }
+        }
+    }
+
+    py::capsule free_when_done(data, [](void* f) {
+        int64_t* data = reinterpret_cast<int64_t*>(f);
+        delete[] data;
+    });
+
+    return py::array_t<int64_t, py::array::c_style>(
+        {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+        data, // the data pointer
+        free_when_done); // numpy array references this parent
 }
 
 } // namespace kgedata
