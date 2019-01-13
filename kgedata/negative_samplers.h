@@ -56,6 +56,7 @@ public:
         int64_t random_seed=std::random_device{}(),
         Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
+    static bool return_labels() { return false; };
     py::array_t<int64_t, py::array::c_style> sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
         py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
@@ -98,6 +99,7 @@ public:
         int64_t num_entity,
         int64_t num_relation,
         bool corrupt_relation = false);
+    static bool return_labels() { return true; };
     pair<py::array_t<int64_t, py::array::c_style>, py::array_t<bool, py::array::c_style>>
     sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,

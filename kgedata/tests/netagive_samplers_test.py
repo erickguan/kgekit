@@ -15,6 +15,9 @@ class PerturbationSamplerTest(unittest.TestCase):
         cls.entity_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 2, 0, 100, kgedata.PerturbationSamplerStrategy.Hash)
         cls.relation_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 0, 1, 100, kgedata.PerturbationSamplerStrategy.Hash)
         cls.combined_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 1, 1, 100, kgedata.PerturbationSamplerStrategy.Hash)
+    
+    def test_return_labels(self):
+        self.assertEqual(kgedata.PerturbationSampler.return_labels(), False)
 
     def test_num_negative_samples(self):
         self.assertEqual(self.entity_sampler.numNegativeSamples(), 2)
@@ -83,6 +86,10 @@ class CWASamplerTest(unittest.TestCase):
             [False, False, False, True, True],
             [False, True, False, False, False],
         ], dtype=np.bool))
+
+    def test_return_labels(self):
+        self.assertEqual(kgedata.CWASampler.return_labels(), True)
+
 
 if __name__ == '__main__':
     unittest.main()
