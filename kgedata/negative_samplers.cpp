@@ -8,7 +8,7 @@ namespace py = pybind11;
 
 namespace kgedata {
 
-LCWANoThrowSampler::LCWANoThrowSampler(
+PerturbationSampler::PerturbationSampler(
     const py::array_t<int64_t>& train_set,
     int64_t num_entity,
     int64_t num_relation,
@@ -25,26 +25,26 @@ LCWANoThrowSampler::LCWANoThrowSampler(
     /* https://codereview.stackexchange.com/posts/109518/revisions "Improved long-period generators based on linear recurrences modulo 2", F. Panneton, P. L'Ecuyer, M. Matsumoto in AVM TOMS Volume 32 Issue 1, March 2006 Pages 1-16 */
     random_engine_.discard(700000);
     if (strategy == Strategy::Hash) {
-        sample_strategy_ = make_unique<LCWANoThrowSampler::HashSampleStrategy>(train_set, this);
+        sample_strategy_ = make_unique<PerturbationSampler::HashSampleStrategy>(train_set, this);
     }
 }
 
-int16_t LCWANoThrowSampler::numNegativeSamples() const
+int16_t PerturbationSampler::numNegativeSamples() const
 {
     return num_corrupt_entity_ + num_corrupt_relation_;
 }
 
 py::array_t<int64_t, py::array::c_style>
-LCWANoThrowSampler::sample(
+PerturbationSampler::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
     return sample_strategy_->sample(corrupt_head_arr, batch);
 }
 
-LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
+PerturbationSampler::HashSampleStrategy::HashSampleStrategy(
     const py::array_t<int64_t>& triples,
-    LCWANoThrowSampler* sampler)
+    PerturbationSampler* sampler)
     : sampler_(sampler)
 {
     auto arr = triples.unchecked<2>();
@@ -60,7 +60,7 @@ LCWANoThrowSampler::HashSampleStrategy::HashSampleStrategy(
 
 /* sample size: (len(batch_size), negatives, 3) */
 py::array_t<int64_t, py::array::c_style>
-LCWANoThrowSampler::HashSampleStrategy::sample(
+PerturbationSampler::HashSampleStrategy::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
@@ -116,7 +116,7 @@ LCWANoThrowSampler::HashSampleStrategy::sample(
         free_when_done); // numpy array references this parent
 }
 
-int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func)
+int64_t PerturbationSampler::HashSampleStrategy::generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func)
 {
     auto k = detail::_pack_value(h, r);
     auto gen_tail = generate_random_func() % sampler_->num_entity_;
@@ -133,7 +133,7 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptHead(int64_t h, i
     }
 }
 
-int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, int64_t r, const std::function<int64_t(void)>& generate_random_func)
+int64_t PerturbationSampler::HashSampleStrategy::generateCorruptTail(int64_t t, int64_t r, const std::function<int64_t(void)>& generate_random_func)
 {
     auto k = detail::_pack_value(t, r);
     auto gen_head = generate_random_func() % sampler_->num_entity_;
@@ -150,7 +150,7 @@ int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptTail(int64_t t, i
     }
 }
 
-int64_t LCWANoThrowSampler::HashSampleStrategy::generateCorruptRelation(int64_t h, int64_t t, const std::function<int64_t(void)>& generate_random_func)
+int64_t PerturbationSampler::HashSampleStrategy::generateCorruptRelation(int64_t h, int64_t t, const std::function<int64_t(void)>& generate_random_func)
 {
     auto k = detail::_pack_value(h, t);
     auto gen_relation = generate_random_func() % sampler_->num_relation_;

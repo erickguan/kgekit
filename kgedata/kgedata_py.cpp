@@ -48,16 +48,16 @@ PYBIND11_MODULE(kgedata, m) {
         .def("getIdFromEntity", &kgedata::EntityNumberIndexer::getIdFromEntity, "gets the entity id from name")
         .def("getIdFromRelation", &kgedata::EntityNumberIndexer::getIdFromRelation, "gets the entity name from id");
 
-    py::enum_<kgedata::LCWANoThrowSampler::Strategy>(m, "LCWANoThrowSamplerStrategy", py::arithmetic())
-        .value("Hash", kgedata::LCWANoThrowSampler::Strategy::Hash)
-        .value("Offset", kgedata::LCWANoThrowSampler::Strategy::Offset);
+    py::enum_<kgedata::PerturbationSampler::Strategy>(m, "PerturbationSamplerStrategy", py::arithmetic())
+        .value("Hash", kgedata::PerturbationSampler::Strategy::Hash)
+        .value("Offset", kgedata::PerturbationSampler::Strategy::Offset);
 
-    py::class_<kgedata::LCWANoThrowSampler>(m, "LCWANoThrowSampler")
+    py::class_<kgedata::PerturbationSampler>(m, "PerturbationSampler")
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t>())
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t>())
-        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::LCWANoThrowSampler::Strategy>())
-        .def("numNegativeSamples", &kgedata::LCWANoThrowSampler::numNegativeSamples, "gets the number of negative samples")
-        .def("sample", &kgedata::LCWANoThrowSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::PerturbationSampler::Strategy>())
+        .def("numNegativeSamples", &kgedata::PerturbationSampler::numNegativeSamples, "gets the number of negative samples")
+        .def("sample", &kgedata::PerturbationSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
     py::class_<kgedata::CWASampler>(m, "CWASampler", "CWASampler returns a negative batch based on a per triple basis corruption head flag. Supports flags for corrupt relation too.")
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, bool>())

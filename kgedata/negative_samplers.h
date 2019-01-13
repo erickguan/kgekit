@@ -41,13 +41,13 @@ struct TripleIndexHasher {
 /*
  * PyTorch requires LongTensor for indicies so int64_t is used.
  */
-class LCWANoThrowSampler: private boost::noncopyable {
+class PerturbationSampler: private boost::noncopyable {
 public:
     enum class Strategy {
         Hash,
         Offset
     };
-    LCWANoThrowSampler(
+    PerturbationSampler(
         const py::array_t<int64_t>& train_set,
         int64_t num_entity,
         int64_t num_relation,
@@ -72,7 +72,7 @@ private:
     };
     class HashSampleStrategy : public SampleStrategy {
     public:
-        HashSampleStrategy(const py::array_t<int64_t>& triples, LCWANoThrowSampler* sampler);
+        HashSampleStrategy(const py::array_t<int64_t>& triples, PerturbationSampler* sampler);
         py::array_t<int64_t, py::array::c_style> sample(
             py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
             py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch) override;
@@ -80,7 +80,7 @@ private:
         int64_t generateCorruptHead(int64_t h, int64_t r, const std::function<int64_t(void)>& generate_random_func);
         int64_t generateCorruptTail(int64_t t, int64_t r, const std::function<int64_t(void)>& generate_random_func);
         int64_t generateCorruptRelation(int64_t h, int64_t t, const std::function<int64_t(void)>& generate_random_func);
-        LCWANoThrowSampler* sampler_;
+        PerturbationSampler* sampler_;
 
         unordered_map<int64_t, unordered_set<int64_t>> rest_head_;
         unordered_map<int64_t, unordered_set<int64_t>> rest_tail_;

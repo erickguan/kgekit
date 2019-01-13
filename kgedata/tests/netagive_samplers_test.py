@@ -7,14 +7,14 @@ import numpy as np
 import pytest
 
 @pytest.mark.numpyfile
-class LCWANoThrowSamplerTest(unittest.TestCase):
+class PerturbationSamplerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.triple_index_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'corruptor_triple.txt')
         cls.triple_indexes, _ = kgekit.io.read_triple_indexes_numpy(cls.triple_index_filename, triple_order="hrt", delimiter=' ')
-        cls.entity_sampler = kgedata.LCWANoThrowSampler(cls.triple_indexes, 5, 2, 2, 0, 100, kgedata.LCWANoThrowSamplerStrategy.Hash)
-        cls.relation_sampler = kgedata.LCWANoThrowSampler(cls.triple_indexes, 5, 2, 0, 1, 100, kgedata.LCWANoThrowSamplerStrategy.Hash)
-        cls.combined_sampler = kgedata.LCWANoThrowSampler(cls.triple_indexes, 5, 2, 1, 1, 100, kgedata.LCWANoThrowSamplerStrategy.Hash)
+        cls.entity_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 2, 0, 100, kgedata.PerturbationSamplerStrategy.Hash)
+        cls.relation_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 0, 1, 100, kgedata.PerturbationSamplerStrategy.Hash)
+        cls.combined_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 1, 1, 100, kgedata.PerturbationSamplerStrategy.Hash)
 
     def test_num_negative_samples(self):
         self.assertEqual(self.entity_sampler.numNegativeSamples(), 2)
