@@ -16,9 +16,6 @@ class PerturbationSamplerTest(unittest.TestCase):
         cls.relation_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 0, 1, 100, kgedata.PerturbationSamplerStrategy.Hash)
         cls.combined_sampler = kgedata.PerturbationSampler(cls.triple_indexes, 5, 2, 1, 1, 100, kgedata.PerturbationSamplerStrategy.Hash)
     
-    def test_return_labels(self):
-        self.assertEqual(kgedata.PerturbationSampler.return_labels(), False)
-
     def test_num_negative_samples(self):
         self.assertEqual(self.entity_sampler.numNegativeSamples(), 2)
         self.assertEqual(self.relation_sampler.numNegativeSamples(), 1)
@@ -58,37 +55,26 @@ class CWASamplerTest(unittest.TestCase):
     def setUpClass(cls):
         cls.triple_index_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'fixtures', 'corruptor_triple.txt')
         cls.triple_indexes, _ = kgekit.io.read_triple_indexes_numpy(cls.triple_index_filename, triple_order="hrt", delimiter=' ')
-        cls.sampler = kgedata.CWASampler(cls.triple_indexes, 5, 2, True)
-        cls.entity_sampler = kgedata.CWASampler(cls.triple_indexes, 5, 2, False)
+        cls.sampler = kgedata.CWASampler(5, 2, True)
+        cls.entity_sampler = kgedata.CWASampler(5, 2, False)
 
     def test_sample(self):
         batch_size = 2
         triple_indexes = self.triple_indexes[:batch_size]
-        samples, labels = self.sampler.sample(np.array([False, True], dtype=np.bool), triple_indexes)
+        samples = self.sampler.sample(np.array([False, True], dtype=np.bool), triple_indexes)
         np.testing.assert_equal(samples, np.array([
             [[0, 1, 0], [0, 1, 1], [0, 1, 2], [0, 1, 3], [0, 1, 4], [0, 0, 3], [0, 1, 3]],
             [[0, 0, 1], [1, 0, 1], [2, 0, 1], [3, 0, 1], [4, 0, 1], [0, 0, 1], [0, 1, 1]],
         ], dtype=np.int64))
-        np.testing.assert_equal(labels, np.array([
-            [False, False, False, True, True, False, True],
-            [True, False, False, True, False, True, False],
-        ], dtype=np.bool))
 
     def test_entity_sample(self):
         batch_size = 2
         triple_indexes = self.triple_indexes[:batch_size]
-        samples, labels = self.entity_sampler.sample(np.array([False, False], dtype=np.bool), triple_indexes)
+        samples = self.entity_sampler.sample(np.array([False, False], dtype=np.bool), triple_indexes)
         np.testing.assert_equal(samples, np.array([
             [[0, 1, 0], [0, 1, 1], [0, 1, 2], [0, 1, 3], [0, 1, 4]],
             [[0, 0, 0], [0, 0, 1], [0, 0, 2], [0, 0, 3], [0, 0, 4]],
         ], dtype=np.int64))
-        np.testing.assert_equal(labels, np.array([
-            [False, False, False, True, True],
-            [False, True, False, False, False],
-        ], dtype=np.bool))
-
-    def test_return_labels(self):
-        self.assertEqual(kgedata.CWASampler.return_labels(), True)
 
 
 if __name__ == '__main__':

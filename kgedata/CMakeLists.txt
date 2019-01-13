@@ -26,7 +26,7 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 endif()
 
 set(SOURCES kgedata.h kgedata.cpp)
-set(PY_SOURCES kgedata_py.cpp entity_number_indexer.cpp negative_samplers.cpp corruptors.cpp ranker.cpp triple_expander.cpp)
+set(PY_SOURCES kgedata_py.cpp entity_number_indexer.cpp label_generator.cpp negative_samplers.cpp corruptors.cpp ranker.cpp triple_expander.cpp)
 set(TEST_SOURCES test_helper.cpp kgedata_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h test_helper.h)
 
 add_library(kgedata_impl ${SOURCES})

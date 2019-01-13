@@ -11,7 +11,6 @@
 
 #include <pybind11/numpy.h>
 #include <boost/core/noncopyable.hpp>
-#include <boost/functional/hash.hpp>
 
 #include "kgedata.h"
 
@@ -24,19 +23,7 @@ using std::make_pair;
 using std::unique_ptr;
 using std::make_unique;
 
-
 namespace py = pybind11;
-
-namespace detail {
-
-struct TripleIndexHasher {
-  size_t operator()(const TripleIndex& obj) const
-  {
-    return std::hash<std::string>()(obj.repr());
-  }
-};
-
-} // namespace detail
 
 /*
  * PyTorch requires LongTensor for indicies so int64_t is used.
@@ -56,7 +43,6 @@ public:
         int64_t random_seed=std::random_device{}(),
         Strategy strategy=Strategy::Hash);
     int16_t numNegativeSamples() const;
-    static bool return_labels() { return false; };
     py::array_t<int64_t, py::array::c_style> sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_arr,
         py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
@@ -95,20 +81,16 @@ private:
 class CWASampler: private boost::noncopyable {
 public:
     CWASampler(
-        const py::array_t<int64_t>& train_set,
         int64_t num_entity,
         int64_t num_relation,
         bool corrupt_relation = false);
-    static bool return_labels() { return true; };
-    pair<py::array_t<int64_t, py::array::c_style>, py::array_t<bool, py::array::c_style>>
-    sample(
+    py::array_t<int64_t, py::array::c_style> sample(
         py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
         py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
 private:
     int64_t num_entity_ = -1;
     int64_t num_relation_ = -1;
     bool corrupt_relation_ = false;
-    unordered_set<TripleIndex, detail::TripleIndexHasher> triples_;
 };
 
 } // namespace kgedata

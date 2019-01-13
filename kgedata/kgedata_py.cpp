@@ -8,6 +8,7 @@
 #include "negative_samplers.h"
 #include "corruptors.h"
 #include "ranker.h"
+#include "label_generator.h"
 #include "triple_expander.h"
 
 namespace py = pybind11;
@@ -57,13 +58,15 @@ PYBIND11_MODULE(kgedata, m) {
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t>())
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::PerturbationSampler::Strategy>())
         .def("numNegativeSamples", &kgedata::PerturbationSampler::numNegativeSamples, "gets the number of negative samples")
-        .def("sample", &kgedata::PerturbationSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch")
-        .def_static("return_labels", &kgedata::PerturbationSampler::return_labels);
+        .def("sample", &kgedata::PerturbationSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
-    py::class_<kgedata::CWASampler>(m, "CWASampler", "CWASampler returns a negative batch based on a per triple basis corruption head flag. Supports flags for corrupt relation too.")
-        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, bool>())
-        .def("sample", &kgedata::CWASampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch")
-        .def_static("return_labels", &kgedata::CWASampler::return_labels);
+    py::class_<kgedata::CWASampler>(m, "CWASampler", "CWASampler returns a negative batch. Supports flags for corrupt relation too.")
+        .def(py::init<int64_t, int64_t, bool>())
+        .def("sample", &kgedata::CWASampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
+
+    py::class_<kgedata::LabelGenerator>(m, "LabelGenerator", "LabelGenerator returns a negative batch based on a per triple basis corruption head flag. Supports flags for corrupt relation too.")
+        .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&>())
+        .def("generate_labels", &kgedata::LabelGenerator::generate_labels, py::arg("batch").noconvert(), "generates labels for the batch");
 
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int32_t, int64_t>())

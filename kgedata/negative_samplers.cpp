@@ -168,32 +168,20 @@ int64_t PerturbationSampler::HashSampleStrategy::generateCorruptRelation(int64_t
 }
 
 CWASampler::CWASampler(
-        const py::array_t<int64_t>& train_set,
         int64_t num_entity,
         int64_t num_relation,
         bool corrupt_relation)
     : num_entity_(num_entity), num_relation_(num_relation), corrupt_relation_(corrupt_relation)
 {
-    auto arr = train_set.unchecked<2>();
-    for (auto i = 0; i < arr.shape(0); ++i) {
-        int64_t head = arr(i, detail::kTripleHeadOffestInABatch);
-        int64_t relation = arr(i, detail::kTripleRelationOffestInABatch);
-        int64_t tail = arr(i, detail::kTripleTailOffestInABatch);
-        triples_.insert(TripleIndex(head, relation, tail));
-    }
 }
 
-pair<py::array_t<int64_t, py::array::c_style>, py::array_t<bool, py::array::c_style>>
-CWASampler::sample(
+py::array_t<int64_t, py::array::c_style> CWASampler::sample(
     py::array_t<bool, py::array::c_style | py::array::forcecast>& corrupt_head_flags,
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
 {
     const auto num_batch = batch.shape(0);
     auto num_corrupts = num_entity_ + (corrupt_relation_ ? num_relation_ : 0);
-
-    const size_t size = num_batch * num_corrupts;
-    bool* existed = new bool[size];
-    int64_t* data = new int64_t[size * detail::kNumTripleElements];
+    int64_t* data = new int64_t[num_batch * num_corrupts * detail::kNumTripleElements];
 
     auto corrupt_head_flags_proxy = static_cast<bool*>(corrupt_head_flags.request().ptr);
     auto batch_proxy = static_cast<int64_t*>(batch.request().ptr);
@@ -207,26 +195,19 @@ CWASampler::sample(
         /* negative samples */
         auto corrupt_adr = corrupt_head_flags_proxy + i;
         auto batch_base_adr = data + i*num_corrupts*detail::kNumTripleElements;
-        auto existed_base_adr = existed + i*num_corrupts;
         for (int64_t id = 0; id < num_entity_; ++id) {
             auto base_adr = batch_base_adr + id*detail::kNumTripleElements;
-            TripleIndex test_triple;
             if (*corrupt_adr) {
                 *base_adr = id;
                 *(base_adr+detail::kTripleRelationOffestInABatch) = r;
                 *(base_adr+detail::kTripleTailOffestInABatch) = t;
-                test_triple = TripleIndex(id, r, t);
             } else {
                 *base_adr = h;
                 *(base_adr+detail::kTripleRelationOffestInABatch) = r;
                 *(base_adr+detail::kTripleTailOffestInABatch) = id;
-                test_triple = TripleIndex(h, r, id);
             }
-            *(existed_base_adr + id) = triples_.find(test_triple) != triples_.end();
         }
-
         batch_base_adr += num_entity_*detail::kNumTripleElements;
-        existed_base_adr += num_entity_;
 
         if (corrupt_relation_) {
             for (int64_t id = 0; id < num_relation_; ++id) {
@@ -234,11 +215,6 @@ CWASampler::sample(
                 *base_adr = h;
                 *(base_adr+detail::kTripleRelationOffestInABatch) = id;
                 *(base_adr+detail::kTripleTailOffestInABatch) = t;
-                if (triples_.find(TripleIndex(h, id, t)) == triples_.end()) {
-                    *(existed_base_adr + id) = false;
-                } else {
-                    *(existed_base_adr + id) = true;
-                }
             }
         }
     }
@@ -247,20 +223,11 @@ CWASampler::sample(
         int64_t* data = reinterpret_cast<int64_t*>(f);
         delete[] data;
     });
-    py::capsule existed_free_when_done(existed, [](void* f) {
-        bool* existed = reinterpret_cast<bool*>(f);
-        delete[] existed;
-    });
 
-    return make_pair(
-        py::array_t<int64_t, py::array::c_style>(
-            {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
-            data, // the data pointer
-            free_when_done),
-        py::array_t<bool, py::array::c_style>(
-            {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts)}, // shape
-            existed, // the data pointer
-            existed_free_when_done)); // numpy array references this parent
+    return py::array_t<int64_t, py::array::c_style>(
+        {static_cast<ssize_t>(num_batch), static_cast<ssize_t>(num_corrupts), static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+        data, // the data pointer
+        free_when_done);
 }
 
 } // namespace kgedata
