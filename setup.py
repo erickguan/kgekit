@@ -126,7 +126,7 @@ setup(name='kgekit',
       test_suite='tests',
       zip_safe=False,
       classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
 
         # Indicate who your project is intended for
