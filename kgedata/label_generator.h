@@ -29,7 +29,7 @@ struct TripleIndexHasher {
 class LabelGenerator : private boost::noncopyable {
 public:
     LabelGenerator(const py::array_t<int64_t>& triple_set);
-    py::array_t<int64_t, py::array::c_style> generate_labels(
+    py::array_t<float, py::array::c_style> generate_labels(
         py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
 private:
     unordered_set<TripleIndex, detail::TripleIndexHasher> triples_;
