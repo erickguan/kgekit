@@ -17,21 +17,23 @@ using std::unordered_map;
 using std::make_pair;
 using std::pair;
 
+namespace py = pybind11;
+
 class Ranker {
 public:
-    Ranker(const pybind11::list& train_triples, const pybind11::list& valid_triples, const pybind11::list& test_triples);
-    Ranker(const pybind11::tuple& rest_head, const pybind11::tuple& rest_tail, const pybind11::tuple& rest_relation);
-    pair<int32_t, int32_t> rankHead(pybind11::array_t<float>& arr, const TripleIndex& triple);
-    pair<int32_t, int32_t> rankTail(pybind11::array_t<float>& arr, const TripleIndex& triple);
-    pair<int32_t, int32_t> rankRelation(pybind11::array_t<float>& arr, const TripleIndex& triple);
-    pybind11::tuple exportState() const;
+    Ranker(const py::array_t<int64_t>& train_triples, const py::array_t<int64_t>& valid_triples, const py::array_t<int64_t>& test_triples);
+    Ranker(const py::tuple& rest_head, const py::tuple& rest_tail, const py::tuple& rest_relation);
+    pair<int32_t, int32_t> rankHead(py::array_t<float>& arr, const TripleIndex& triple);
+    pair<int32_t, int32_t> rankTail(py::array_t<float>& arr, const TripleIndex& triple);
+    pair<int32_t, int32_t> rankRelation(py::array_t<float>& arr, const TripleIndex& triple);
+    py::tuple exportState() const;
 private:
     unordered_map<int64_t, unordered_set<int64_t>> rest_head_;
     unordered_map<int64_t, unordered_set<int64_t>> rest_tail_;
     unordered_map<int64_t, unordered_set<int64_t>> rest_relation_;
 };
 
-pybind11::tuple ranker_pickle_getstate(const Ranker& ranker);
-Ranker ranker_pickle_setstate(pybind11::tuple t);
+py::tuple ranker_pickle_getstate(const Ranker& ranker);
+Ranker ranker_pickle_setstate(py::tuple t);
 
 } // namespace kgedata

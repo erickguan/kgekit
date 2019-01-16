@@ -4,36 +4,51 @@
 
 namespace kgedata {
 
-pair<int32_t, int32_t> _rank(pybind11::array_t<float>& arr, int64_t original, unordered_set<int64_t>& filters);
+pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original, unordered_set<int64_t>& filters);
 
-Ranker::Ranker(const pybind11::list& train_triples, const pybind11::list& valid_triples, const pybind11::list& test_triples)
+Ranker::Ranker(const py::array_t<int64_t>& train_triples, const py::array_t<int64_t>& valid_triples, const py::array_t<int64_t>& test_triples)
 {
-    for (auto const& t : train_triples) {
-        auto triple = t.cast<TripleIndex>();
-        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
-        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+    {
+        auto arr = train_triples.unchecked<2>();
+        for (auto i = 0; i < arr.shape(0); ++i) {
+            auto head = arr(i, detail::kTripleHeadOffestInABatch);
+            auto relation = arr(i, detail::kTripleRelationOffestInABatch);
+            auto tail = arr(i, detail::kTripleTailOffestInABatch);
+            rest_head_[detail::_pack_value(relation, tail)].insert(head);
+            rest_relation_[detail::_pack_value(head, tail)].insert(relation);
+            rest_tail_[detail::_pack_value(head, relation)].insert(tail);
+        }
     }
 
-    for (auto const& t : valid_triples) {
-        auto triple = t.cast<TripleIndex>();
-        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
-        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+    {
+        auto arr = valid_triples.unchecked<2>();
+        for (auto i = 0; i < arr.shape(0); ++i) {
+            auto head = arr(i, detail::kTripleHeadOffestInABatch);
+            auto relation = arr(i, detail::kTripleRelationOffestInABatch);
+            auto tail = arr(i, detail::kTripleTailOffestInABatch);
+            rest_head_[detail::_pack_value(relation, tail)].insert(head);
+            rest_relation_[detail::_pack_value(head, tail)].insert(relation);
+            rest_tail_[detail::_pack_value(head, relation)].insert(tail);
+        }
     }
 
-    for (auto const& t : test_triples) {
-        auto triple = t.cast<TripleIndex>();
-        rest_head_[detail::_pack_value(triple.relation, triple.tail)].insert(triple.head);
-        rest_tail_[detail::_pack_value(triple.head, triple.relation)].insert(triple.tail);
-        rest_relation_[detail::_pack_value(triple.head, triple.tail)].insert(triple.relation);
+    {
+        auto arr = test_triples.unchecked<2>();
+        for (auto i = 0; i < arr.shape(0); ++i) {
+            auto head = arr(i, detail::kTripleHeadOffestInABatch);
+            auto relation = arr(i, detail::kTripleRelationOffestInABatch);
+            auto tail = arr(i, detail::kTripleTailOffestInABatch);
+            rest_head_[detail::_pack_value(relation, tail)].insert(head);
+            rest_relation_[detail::_pack_value(head, tail)].insert(relation);
+            rest_tail_[detail::_pack_value(head, relation)].insert(tail);
+        }
     }
 }
 
-Ranker::Ranker(const pybind11::tuple& rest_head, const pybind11::tuple& rest_tail, const pybind11::tuple& rest_relation)
+Ranker::Ranker(const py::tuple& rest_head, const py::tuple& rest_tail, const py::tuple& rest_relation)
 {
-    auto rest_head_keys = rest_head[0].cast<pybind11::list>();
-    auto rest_head_sets = rest_head[1].cast<pybind11::list>();
+    auto rest_head_keys = rest_head[0].cast<py::list>();
+    auto rest_head_sets = rest_head[1].cast<py::list>();
     auto i = 0;
     for (const auto& key : rest_head_keys) {
         for (const auto& item : rest_head_sets[i]) {
@@ -42,8 +57,8 @@ Ranker::Ranker(const pybind11::tuple& rest_head, const pybind11::tuple& rest_tai
         i++;
     }
     i = 0;
-    auto rest_tail_keys = rest_tail[0].cast<pybind11::list>();
-    auto rest_tail_sets = rest_tail[1].cast<pybind11::list>();
+    auto rest_tail_keys = rest_tail[0].cast<py::list>();
+    auto rest_tail_sets = rest_tail[1].cast<py::list>();
     for (const auto& key : rest_tail_keys) {
         for (const auto& item : rest_tail_sets[i]) {
             rest_tail_[key.cast<int64_t>()].insert(item.cast<int64_t>());
@@ -51,8 +66,8 @@ Ranker::Ranker(const pybind11::tuple& rest_head, const pybind11::tuple& rest_tai
         i++;
     }
     i = 0;
-    auto rest_relation_keys = rest_relation[0].cast<pybind11::list>();
-    auto rest_relation_sets = rest_relation[1].cast<pybind11::list>();
+    auto rest_relation_keys = rest_relation[0].cast<py::list>();
+    auto rest_relation_sets = rest_relation[1].cast<py::list>();
     for (const auto& key : rest_relation_keys) {
         for (const auto& item : rest_relation_sets[i]) {
             rest_relation_[key.cast<int64_t>()].insert(item.cast<int64_t>());
@@ -62,10 +77,10 @@ Ranker::Ranker(const pybind11::tuple& rest_head, const pybind11::tuple& rest_tai
 }
 
 /* Not using index based creation cause segfault */
-pybind11::tuple Ranker::exportState() const
+py::tuple Ranker::exportState() const
 {
-    pybind11::list rest_head_keys(rest_head_.size());
-    pybind11::list rest_head_sets(rest_head_.size());
+    py::list rest_head_keys(rest_head_.size());
+    py::list rest_head_sets(rest_head_.size());
     auto i = 0;
     auto j = 0;
     for (const auto& it: rest_head_) {
@@ -73,7 +88,7 @@ pybind11::tuple Ranker::exportState() const
         auto entry_set = it.second;
 
         rest_head_keys[i] = rest_key;
-        pybind11::list entry_container(entry_set.size());
+        py::list entry_container(entry_set.size());
         j = 0;
         for (int64_t item : entry_set) {
             entry_container[j++] = item;
@@ -83,17 +98,17 @@ pybind11::tuple Ranker::exportState() const
     if (rest_head_keys.size() != rest_head_sets.size()) {
         throw std::runtime_error("Invalid head k/v mismatch.");
     }
-    pybind11::tuple rest_head = pybind11::make_tuple(rest_head_keys, rest_head_sets);
+    py::tuple rest_head = py::make_tuple(rest_head_keys, rest_head_sets);
 
-    pybind11::list rest_tail_keys(rest_tail_.size());
-    pybind11::list rest_tail_sets(rest_tail_.size());
+    py::list rest_tail_keys(rest_tail_.size());
+    py::list rest_tail_sets(rest_tail_.size());
     i = 0;
     for (const auto& it: rest_tail_) {
         int64_t rest_key = it.first;
         auto entry_set = it.second;
 
         rest_tail_keys[i] = rest_key;
-        pybind11::list entry_container(entry_set.size());
+        py::list entry_container(entry_set.size());
         j = 0;
         for (int64_t item : entry_set) {
             entry_container[j++] = item;
@@ -103,17 +118,17 @@ pybind11::tuple Ranker::exportState() const
     if (rest_tail_keys.size() != rest_tail_sets.size()) {
         throw std::runtime_error("Invalid head k/v mismatch.");
     }
-    pybind11::tuple rest_tail = pybind11::make_tuple(rest_tail_keys, rest_tail_sets);
+    py::tuple rest_tail = py::make_tuple(rest_tail_keys, rest_tail_sets);
 
-    pybind11::list rest_relation_keys(rest_relation_.size());
-    pybind11::list rest_relation_sets(rest_relation_.size());
+    py::list rest_relation_keys(rest_relation_.size());
+    py::list rest_relation_sets(rest_relation_.size());
     i = 0;
     for (const auto& it: rest_relation_) {
         int64_t rest_key = it.first;
         auto entry_set = it.second;
 
         rest_relation_keys[i] = rest_key;
-        pybind11::list entry_container(entry_set.size());
+        py::list entry_container(entry_set.size());
         j = 0;
         for (int64_t item : entry_set) {
             entry_container[j++] = item;
@@ -123,12 +138,12 @@ pybind11::tuple Ranker::exportState() const
     if (rest_relation_keys.size() != rest_relation_sets.size()) {
         throw std::runtime_error("Invalid head k/v mismatch.");
     }
-    pybind11::tuple rest_relation = pybind11::make_tuple(rest_relation_keys, rest_relation_sets);
+    py::tuple rest_relation = py::make_tuple(rest_relation_keys, rest_relation_sets);
 
-    return pybind11::make_tuple(rest_head, rest_tail, rest_relation);
+    return py::make_tuple(rest_head, rest_tail, rest_relation);
 }
 
-pair<int32_t, int32_t> _rank(pybind11::array_t<float>& arr, int64_t original, unordered_set<int64_t>& filters)
+pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original, unordered_set<int64_t>& filters)
 {
     constexpr auto kEpsilon = 1e-6;
     auto r = arr.mutable_unchecked<1>(); // Will throw if ndim != 1 or flags.writeable is false
@@ -149,41 +164,41 @@ pair<int32_t, int32_t> _rank(pybind11::array_t<float>& arr, int64_t original, un
     return make_pair(rank, filtered_rank);
 }
 
-pair<int32_t, int32_t> Ranker::rankHead(pybind11::array_t<float>& arr, const TripleIndex& triple)
+pair<int32_t, int32_t> Ranker::rankHead(py::array_t<float>& arr, const TripleIndex& triple)
 {
     return _rank(arr, triple.head, rest_head_[detail::_pack_value(triple.relation, triple.tail)]);
 }
 
-pair<int32_t, int32_t> Ranker::rankTail(pybind11::array_t<float>& arr, const TripleIndex& triple)
+pair<int32_t, int32_t> Ranker::rankTail(py::array_t<float>& arr, const TripleIndex& triple)
 {
     return _rank(arr, triple.tail, rest_tail_[detail::_pack_value(triple.head, triple.relation)]);
 }
 
-pair<int32_t, int32_t> Ranker::rankRelation(pybind11::array_t<float>& arr, const TripleIndex& triple)
+pair<int32_t, int32_t> Ranker::rankRelation(py::array_t<float>& arr, const TripleIndex& triple)
 {
     return _rank(arr, triple.relation, rest_relation_[detail::_pack_value(triple.head, triple.tail)]);
 }
 
-pybind11::tuple ranker_pickle_getstate(const Ranker& ranker)
+py::tuple ranker_pickle_getstate(const Ranker& ranker)
 {
     return ranker.exportState();
 }
 
-Ranker ranker_pickle_setstate(pybind11::tuple t)
+Ranker ranker_pickle_setstate(py::tuple t)
 {
     if (t.size() != 3) {
         throw std::runtime_error("Invalid state!");
     }
-    auto rest_head = t[0].cast<pybind11::tuple>();
-    if (rest_head[0].cast<pybind11::list>().size() != rest_head[1].cast<pybind11::list>().size()) {
+    auto rest_head = t[0].cast<py::tuple>();
+    if (rest_head[0].cast<py::list>().size() != rest_head[1].cast<py::list>().size()) {
         throw std::runtime_error("Invalid state!");
     }
-    auto rest_tail = t[1].cast<pybind11::tuple>();
-    if (rest_tail[0].cast<pybind11::list>().size() != rest_tail[1].cast<pybind11::list>().size()) {
+    auto rest_tail = t[1].cast<py::tuple>();
+    if (rest_tail[0].cast<py::list>().size() != rest_tail[1].cast<py::list>().size()) {
         throw std::runtime_error("Invalid state!");
     }
-    auto rest_relation = t[2].cast<pybind11::tuple>();
-    if (rest_relation[0].cast<pybind11::list>().size() != rest_relation[1].cast<pybind11::list>().size()) {
+    auto rest_relation = t[2].cast<py::tuple>();
+    if (rest_relation[0].cast<py::list>().size() != rest_relation[1].cast<py::list>().size()) {
         throw std::runtime_error("Invalid state!");
     }
 

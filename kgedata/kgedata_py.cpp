@@ -79,7 +79,7 @@ PYBIND11_MODULE(kgedata, m) {
         .def("make_random_choice", &kgedata::UniformCorruptor::make_random_choice, py::arg("batch").noconvert(), "gets the choice for given batch item");
 
     py::class_<kgedata::Ranker>(m, "Ranker", "ranks the prediction")
-        .def(py::init<const py::list&, const py::list&, const py::list&>())
+        .def(py::init<const py::array_t<int64_t>&, const py::array_t<int64_t>&, const py::array_t<int64_t>&>())
         .def("rankHead", &kgedata::Ranker::rankHead, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test head prediction.")
         .def("rankTail", &kgedata::Ranker::rankTail, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test tail prediction.")
         .def("rankRelation", &kgedata::Ranker::rankRelation, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test relation prediction.")
