@@ -77,7 +77,7 @@ Ranker::Ranker(const py::tuple& rest_head, const py::tuple& rest_tail, const py:
 }
 
 /* Not using index based creation cause segfault */
-py::tuple Ranker::exportState() const
+py::tuple Ranker::export_state() const
 {
     py::list rest_head_keys(rest_head_.size());
     py::list rest_head_sets(rest_head_.size());
@@ -146,15 +146,15 @@ py::tuple Ranker::exportState() const
 pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original, unordered_set<int64_t>& filters)
 {
     constexpr auto kEpsilon = 1e-6;
-    auto r = arr.mutable_unchecked<1>(); // Will throw if ndim != 1 or flags.writeable is false
-    float expected_best = r(original);
+    auto p = static_cast<float*>(arr.request().ptr);
+    float expected_best = p[original];
      // rank starts with 1
     int32_t rank = 1;
     int32_t filtered_rank = 1;
-    for (ssize_t i = 0; i < r.shape(0); ++i) {
-        if (fabs(r(i) - expected_best) < kEpsilon) {
+    for (ssize_t i = 0; i < arr.shape(0); ++i) {
+        if (fabs(p[i] - expected_best) < kEpsilon) {
             continue;
-        } else if (r(i) < expected_best) {
+        } else if (p[i] < expected_best) {
             rank++;
             if (filters.find(i) == filters.end()) {
                 filtered_rank++;
@@ -164,24 +164,27 @@ pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original, unordere
     return make_pair(rank, filtered_rank);
 }
 
-pair<int32_t, int32_t> Ranker::rankHead(py::array_t<float>& arr, const TripleIndex& triple)
+pair<int32_t, int32_t> Ranker::rank_head(py::array_t<float>& arr, py::array_t<int64_t>& triple)
 {
-    return _rank(arr, triple.head, rest_head_[detail::_pack_value(triple.relation, triple.tail)]);
+    auto p = static_cast<int64_t*>(triple.request().ptr);
+    return _rank(arr, p[detail::kTripleHeadOffestInABatch], rest_head_[detail::_pack_value(p[detail::kTripleRelationOffestInABatch], p[detail::kTripleTailOffestInABatch])]);
 }
 
-pair<int32_t, int32_t> Ranker::rankTail(py::array_t<float>& arr, const TripleIndex& triple)
+pair<int32_t, int32_t> Ranker::rank_tail(py::array_t<float>& arr, py::array_t<int64_t>& triple)
 {
-    return _rank(arr, triple.tail, rest_tail_[detail::_pack_value(triple.head, triple.relation)]);
+    auto p = static_cast<int64_t*>(triple.request().ptr);
+    return _rank(arr, p[detail::kTripleTailOffestInABatch], rest_tail_[detail::_pack_value(p[detail::kTripleHeadOffestInABatch], p[detail::kTripleRelationOffestInABatch])]);
 }
 
-pair<int32_t, int32_t> Ranker::rankRelation(py::array_t<float>& arr, const TripleIndex& triple)
+pair<int32_t, int32_t> Ranker::rank_relation(py::array_t<float>& arr, py::array_t<int64_t>& triple)
 {
-    return _rank(arr, triple.relation, rest_relation_[detail::_pack_value(triple.head, triple.tail)]);
+    auto p = static_cast<int64_t*>(triple.request().ptr);
+    return _rank(arr, p[detail::kTripleRelationOffestInABatch], rest_relation_[detail::_pack_value(p[detail::kTripleHeadOffestInABatch], p[detail::kTripleTailOffestInABatch])]);
 }
 
 py::tuple ranker_pickle_getstate(const Ranker& ranker)
 {
-    return ranker.exportState();
+    return ranker.export_state();
 }
 
 Ranker ranker_pickle_setstate(py::tuple t)
