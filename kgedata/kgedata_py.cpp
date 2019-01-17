@@ -80,9 +80,9 @@ PYBIND11_MODULE(kgedata, m) {
 
     py::class_<kgedata::Ranker>(m, "Ranker", "ranks the prediction")
         .def(py::init<const py::array_t<int64_t>&, const py::array_t<int64_t>&, const py::array_t<int64_t>&>())
-        .def("rank_head", &kgedata::Ranker::rank_head, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test head prediction.")
-        .def("rank_tail", &kgedata::Ranker::rank_tail, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test tail prediction.")
-        .def("rank_relation", &kgedata::Ranker::rank_relation, py::arg("arr").noconvert(), py::arg("triple").noconvert(), "returns rank and filter rank of triple of interests. Used to test relation prediction.")
+        .def("rank_head", &kgedata::Ranker::rank_head, py::arg("arr").noconvert(), py::arg("triple").noconvert(), py::arg("rank_higher").noconvert()=false, "returns rank and filter rank of triple of interests. Used to test head prediction.")
+        .def("rank_tail", &kgedata::Ranker::rank_tail, py::arg("arr").noconvert(), py::arg("triple").noconvert(), py::arg("rank_higher").noconvert()=false, "returns rank and filter rank of triple of interests. Used to test tail prediction.")
+        .def("rank_relation", &kgedata::Ranker::rank_relation, py::arg("arr").noconvert(), py::arg("triple").noconvert(), py::arg("rank_higher").noconvert()=false, "returns rank and filter rank of triple of interests. Used to test relation prediction.")
         .def("export_state", &kgedata::Ranker::export_state)
         .def(py::pickle(&kgedata::ranker_pickle_getstate, &kgedata::ranker_pickle_setstate));
 }
