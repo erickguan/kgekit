@@ -5,6 +5,7 @@ import glob
 import sysconfig
 import platform
 import subprocess
+import multiprocessing
 import kgekit
 
 from distutils.version import LooseVersion
@@ -78,7 +79,7 @@ class CMakeBuild(build_ext):
             build_args += ['--', '/m']
         else:
             cmake_args += ['-DCMAKE_BUILD_TYPE=' + cfg]
-            build_args += ['--', '-j2']
+            build_args += ['--', '-j{}'.format(multiprocessing.cpu_count())]
 
         env = os.environ.copy()
         env['CXXFLAGS'] = '{} -DVERSION_INFO=\\"{}\\"'.format(
