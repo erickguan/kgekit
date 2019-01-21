@@ -5,7 +5,7 @@ import kgekit.data
 import kgekit.io
 
 def build_dataset(filename, deficit_threshold=0.0000124, delimiter=' ', triple_order="hrt"):
-    triples, num_failed = kgekit.io.read_triples(filename, 'hrt', ' ')
+    triples, num_failed = kgekit.io.read_triples(filename, triple_order=triple_order, delimiter=delimiter)
     if num_failed > 0:
         print("There is " + str(num_failed) + " failures.")
     indexer = kgekit.EntityNumberIndexer(triples, "hrt")
