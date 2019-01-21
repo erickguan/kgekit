@@ -23,6 +23,9 @@ def split_golden_set(triples, valid_ratio, test_ratio):
     test_set = triples[num_valid:num_valid+num_test]
     train_set = triples[num_valid+num_test:]
     assert len(valid_set) + len(test_set) + len(train_set) == len(triples)
+    assert isinstance(train_set, list)
+    assert isinstance(valid_set, list)
+    assert isinstance(test_set, list)
 
     return train_set, valid_set, test_set
 
