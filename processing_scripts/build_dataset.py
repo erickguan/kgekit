@@ -16,7 +16,7 @@ def build_dataset(filename, deficit_threshold=0.0000124, delimiter=' ', triple_o
     kgekit.io.write_index_translation('translation.protobuf', indexer.entityIdMap(), indexer.relationIdMap())
 
     train, valid, test = kgekit.data.build_dataset(
-        triples,
+        indexes,
         0.005,
         0.005)
     kgekit.io.write_triples('train.txt', train, delimiter=delimiter, triple_order=triple_order)
