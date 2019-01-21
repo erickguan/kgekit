@@ -121,11 +121,13 @@ def remove_direct_link_triples(train, valid, test):
     filtered = filterfalse(lambda t: (t.head, t.tail) in pairs or (t.tail, t.head) in pairs, train)
     return list(filtered)
 
-def build_dataset(triples, valid_ratio, test_ratio, deficit_threshold, duplicate_threshold, inverse_threshold):
+def remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold, inverse_threshold):
     triples = remove_deficit_relation(triples, deficit_threshold)
     triples = remove_near_duplicate_relation(triples, duplicate_threshold)
     triples = remove_inverse_relation(triples, inverse_threshold)
+    return triples
 
+def build_dataset(triples, valid_ratio, test_ratio):
     triples = list(shuffle_triples(triples))
     train, valid, test = split_golden_set(triples, valid_ratio, test_ratio)
     train = remove_direct_link_triples(train, valid, test)
