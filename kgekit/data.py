@@ -23,9 +23,6 @@ def split_golden_set(triples, valid_ratio, test_ratio):
     test_set = triples[num_valid:num_valid+num_test]
     train_set = triples[num_valid+num_test:]
     assert len(valid_set) + len(test_set) + len(train_set) == len(triples)
-    assert isinstance(train_set, list)
-    assert isinstance(valid_set, list)
-    assert isinstance(test_set, list)
 
     return train_set, valid_set, test_set
 
@@ -129,7 +126,7 @@ def build_dataset(triples, valid_ratio, test_ratio, deficit_threshold, duplicate
     triples = remove_near_duplicate_relation(triples, duplicate_threshold)
     triples = remove_inverse_relation(triples, inverse_threshold)
 
-    triples = shuffle_triples(triples)
+    triples = list(shuffle_triples(triples))
     train, valid, test = split_golden_set(triples, valid_ratio, test_ratio)
     train = remove_direct_link_triples(train, valid, test)
     return train, valid, test
