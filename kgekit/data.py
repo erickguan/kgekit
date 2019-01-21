@@ -127,6 +127,6 @@ def build_dataset(triples, valid_ratio, test_ratio, deficit_threshold, duplicate
     triples = remove_inverse_relation(triples, inverse_threshold)
 
     triples = shuffle_triples(triples)
-    train, valid, test = split_golden_set(triples)
+    train, valid, test = split_golden_set(triples, valid_ratio, test_ratio)
     train = remove_direct_link_triples(train, valid, test)
     return train, valid, test
