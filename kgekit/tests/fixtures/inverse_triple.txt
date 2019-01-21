@@ -1,0 +1,5 @@
+/m/entity1 /rel1 /m/entity2
+/m/entity2 /rel1 /m/entity3
+/m/entity2 /rel2 /m/entity1
+/m/entity3 /rel2 /m/entity2
+/m/entity1 /rel3 /m/entity4
