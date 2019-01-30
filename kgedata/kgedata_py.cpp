@@ -34,8 +34,8 @@ PYBIND11_MODULE(kgedata, m) {
           py::arg("batch"),
           py::arg("num_entity"),
           py::arg("num_relation"),
-          py::arg("expand_entity"),
-          py::arg("expand_relation"));
+          py::arg("expand_entity") = true,
+          py::arg("expand_relation") = false);
 
     py::class_<kgedata::EntityNumberIndexer>(m, "EntityNumberIndexer", "index from triples and translation between index and lists")
         .def(py::init<const py::list&, const std::string&>())

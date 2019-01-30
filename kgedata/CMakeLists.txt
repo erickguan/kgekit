@@ -13,17 +13,10 @@ find_package(Protobuf CONFIG REQUIRED)
 hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
 
-add_subdirectory(messages)
+hunter_add_package(folly)
+find_package(folly CONFIG REQUIRED)
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_LESS 7.0)
-        set(FS_LIBRARY c++experimental)
-    else()
-        set(FS_LIBRARY c++fs)
-    endif()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    set(FS_LIBRARY stdc++fs)
-endif()
+add_subdirectory(messages)
 
 set(SOURCES kgedata.h kgedata.cpp)
 set(PY_SOURCES kgedata_py.cpp entity_number_indexer.cpp label_generator.cpp negative_samplers.cpp corruptors.cpp ranker.cpp triple_expander.cpp)
@@ -36,7 +29,7 @@ target_link_libraries(kgedata_impl PUBLIC kgedata_structs fmt::fmt)
 
 pybind11_add_module(kgedata SHARED ${PY_SOURCES})
 target_compile_features(kgedata PUBLIC cxx_std_17)
-target_link_libraries(kgedata PUBLIC kgedata_impl PRIVATE Boost::boost)
+target_link_libraries(kgedata PUBLIC kgedata_impl PRIVATE Boost::boost Folly::folly)
 
 # test target and helper, from pybind11 tools
 

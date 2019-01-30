@@ -11,6 +11,11 @@ namespace detail {
 void assert_triple_order(const std::string& order);
 
 constexpr auto kNumTripleElements = 3;
+constexpr auto kNumExpansionPoints = 4;
+constexpr auto kExpansionHeadsOffest = 0;
+constexpr auto kExpansionTailsOffest = 1;
+constexpr auto kExpansionRelationsOffest = 2;
+constexpr auto kExpansionBatchOffest = 3;
 constexpr auto kTripleRelationOffestInABatch = 1; // h, r, t
 constexpr auto kTripleHeadOffestInABatch = 0;
 constexpr auto kTripleTailOffestInABatch = 2;

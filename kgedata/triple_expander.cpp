@@ -2,7 +2,8 @@
 
 namespace kgedata {
 
-pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
+pair<py::array_t<int64_t, py::array::c_style>, py::array_t<int64_t, py::array::c_style>>
+expand_triple_batch(
     py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
     int64_t num_entity,
     int64_t num_relation,
@@ -21,23 +22,26 @@ pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
         num_relation = 0;
     }
 
-    ssize_t batch_size = batch.shape(0) * num_expands;
-    const size_t size = batch_size * detail::kNumTripleElements;
-    int64_t* data = new int64_t[size];
+    ssize_t batch_size = batch.shape(0);
+    ssize_t expansion_size = batch_size * num_expands;
+    const size_t data_size = expansion_size * detail::kNumTripleElements;
+    int64_t* data = new int64_t[data_size];
     auto p = static_cast<int64_t*>(batch.request().ptr);
-    py::list split_points;
+
+    const size_t splits_size = batch_size * detail::kNumExpansionPoints;
+    int64_t* splits_data = new int64_t[splits_size];
 
     auto base_offset = 0;
     auto base_adr = data;
-    for (auto i = 0; i < batch.shape(0); ++i) {
-        py::tuple splits(4);
+    for (auto i = 0; i < batch_size; ++i) {
         auto adr = p + i*detail::kNumTripleElements;
         auto head = *adr;
         auto relation = *(adr + detail::kTripleRelationOffestInABatch);
         auto tail = *(adr + detail::kTripleTailOffestInABatch);
+        auto split_adr = splits_data + i*detail::kNumExpansionPoints;
 
         /* link prediction on head */
-        splits[0] = base_offset;
+        split_adr[detail::kExpansionHeadsOffest] = base_offset;
         for (auto i = 0; i < num_entity; ++i) {
             auto data_adr = base_adr + i*detail::kNumTripleElements;
             *data_adr = i;
@@ -49,7 +53,7 @@ pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
         base_adr += num_entity*detail::kNumTripleElements;
 
         /* link prediction on tail */
-        splits[1] = base_offset;
+        split_adr[detail::kExpansionTailsOffest] = base_offset;
         for (auto i = 0; i < num_entity; ++i) {
             auto data_adr = base_adr + i*detail::kNumTripleElements;
             *data_adr = head;
@@ -61,7 +65,7 @@ pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
         base_adr += num_entity*detail::kNumTripleElements;
 
         /* link prediction on relation */
-        splits[2] = base_offset;
+        split_adr[detail::kExpansionRelationsOffest] = base_offset;
         for (auto i = 0; i < num_relation; ++i) {
             auto data_adr = base_adr + i*detail::kNumTripleElements;
             *data_adr = head;
@@ -70,8 +74,7 @@ pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
         }
         base_offset += num_relation;
         base_adr += num_relation*detail::kNumTripleElements;
-        splits[3] = base_offset;
-        split_points.append(splits);
+        split_adr[detail::kExpansionBatchOffest] = base_offset;
     }
 
     // Create a Python object that will free the allocated
@@ -80,11 +83,19 @@ pair<py::array_t<int64_t, py::array::c_style>, py::list> expand_triple_batch(
         int64_t* data = reinterpret_cast<int64_t*>(f);
         delete[] data;
     });
+    py::capsule free_when_done_splits(splits_data, [](void* f) {
+        int64_t* data = reinterpret_cast<int64_t*>(f);
+        delete[] data;
+    });
 
     auto arr = py::array_t<int64_t, py::array::c_style>(
-        {batch_size, static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
+        {expansion_size, static_cast<ssize_t>(detail::kNumTripleElements)}, // shape
         data, // the data pointer
         free_when_done); // numpy array references this parent
+    auto split_points = py::array_t<int64_t, py::array::c_style>(
+        {batch_size, static_cast<ssize_t>(detail::kNumExpansionPoints)}, // shape
+        splits_data, // the data pointer
+        free_when_done_splits); // numpy array references this parent
     return make_pair(arr, split_points);
 }
 
