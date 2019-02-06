@@ -12,14 +12,6 @@
 
 #include "kgedata.h"
 
-#if (__cplusplus >= 201703L) && __has_builtin(__builtin_hardware_destructive_interference_size) && __has_builtin(__builtin_hardware_constructive_interference_size)
-inline constexpr std::size_t hardware_destructive_interference_size = __builtin_hardware_destructive_interference_size();
-inline constexpr std::size_t hardware_constructive_interference_size = __builtin_hardware_constructive_interference_size();
-#else
-inline constexpr std::size_t hardware_destructive_interference_size = 128;
-#endif
-
-
 namespace kgedata {
 
 using std::unordered_set;
