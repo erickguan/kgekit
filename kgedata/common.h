@@ -19,6 +19,7 @@ constexpr auto kExpansionBatchOffest = 3;
 constexpr auto kTripleRelationOffestInABatch = 1; // h, r, t
 constexpr auto kTripleHeadOffestInABatch = 0;
 constexpr auto kTripleTailOffestInABatch = 2;
+constexpr auto kRankerEpsilon = 1e-6;
 
 } // namespace detail
 

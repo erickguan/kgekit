@@ -13,14 +13,11 @@ find_package(Protobuf CONFIG REQUIRED)
 hunter_add_package(fmt)
 find_package(fmt CONFIG REQUIRED)
 
-hunter_add_package(folly)
-find_package(folly CONFIG REQUIRED)
-
 add_subdirectory(messages)
 
 set(SOURCES kgedata.h kgedata.cpp)
 set(PY_SOURCES kgedata_py.cpp entity_number_indexer.cpp label_generator.cpp negative_samplers.cpp corruptors.cpp ranker.cpp triple_expander.cpp)
-set(TEST_SOURCES test_helper.cpp kgedata_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h test_helper.h)
+set(TEST_SOURCES test_helper.cpp ranker_test.cpp kgedata_test.cpp entity_number_indexer_test.cpp entity_number_indexer.h test_helper.h)
 
 add_library(kgedata_impl ${SOURCES})
 target_compile_features(kgedata_impl PUBLIC cxx_std_17)
@@ -29,7 +26,7 @@ target_link_libraries(kgedata_impl PUBLIC kgedata_structs fmt::fmt)
 
 pybind11_add_module(kgedata SHARED ${PY_SOURCES})
 target_compile_features(kgedata PUBLIC cxx_std_17)
-target_link_libraries(kgedata PUBLIC kgedata_impl PRIVATE Boost::boost Folly::folly)
+target_link_libraries(kgedata PUBLIC kgedata_impl PRIVATE Boost::boost)
 
 # test target and helper, from pybind11 tools
 

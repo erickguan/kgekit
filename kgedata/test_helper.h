@@ -33,7 +33,7 @@ protected:
     while (f >> h >> r >> t) {
       content.append(Triple(h, r, t));
     }
-    assert(content.size() == 3);
+    assert(content.size() == 5);
 
     return make_shared<T>(content, "hrt");
   }

@@ -12,7 +12,7 @@ def batch_parameters():
 
 def test_expand_triple_batch(batch_parameters):
     batch, num_entity, num_relation = batch_parameters
-    expand1, splits1 = kgedata.expand_triple_batch(batch, num_entity, num_relation)
+    expand1, splits1 = kgedata.expand_triple_batch(batch, num_entity, num_relation, True, True)
     np.testing.assert_array_equal(expand1, np.array([
         [0, 0, 2], #0
         [1, 0, 2],
@@ -66,11 +66,11 @@ def test_expand_triple_batch(batch_parameters):
     np.testing.assert_array_equal(splits3, np.array([
         [0, 3, 6, 6],
         [6, 9, 12, 12]
-    ]), dtype=np.int64)
+    ], dtype=np.int64))
 
     expand4, splits4 = kgedata.expand_triple_batch(batch, num_entity, num_relation, False, False)
     np.testing.assert_array_equal(expand4, np.array([], dtype=np.int64).reshape((0,3)))
     np.testing.assert_array_equal(splits4, np.array([
         [0, 0, 0, 0],
         [0, 0, 0, 0]
-    ]), dtype=np.int64)
+    ], dtype=np.int64))

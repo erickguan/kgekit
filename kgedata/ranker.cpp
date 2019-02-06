@@ -1,15 +1,32 @@
 #include "ranker.h"
 
 #include <cmath>
+#include <stdexcept>
 
 namespace kgedata {
+
+namespace detail {
+
+constexpr auto kInitialCounterValue = 0;
+constexpr auto kNumRankElements = 6;
+constexpr auto kNumRankHeadOffset = 0;
+constexpr auto kNumRankFilteredHeadOffset = 1;
+constexpr auto kNumRankTailOffset = 2;
+constexpr auto kNumRankFilteredTailOffset = 3;
+constexpr auto kNumRankRelationOffset = 4;
+constexpr auto kNumRankFilteredRelationOffset = 5;
+constexpr auto kRankPlaceholder = -1;
+constexpr auto kDefaultProducerConsumerQueueSize = 1024;
+
+} // namespace detail
 
 pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original,
                              unordered_set<int64_t>& filters);
 
-Ranker::Ranker(const py::array_t<int64_t>& train_triples,
-               const py::array_t<int64_t>& valid_triples,
-               const py::array_t<int64_t>& test_triples)
+Ranker::Ranker(
+    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& train_triples,
+    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& valid_triples,
+    const py::array_t<int64_t, py::array::c_style | py::array::forcecast>& test_triples)
 {
   {
     auto arr = train_triples.unchecked<2>();
@@ -154,23 +171,24 @@ inline bool _rank_precedence(const T& lhs, const T& rhs)
   return compare()(lhs, rhs);
 }
 
-pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original,
-                             unordered_set<int64_t>& filters,
-                             bool rank_higher)
+optional<pair<int32_t, int32_t>> rank_raw(
+  const float* begin,
+  const float* end,
+  int64_t original,
+  unordered_set<int64_t>& filters,
+  bool ascending_rank)
 {
-  constexpr auto kEpsilon = 1e-6;
-  auto p = static_cast<float*>(arr.request().ptr);
-  float expected_best = p[original];
+  if (begin == end) { return {}; }
+  float expected_best = begin[original];
   // rank starts with 1
   int32_t rank = 1;
   int32_t filtered_rank = 1;
-  auto op = rank_higher ? &_rank_precedence<float, std::greater<float>> :
-    &_rank_precedence<float, std::less<float>>;
-  for (ssize_t i = 0; i < arr.shape(0); ++i) {
-    if (fabs(p[i] - expected_best) < kEpsilon) {
+  auto op = ascending_rank ? &_rank_precedence<float, std::less<float>> :
+    &_rank_precedence<float, std::greater<float>>;
+  for (auto i = 0; begin != end; ++begin, ++i) {
+    if (fabs(*begin - expected_best) < detail::kRankerEpsilon) {
       continue;
-    }
-    else if (op(p[i], expected_best)) {
+    } else if (op(*begin, expected_best)) {
       rank++;
       if (filters.find(i) == filters.end()) {
         filtered_rank++;
@@ -180,40 +198,55 @@ pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original,
   return make_pair(rank, filtered_rank);
 }
 
+pair<int32_t, int32_t> _rank(py::array_t<float>& arr, int64_t original,
+                             unordered_set<int64_t>& filters,
+                             bool ascending_rank)
+{
+  auto p = static_cast<float*>(arr.request().ptr);
+  auto r = rank_raw(
+    p,
+    p + arr.shape(0),
+    original,
+    filters,
+    ascending_rank
+  );
+  return *r;
+}
+
 pair<int32_t, int32_t> Ranker::rank_head(py::array_t<float>& arr,
                                          py::array_t<int64_t>& triple,
-                                         bool rank_higher)
+                                         bool ascending_rank)
 {
   auto p = static_cast<int64_t*>(triple.request().ptr);
   return _rank(
       arr, p[detail::kTripleHeadOffestInABatch],
       rest_head_[detail::_pack_value(p[detail::kTripleRelationOffestInABatch],
                                      p[detail::kTripleTailOffestInABatch])],
-      rank_higher);
+      ascending_rank);
 }
 
 pair<int32_t, int32_t> Ranker::rank_tail(py::array_t<float>& arr,
                                          py::array_t<int64_t>& triple,
-                                         bool rank_higher)
+                                         bool ascending_rank)
 {
   auto p = static_cast<int64_t*>(triple.request().ptr);
   return _rank(arr, p[detail::kTripleTailOffestInABatch],
                rest_tail_[detail::_pack_value(
                    p[detail::kTripleHeadOffestInABatch],
                    p[detail::kTripleRelationOffestInABatch])],
-                   rank_higher);
+                   ascending_rank);
 }
 
 pair<int32_t, int32_t> Ranker::rank_relation(py::array_t<float>& arr,
                                              py::array_t<int64_t>& triple,
-                                             bool rank_higher)
+                                             bool ascending_rank)
 {
   auto p = static_cast<int64_t*>(triple.request().ptr);
   return _rank(arr, p[detail::kTripleRelationOffestInABatch],
                rest_relation_[detail::_pack_value(
                    p[detail::kTripleHeadOffestInABatch],
                    p[detail::kTripleTailOffestInABatch])],
-                   rank_higher);
+                   ascending_rank);
 }
 
 py::tuple ranker_pickle_getstate(const Ranker& ranker)
@@ -245,4 +278,113 @@ Ranker ranker_pickle_setstate(py::tuple t)
   return Ranker(rest_head, rest_tail, rest_relation);
 }
 
-}  // namespace kgedata
+optional<pair<int32_t, int32_t>> Ranker::rank_head_raw(
+    const float* begin,
+    const float* end,
+    const TripleIndex& triple,
+    bool ascending_rank)
+{
+  return rank_raw(begin, end, triple.head,
+      rest_head_[detail::_pack_value(triple.relation, triple.tail)],
+      ascending_rank);
+}
+
+optional<pair<int32_t, int32_t>> Ranker::rank_tail_raw(
+    const float* begin,
+    const float* end,
+    const TripleIndex& triple,
+    bool ascending_rank)
+{
+  return rank_raw(begin, end, triple.tail,
+    rest_tail_[detail::_pack_value(triple.head, triple.relation)],
+    ascending_rank);
+}
+
+optional<pair<int32_t, int32_t>> Ranker::rank_relation_raw(
+    const float* begin,
+    const float* end,
+    const TripleIndex& triple,
+    bool ascending_rank)
+{
+  return rank_raw(begin, end, triple.relation,
+    rest_relation_[detail::_pack_value(triple.head, triple.tail)],
+    ascending_rank);
+}
+
+py::array_t<int64_t, py::array::c_style>
+Ranker::submit(
+    py::array_t<float, py::array::c_style | py::array::forcecast> prediction,
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast> triple,
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast> split_points,
+    bool ascending_rank)
+{
+  auto prediction_data = static_cast<float*>(prediction.request().ptr);
+  auto triple_data = static_cast<int64_t*>(triple.request().ptr);
+  auto split_points_data = static_cast<int64_t*>(split_points.request().ptr);
+  auto num_triple = triple.shape(0);
+
+  int64_t* data = nullptr;
+
+  {
+    py::gil_scoped_release release;
+    auto num_data = num_triple*detail::kNumRankElements;
+    data = new int64_t[num_data];
+    std::fill_n(data, num_data, detail::kRankPlaceholder);
+
+    for (auto i = 0; i < num_triple; ++i) {
+      auto splits_adr = split_points_data + i*detail::kNumExpansionPoints;
+      auto splits_head = splits_adr[detail::kExpansionHeadsOffest];
+      auto splits_tail = splits_adr[detail::kExpansionTailsOffest];
+      auto splits_relation = splits_adr[detail::kExpansionRelationsOffest];
+      auto splits_batch = splits_adr[detail::kExpansionBatchOffest];
+      auto triple_adr = triple_data + i*detail::kNumTripleElements;
+      auto data_adr = data + i*detail::kNumRankElements;
+      TripleIndex triple(
+        triple_adr[detail::kTripleHeadOffestInABatch],
+        triple_adr[detail::kTripleRelationOffestInABatch],
+        triple_adr[detail::kTripleTailOffestInABatch]);
+
+      auto head_ranks = rank_head_raw(
+        prediction_data + splits_head,
+        prediction_data + splits_tail,
+        triple,
+        ascending_rank);
+
+      auto tail_ranks = rank_tail_raw(
+        prediction_data + splits_tail,
+        prediction_data + splits_relation,
+        triple,
+        ascending_rank);
+      auto relation_ranks = rank_relation_raw(
+        prediction_data + splits_relation,
+        prediction_data + splits_batch,
+        triple,
+        ascending_rank);
+
+      if (auto unwrap = head_ranks) {
+        data_adr[detail::kNumRankHeadOffset] = unwrap->first;
+        data_adr[detail::kNumRankFilteredHeadOffset] = unwrap->second;
+      }
+      if (auto unwrap = tail_ranks) {
+        data_adr[detail::kNumRankTailOffset] = unwrap->first;
+        data_adr[detail::kNumRankFilteredTailOffset] = unwrap->second;
+      }
+      if (auto unwrap = relation_ranks) {
+        data_adr[detail::kNumRankRelationOffset] = unwrap->first;
+        data_adr[detail::kNumRankFilteredRelationOffset] = unwrap->second;
+      }
+    }
+  }
+
+  py::capsule free_when_done(data, [](void* f) {
+    int64_t* data = reinterpret_cast<int64_t*>(f);
+    delete[] data;
+  });
+
+  return py::array_t<int64_t, py::array::c_style>(
+    {static_cast<ssize_t>(num_triple), static_cast<ssize_t>(detail::kNumRankElements)},
+    data, // the data pointer
+    free_when_done);
+}
+
+} // namespace kgedata
