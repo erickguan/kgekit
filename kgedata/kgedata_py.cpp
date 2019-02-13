@@ -58,24 +58,29 @@ PYBIND11_MODULE(kgedata, m) {
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t>())
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int64_t, int64_t, int16_t, int16_t, int64_t, kgedata::PerturbationSampler::Strategy>())
         .def("numNegativeSamples", &kgedata::PerturbationSampler::numNegativeSamples, "gets the number of negative samples")
+        .def("__call__", &kgedata::PerturbationSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch")
         .def("sample", &kgedata::PerturbationSampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
     py::class_<kgedata::CWASampler>(m, "CWASampler", "CWASampler returns a negative batch. Supports flags for corrupt relation too.")
         .def(py::init<int64_t, int64_t, bool>())
+        .def("__call__", &kgedata::CWASampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch")
         .def("sample", &kgedata::CWASampler::sample, py::arg("corrupt_head_flags").noconvert(), py::arg("batch").noconvert(), "samples current batch");
 
     py::class_<kgedata::LabelGenerator>(m, "LabelGenerator", "LabelGenerator returns a negative batch based on a per triple basis corruption head flag. Supports flags for corrupt relation too.")
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&>())
-        .def("generate_labels", &kgedata::LabelGenerator::generate_labels, py::arg("batch").noconvert(), "generates labels for the batch");
+        .def("__call__", &kgedata::LabelGenerator::generate_labels, py::arg("batch").noconvert(), py::arg("true_label") = 1.0, py::arg("false_label") = -1.0, "generates labels for the batch")
+        .def("generate_labels", &kgedata::LabelGenerator::generate_labels, py::arg("batch").noconvert(), py::arg("true_label") = 1.0, py::arg("false_label") = -1.0, "generates labels for the batch");
 
     py::class_<kgedata::BernoulliCorruptor>(m, "BernoulliCorruptor", "generates the bernoulli distribution of samples")
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int32_t, int64_t>())
         .def(py::init<const py::array_t<int64_t, py::array::c_style | py::array::forcecast>&, int32_t, int64_t, int64_t>())
         .def("get_probability_relation", &kgedata::BernoulliCorruptor::get_probability_relation, "gets the probability for certain relation")
+        .def("__call__", &kgedata::BernoulliCorruptor::make_random_choice, py::arg("batch").noconvert(), "gets the choice for given batch item")
         .def("make_random_choice", &kgedata::BernoulliCorruptor::make_random_choice, py::arg("batch").noconvert(), "gets the choice for given batch item");
     py::class_<kgedata::UniformCorruptor>(m, "UniformCorruptor", "generates the uniform distribution of samples")
         .def(py::init<int64_t>())
         .def(py::init<int64_t, int64_t>())
+        .def("__call__", &kgedata::UniformCorruptor::make_random_choice, py::arg("batch").noconvert(), "gets the choice for given batch item")
         .def("make_random_choice", &kgedata::UniformCorruptor::make_random_choice, py::arg("batch").noconvert(), "gets the choice for given batch item");
 
     py::class_<kgedata::Ranker>(m, "Ranker", "ranks the prediction")

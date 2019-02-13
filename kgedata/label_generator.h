@@ -30,7 +30,9 @@ class LabelGenerator : private boost::noncopyable {
 public:
     LabelGenerator(const py::array_t<int64_t>& triple_set);
     py::array_t<float, py::array::c_style> generate_labels(
-        py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
+        py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+        float true_label = 1.0,
+        float false_label = -1.0);
 private:
     unordered_set<TripleIndex, detail::TripleIndexHasher> triples_;
 };

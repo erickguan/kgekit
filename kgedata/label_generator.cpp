@@ -16,7 +16,9 @@ LabelGenerator::LabelGenerator(const py::array_t<int64_t>& triple_set)
 
 
 py::array_t<float, py::array::c_style> LabelGenerator::generate_labels(
-    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch)
+    py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
+    float true_label,
+    float false_label)
 {
     auto shape = batch.request().shape;
     // the number of triple elements is in the last dimension.
@@ -29,7 +31,7 @@ py::array_t<float, py::array::c_style> LabelGenerator::generate_labels(
         auto h = *base_adr;
         auto r = *(base_adr + detail::kTripleRelationOffestInABatch);
         auto t = *(base_adr + detail::kTripleTailOffestInABatch);
-        data[i] = (triples_.find(TripleIndex(h, r, t)) == triples_.end() ? -1.0 : 1.0);
+        data[i] = (triples_.find(TripleIndex(h, r, t)) == triples_.end() ? false_label : true_label);
     }
 
     py::capsule free_when_done(data, [](void* f) {
