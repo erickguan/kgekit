@@ -92,44 +92,46 @@ PYBIND11_MODULE(kgedata, m)
            py::arg("corrupt_head_flags").noconvert(),
            py::arg("batch").noconvert(), "samples current batch");
 
-  py::class_<kgedata::LabelGenerator>(
-      m, "LabelGenerator",
-      "LabelGenerator returns labels based on if the given triple appears on "
+  py::class_<kgedata::MemoryLabelGenerator>(
+      m, "MemoryLabelGenerator",
+      "MemoryLabelGenerator returns labels based on if the given triple "
+      "appears on "
       "the training set")
       .def(py::init<const py::array_t<int64_t, py::array::c_style |
+                                                   py::array::forcecast>&,
+                    float, float>())
+      .def(py::init<const py::array_t<int64_t, py::array::c_style |
                                                    py::array::forcecast>&>())
-      .def("__call__", &kgedata::LabelGenerator::generate_labels,
-           py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
-           py::arg("false_label") = -1.0, "generates labels for the batch")
-      .def("generate_labels", &kgedata::LabelGenerator::generate_labels,
-           py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
-           py::arg("false_label") = -1.0, "generates labels for the batch");
+      .def("__call__", &kgedata::MemoryLabelGenerator::generate_labels,
+           py::arg("batch").noconvert(), "generates labels for the batch")
+      .def("generate_labels", &kgedata::MemoryLabelGenerator::generate_labels,
+           py::arg("batch").noconvert(), "generates labels for the batch");
   py::class_<kgedata::StaticLabelGenerator>(
       m, "StaticLabelGenerator",
       "StaticLabelGenerator returns labels based on set parameters.")
+      .def(py::init<bool, float, float>())
+
       .def(py::init<bool>())
+      .def(
+          "__call__",
+          py::overload_cast<
+              py::array_t<int64_t, py::array::c_style | py::array::forcecast>&>(
+              &kgedata::StaticLabelGenerator::generate_labels),
+          py::arg("batch").noconvert(), "generates labels for the batch")
+      .def(
+          "generate_labels",
+          py::overload_cast<
+              py::array_t<int64_t, py::array::c_style | py::array::forcecast>&>(
+              &kgedata::StaticLabelGenerator::generate_labels),
+          py::arg("batch").noconvert(), "generates labels for the batch")
       .def("__call__",
-           py::overload_cast<
-               py::array_t<int64_t, py::array::c_style | py::array::forcecast>&,
-               float, float>(&kgedata::StaticLabelGenerator::generate_labels),
-           py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
-           py::arg("false_label") = -1.0, "generates labels for the batch")
-      .def("generate_labels",
-           py::overload_cast<
-               py::array_t<int64_t, py::array::c_style | py::array::forcecast>&,
-               float, float>(&kgedata::StaticLabelGenerator::generate_labels),
-           py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
-           py::arg("false_label") = -1.0, "generates labels for the batch")
-      .def("__call__",
-           py::overload_cast<py::tuple, float, float>(
+           py::overload_cast<py::tuple>(
                &kgedata::StaticLabelGenerator::generate_labels),
-           py::arg("shape").noconvert(), py::arg("true_label") = 1.0,
-           py::arg("false_label") = -1.0, "generates labels for the batch")
+           py::arg("shape").noconvert(), "generates labels for the batch")
       .def("generate_labels",
-           py::overload_cast<py::tuple, float, float>(
+           py::overload_cast<py::tuple>(
                &kgedata::StaticLabelGenerator::generate_labels),
-           py::arg("shape").noconvert(), py::arg("true_label") = 1.0,
-           py::arg("false_label") = -1.0, "generates labels for the batch");
+           py::arg("shape").noconvert(), "generates labels for the batch");
 
   py::class_<kgedata::BernoulliCorruptor>(
       m, "BernoulliCorruptor",

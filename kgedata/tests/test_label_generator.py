@@ -24,8 +24,8 @@ def sampler():
 
 
 @pytest.fixture(scope="module")
-def label_generators(triple_indexes):
-  return kgedata.LabelGenerator(triple_indexes)
+def memory_label_generators(triple_indexes):
+  return kgedata.MemoryLabelGenerator(triple_indexes)
 
 
 @pytest.fixture(scope="module")
@@ -37,7 +37,7 @@ def static_false_label_generator():
 def static_true_label_generator():
   return kgedata.StaticLabelGenerator(True)
 
-def test_labels(sampler, triple_indexes, label_generators):
+def test_labels(sampler, triple_indexes, memory_label_generators):
   batch_size = 2
   triple_indexes = triple_indexes[:batch_size]
   samples = sampler(np.array([False, True], dtype=np.bool), triple_indexes)
@@ -50,7 +50,7 @@ def test_labels(sampler, triple_indexes, label_generators):
            [0, 1, 1]],
       ],
                dtype=np.int64))
-  labels = label_generators(samples)
+  labels = memory_label_generators(samples)
   np.testing.assert_equal(
       labels,
       np.array([
@@ -60,7 +60,7 @@ def test_labels(sampler, triple_indexes, label_generators):
                dtype=np.float32))
 
 
-def test_entity_labels(triple_indexes, label_generators):
+def test_entity_labels(triple_indexes, memory_label_generators):
   batch_size = 2
   sampled_triple_indexes = triple_indexes[:batch_size]
   samples = kgedata.CWASampler(5, 2, False).sample(
@@ -72,7 +72,7 @@ def test_entity_labels(triple_indexes, label_generators):
           [[0, 0, 0], [0, 0, 1], [0, 0, 2], [0, 0, 3], [0, 0, 4]],
       ],
                dtype=np.int64))
-  labels = label_generators(samples)
+  labels = memory_label_generators(samples)
   np.testing.assert_equal(
       labels,
       np.array([
@@ -81,17 +81,17 @@ def test_entity_labels(triple_indexes, label_generators):
       ], dtype=np.float32))
 
 
-def test_shapes(label_generators):
+def test_shapes(memory_label_generators):
   samples = np.array([[0, 1, 2], [0, 1, 3]], dtype=np.int64)  # 2, 3
-  res = label_generators(samples)
+  res = memory_label_generators(samples)
   assert res.shape == (2,)
   np.testing.assert_equal(res.flatten(), np.array([-1, 1], dtype=np.int64))
 
-  res = label_generators(samples.reshape(1, 2, -1))
+  res = memory_label_generators(samples.reshape(1, 2, -1))
   assert res.shape == (1, 2)
   np.testing.assert_equal(res.flatten(), np.array([-1, 1], dtype=np.int64))
 
-  res = label_generators(samples.reshape(2, 1, -1))
+  res = memory_label_generators(samples.reshape(2, 1, -1))
   assert res.shape == (2, 1)
   np.testing.assert_equal(res.flatten(), np.array([-1, 1], dtype=np.int64))
 

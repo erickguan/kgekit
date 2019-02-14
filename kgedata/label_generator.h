@@ -26,27 +26,41 @@ struct TripleIndexHasher
 
 }  // namespace detail
 
-class LabelGenerator : private boost::noncopyable
+class LabelGenerator
 {
  public:
-  explicit LabelGenerator(const py::array_t<int64_t>& triple_set);
+  explicit LabelGenerator(float true_label_value = 1.0,
+                          float false_label_value = -1.0)
+      : true_label_value_(true_label_value),
+        false_label_value_(false_label_value)
+  {}
+
+ protected:
+  float true_label_value_;
+  float false_label_value_;
+};
+
+class MemoryLabelGenerator : public LabelGenerator, private boost::noncopyable
+{
+ public:
+  MemoryLabelGenerator(const py::array_t<int64_t>& triple_set,
+                       float true_label_value = 1.0,
+                       float false_label_value = -1.0);
   py::array_t<float, py::array::c_style> generate_labels(
-      py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
-      float true_label = 1.0, float false_label = -1.0);
+      py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
 
  private:
   unordered_set<TripleIndex, detail::TripleIndexHasher> triples_;
 };
 
-class StaticLabelGenerator : private boost::noncopyable
+class StaticLabelGenerator : public LabelGenerator, private boost::noncopyable
 {
  public:
-  explicit StaticLabelGenerator(bool true_label = false);
+  StaticLabelGenerator(bool true_label = false, float true_label_value = 1.0,
+                       float false_label_value = -1.0);
   py::array_t<float, py::array::c_style> generate_labels(
-      py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
-      float true_label = 1.0, float false_label = -1.0);
-  py::array_t<float, py::array::c_style> generate_labels(
-      py::tuple shape, float true_label = 1.0, float false_label = -1.0);
+      py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch);
+  py::array_t<float, py::array::c_style> generate_labels(py::tuple shape);
 
  private:
   bool true_label_;
