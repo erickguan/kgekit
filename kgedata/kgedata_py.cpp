@@ -94,14 +94,24 @@ PYBIND11_MODULE(kgedata, m)
 
   py::class_<kgedata::LabelGenerator>(
       m, "LabelGenerator",
-      "LabelGenerator returns a negative batch based on a per triple basis "
-      "corruption head flag. Supports flags for corrupt relation too.")
+      "LabelGenerator returns labels based on if the given triple appears on "
+      "the training set")
       .def(py::init<const py::array_t<int64_t, py::array::c_style |
                                                    py::array::forcecast>&>())
       .def("__call__", &kgedata::LabelGenerator::generate_labels,
            py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
            py::arg("false_label") = -1.0, "generates labels for the batch")
       .def("generate_labels", &kgedata::LabelGenerator::generate_labels,
+           py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
+           py::arg("false_label") = -1.0, "generates labels for the batch");
+  py::class_<kgedata::StaticLabelGenerator>(
+      m, "StaticLabelGenerator",
+      "StaticLabelGenerator returns labels based on set parameters.")
+      .def(py::init<bool>())
+      .def("__call__", &kgedata::StaticLabelGenerator::generate_labels,
+           py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
+           py::arg("false_label") = -1.0, "generates labels for the batch")
+      .def("generate_labels", &kgedata::StaticLabelGenerator::generate_labels,
            py::arg("batch").noconvert(), py::arg("true_label") = 1.0,
            py::arg("false_label") = -1.0, "generates labels for the batch");
 
