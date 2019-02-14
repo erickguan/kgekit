@@ -45,6 +45,8 @@ class StaticLabelGenerator : private boost::noncopyable
   py::array_t<float, py::array::c_style> generate_labels(
       py::array_t<int64_t, py::array::c_style | py::array::forcecast>& batch,
       float true_label = 1.0, float false_label = -1.0);
+  py::array_t<float, py::array::c_style> generate_labels(
+      py::tuple shape, float true_label = 1.0, float false_label = -1.0);
 
  private:
   bool true_label_;
