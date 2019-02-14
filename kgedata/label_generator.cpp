@@ -30,12 +30,9 @@ StaticLabelGenerator::StaticLabelGenerator(bool true_label,
 {}
 
 inline py::array_t<float, py::array::c_style> _gen_label_from_shape(
-    vector<ssize_t>& shape, const int64_t* batch,
+    vector<ssize_t>& shape, int64_t num_triples, const int64_t* batch,
     function<void(ssize_t, const int64_t*, float*)> gen_labels)
 {
-  // the number of triple elements is in the last dimension.
-  const auto num_triples = std::accumulate(
-      std::next(shape.rbegin()), shape.rend(), 1, std::multiplies<ssize_t>());
   float* data = new float[num_triples];
 
   gen_labels(num_triples, batch, data);
@@ -45,7 +42,6 @@ inline py::array_t<float, py::array::c_style> _gen_label_from_shape(
     delete[] data;
   });
 
-  shape.pop_back();
   return py::array_t<float, py::array::c_style>(
       shape,
       data,             // the data pointer
@@ -57,10 +53,14 @@ inline py::array_t<float, py::array::c_style> _gen_label(
     function<void(ssize_t, const int64_t*, float*)> gen_labels)
 {
   auto shape = batch.request().shape;
+  // the number of triple elements is in the last dimension.
+  const auto num_triples = std::accumulate(
+      std::next(shape.rbegin()), shape.rend(), 1, std::multiplies<ssize_t>());
+  shape.pop_back();
   auto p =
       const_cast<const int64_t*>(static_cast<int64_t*>(batch.request().ptr));
 
-  return _gen_label_from_shape(shape, p, gen_labels);
+  return _gen_label_from_shape(shape, num_triples, p, gen_labels);
 }
 
 py::array_t<float, py::array::c_style> MemoryLabelGenerator::generate_labels(
@@ -95,12 +95,14 @@ py::array_t<float, py::array::c_style> StaticLabelGenerator::generate_labels(
     py::tuple shape)
 {
   vector<ssize_t> shape_vec;
+  int64_t num_triples = 1;
   for (auto const& v : shape) {
     auto val = v.cast<ssize_t>();
     shape_vec.push_back(val);
+    num_triples *= val;
   }
   return _gen_label_from_shape(
-      shape_vec, nullptr,
+      shape_vec, num_triples, nullptr,
       [this](ssize_t num_triples, const int64_t* batch, float* data) {
         for (size_t i = 0; i < num_triples; i++) {
           data[i] = true_label_ ? true_label_value_ : false_label_value_;

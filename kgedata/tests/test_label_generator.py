@@ -123,3 +123,10 @@ def test_static_label_generator(triple_indexes,
           [1, 1, 1, 1, 1],
           [1, 1, 1, 1, 1],
       ], dtype=np.float32))
+
+  labels = static_true_label_generator((6,))
+  np.testing.assert_equal(
+      labels,
+      np.array([
+          1, 1, 1, 1, 1, 1
+      ], dtype=np.float32))
