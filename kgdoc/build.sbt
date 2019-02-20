@@ -7,7 +7,11 @@ ThisBuild / organization     := "me.erickguan.kgdoc"
 lazy val root = (project in file("."))
   .settings(
     name := "kgdoc",
-    libraryDependencies += scalaTest % Test
+    libraryDependencies ++= Seq(
+        jenaLibs % Compile,
+        confLib % Compile,
+        scalaTest % Test
+    )
   )
 
 // Uncomment the following for publishing to Sonatype.
