@@ -1,5 +1,9 @@
 package me.erickguan.kgdoc.tasks
 
-class ExtractLabel {
+import com.typesafe.config.Config
 
+object ExtractLabel {
+  def run(config: Config): Unit = {
+    print(config)
+  }
 }
