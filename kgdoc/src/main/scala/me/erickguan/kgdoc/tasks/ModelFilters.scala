@@ -28,4 +28,7 @@ class ModelFilters(model: Model) {
     model
   }
 
+  def triples: Model = {
+    model
+  }
 }

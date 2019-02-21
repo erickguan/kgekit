@@ -20,6 +20,7 @@ using std::string;
 using std::make_shared;
 using std::unordered_map;
 
+/* TODO: it should be deprecated and moved to kgdoc. */
 class EntityNumberIndexer: private boost::noncopyable {
 public:
     EntityNumberIndexer(const pybind11::list& triples, const string& order);
