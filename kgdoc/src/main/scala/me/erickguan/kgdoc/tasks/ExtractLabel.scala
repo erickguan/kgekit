@@ -9,7 +9,8 @@ object ExtractLabel {
     val prefix = FileResolver.getFilePrefixFromConfig(config)
     val docs = config.getStringList("labelDocs").asScala
     val model = FileResolver.getModelFromFile(docs, prefix)
-    print(model)
+    val filters = new ModelFilters(model)
+    print(filters.onlyLabels)
     // build a T
     // build a C
   }
