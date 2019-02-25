@@ -1,8 +1,8 @@
-package me.erickguan.kgdoc.tasks
+package me.erickguan.kgdoc
 
 import org.apache.jena.rdf.model.Model
 
-class ModelFilters(model: Model) {
+class Discarder(model: Model) {
   def onlyLabels: Model = {
     val iter = model.listStatements
 

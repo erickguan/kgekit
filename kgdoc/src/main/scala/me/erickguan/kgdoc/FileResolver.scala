@@ -1,4 +1,4 @@
-package me.erickguan.kgdoc.tasks
+package me.erickguan.kgdoc
 
 import java.nio.file.Paths
 
