@@ -19,10 +19,7 @@ class ModelFilters(model: Model) {
       val `object` = stmt.getObject // get the object
       System.out.print(subject.toString)
       System.out.print(" " + predicate.toString + " ")
-      if (`object`.isInstanceOf[Nothing]) System.out.print(`object`.toString)
-      else { // object is a literal
-        System.out.print(" \"" + `object`.toString + "\"")
-      }
+      System.out.print(" \"" + `object`.toString + "\"")
       System.out.println(" .")
     }
     model
