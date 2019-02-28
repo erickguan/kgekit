@@ -17,12 +17,20 @@ class NodeFormatterBare extends NodeFormatterBase {
   override def formatLitString(w: AWriter, lex: String): Unit = w.write(lex)
 
   override def formatBNode(w: AWriter, n: Node): Unit = {
-    w.write(n.getLocalName)
+    try {
+      formatBNode(w, n.getLocalName)
+    } catch {
+      case e: Exception => formatBNode(w, n.toString)
+    }
   }
   override def formatBNode(w: AWriter, label: String): Unit = w.write(label)
 
   override def formatURI(w: AWriter, n: Node): Unit = {
-    formatURI(w, n.getLocalName)
+    try {
+      formatURI(w, n.getLocalName)
+    } catch {
+      case e: Exception => formatURI(w, n.toString)
+    }
   }
   override def formatURI(w: AWriter, uriStr: String): Unit = w.write(uriStr)
 
