@@ -10,6 +10,7 @@ import org.apache.jena.atlas.lib.ProgressMonitor
 import org.apache.jena.riot.process.StreamRDFApplyObject
 import org.apache.jena.riot.system.{ProgressStreamRDF, StreamRDF2}
 import org.apache.jena.riot.{RDFDataMgr, RDFLanguages, RDFParser}
+import org.apache.jena.sys.JenaSystem
 import org.slf4j.{Logger, LoggerFactory}
 
 import scala.collection.mutable.ListBuffer
@@ -21,6 +22,9 @@ object ExtractLabel {
     val docs = config.getStringList("labelDocs")
     val langStr = config.getString("rdfLang")
     val outFilename = config.getString("outFilename")
+    val literalLangAllowed = config.getStringList("literalLangAllowed")
+
+    JenaSystem.init()
     val lang = RDFLanguages.nameToLang(langStr)
     val in = FileResolver.getInputStreamFromFiles(docs, prefix)
     val out = FileResolver.getOutputStreamFromFilename(outFilename, prefix)
@@ -30,6 +34,7 @@ object ExtractLabel {
     val sink = new ProgressStreamRDF(
       new StreamRDFDiscarder(
         new StreamRDFWriterBareLabel(
+          StreamRDFWriterBareLabel.getLiteralLangAllowedSet(literalLangAllowed),
           Writer2.wrap(new BufferingWriter(new OutputStreamWriter(out))),
         )),
       progressMonitor

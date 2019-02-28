@@ -10,16 +10,16 @@ import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.shared.UnknownPropertyException
 import org.apache.jena.sparql.core.Quad
 
-class StreamRDFWriterBareLabel(out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
-  def this(w: AWriter, charSpace: CharSpace) {
-    this(w, new NodeFormatterBare(charSpace))
+class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
+  def this(literalLangAllowed: Set[String], w: AWriter, charSpace: CharSpace) {
+    this(literalLangAllowed, w, new NodeFormatterBare(charSpace))
   }
   /**
     * Output tuples, using UTF8 output See {@link StreamRDFLib#writer} for
     * ways to create a AWriter object.
     */
-  def this(w: AWriter) {
-    this(w, CharSpace.UTF8)
+  def this(literalLangAllowed: Set[String], w: AWriter) {
+    this(literalLangAllowed, w, CharSpace.UTF8)
   }
 
 
@@ -33,7 +33,7 @@ class StreamRDFWriterBareLabel(out: AWriter, nodeFmt: NodeFormatter) extends Str
   override def triple(triple: Triple): Unit = {
     val s = triple.getSubject
     val o = triple.getObject
-    if (o.getLiteralLanguage != "en") {
+    if (!literalLangAllowed.contains(o.getLiteralLanguage)) {
       return
     }
     format(s)
@@ -71,4 +71,12 @@ class StreamRDFWriterBareLabel(out: AWriter, nodeFmt: NodeFormatter) extends Str
   }
 
   private def outputGraphSlot(g: Node) = g != null && (g ne Quad.tripleInQuad) && !(Quad.isDefaultGraph(g))
+}
+
+object StreamRDFWriterBareLabel {
+  def getLiteralLangAllowedSet(literalLangAllowed: java.util.List[String]): Set[String] = {
+    import scala.collection.JavaConverters._
+
+    literalLangAllowed.asScala.toSet
+  }
 }
