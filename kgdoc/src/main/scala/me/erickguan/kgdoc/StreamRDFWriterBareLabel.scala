@@ -38,7 +38,7 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     }
     try {
       format(s)
-      out.print(" ")
+      out.print("\t")
 
       format(o)
       out.print("\n")
@@ -54,15 +54,15 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     val o = quad.getObject
     val g = quad.getGraph
     format(s)
-    out.print(" ")
+    out.print("\t")
     format(p)
-    out.print(" ")
+    out.print("\t")
     format(o)
     if (outputGraphSlot(g)) {
-      out.print(" ")
+      out.print("\t")
       format(g)
     }
-    out.print(" .\n")
+    out.print("\n")
   }
 
   private def format(n: Node): Unit = {

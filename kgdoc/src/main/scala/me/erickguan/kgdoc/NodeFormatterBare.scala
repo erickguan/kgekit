@@ -18,16 +18,27 @@ class NodeFormatterBare extends NodeFormatterBase {
 
   override def formatBNode(w: AWriter, n: Node): Unit = {
     try {
-      formatBNode(w, n.getLocalName)
+      val str = n.toString
+      if (str.indexOf(NodeFormatterBare.YAGO_PREFIX) != -1) {
+        formatBNode(w, str.substring(NodeFormatterBare.YAGO_PREFIX.length))
+      } else {
+        formatBNode(w, n.getLocalName)
+      }
     } catch {
       case e: Exception => formatBNode(w, n.toString)
     }
   }
+
   override def formatBNode(w: AWriter, label: String): Unit = w.write(label)
 
   override def formatURI(w: AWriter, n: Node): Unit = {
     try {
-      formatURI(w, n.getLocalName)
+      val str = n.toString
+      if (str.indexOf(NodeFormatterBare.YAGO_PREFIX) != -1) {
+        formatURI(w, str.substring(NodeFormatterBare.YAGO_PREFIX.length))
+      } else {
+        formatURI(w, n.getLocalName)
+      }
     } catch {
       case e: Exception => formatURI(w, n.toString)
     }
@@ -44,4 +55,8 @@ class NodeFormatterBare extends NodeFormatterBase {
     w.write("@")
     w.write(langTag)
   }
+}
+
+object NodeFormatterBare {
+  val YAGO_PREFIX = "http://yago-knowledge.org/resource/"
 }
