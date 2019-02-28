@@ -1,20 +1,15 @@
 package me.erickguan.kgdoc.tasks
 
-
-import java.io.{FileWriter, OutputStreamWriter, StringWriter}
+import java.io.OutputStreamWriter
 
 import com.typesafe.config.Config
 import me.erickguan.kgdoc._
 import org.apache.jena.atlas.io.{BufferingWriter, Writer2}
 import org.apache.jena.atlas.lib.ProgressMonitor
-import org.apache.jena.riot.process.StreamRDFApplyObject
-import org.apache.jena.riot.system.{ProgressStreamRDF, StreamRDF2}
-import org.apache.jena.riot.{RDFDataMgr, RDFLanguages, RDFParser}
+import org.apache.jena.riot.system.ProgressStreamRDF
+import org.apache.jena.riot.{RDFLanguages, RDFParser}
 import org.apache.jena.sys.JenaSystem
-import org.slf4j.{Logger, LoggerFactory}
-
-import scala.collection.mutable.ListBuffer
-
+import org.slf4j.LoggerFactory
 
 object ExtractLabel {
   def run(config: Config): Unit = {
@@ -33,7 +28,7 @@ object ExtractLabel {
     val progressMonitor = ProgressMonitor.create(logger, "Discarder", 100, 1000)
     progressMonitor.start()
     val sink = new ProgressStreamRDF(
-      new StreamRDFDiscarder(
+      new StreamRDFPredicatesDiscarder(
         new StreamRDFWriterBareLabel(
           StreamRDFWriterBareLabel.getLiteralLangAllowedSet(literalLangAllowed),
           Writer2.wrap(new BufferingWriter(new OutputStreamWriter(out))),

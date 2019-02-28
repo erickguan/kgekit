@@ -1,13 +1,11 @@
 package me.erickguan.kgdoc
 
 import org.apache.jena.graph.Triple
-import org.apache.jena.rdf.model.Model
 import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.sparql.core.Quad
-import org.apache.jena.riot.writer.WriterStreamRDFPlain
 
 
-class StreamRDFDiscarder(other: StreamRDF, predicates: Set[String]) extends StreamRDF {
+class StreamRDFPredicatesDiscarder(other: StreamRDF, predicates: Set[String]) extends StreamRDF {
   def this(other: StreamRDF, predicates: java.util.List[String]) {
     this(other, predicates)
   }
@@ -34,8 +32,7 @@ class StreamRDFDiscarder(other: StreamRDF, predicates: Set[String]) extends Stre
 
   override def triple(tripleRecord: Triple): Unit = {
     val p = tripleRecord.getPredicate
-    if (p.toString.indexOf("http://www.w3.org/2004/02/skos/core#prefLabel") != -1 ||
-        p.toString.indexOf("http://www.w3.org/2000/01/rdf-schema#label") != -1) {
+    if (predicates.contains(p.toString)) {
       val s = tripleRecord.getSubject
 //      print(s.isURI, s.isVariable, s.isLiteral)
 //      System.exit(1)
