@@ -10,6 +10,8 @@ import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.shared.UnknownPropertyException
 import org.apache.jena.sparql.core.Quad
 
+import scala.collection.mutable
+
 class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
   def this(literalLangAllowed: Set[String], w: AWriter, charSpace: CharSpace) {
     this(literalLangAllowed, w, new NodeFormatterBare(charSpace))
@@ -22,11 +24,17 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     this(literalLangAllowed, w, CharSpace.UTF8)
   }
 
-
+  var literalLanguageSet: mutable.Set[String] = mutable.Set()
   override def start(): Unit = {
+    literalLanguageSet = mutable.Set()
   }
 
   override def finish(): Unit = {
+    if (true) {
+      out.print("=====language===== ")
+      literalLanguageSet.foreach(f => out.print(s"$f "))
+      out.print("\n")
+    }
     IO.flush(out)
   }
 
@@ -36,6 +44,7 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     if (!literalLangAllowed.contains(o.getLiteralLanguage)) {
       return
     }
+    literalLanguageSet += o.getLiteralLanguage
     try {
       format(s)
       out.print("\t")
