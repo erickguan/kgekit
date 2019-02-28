@@ -11,7 +11,7 @@ import org.apache.jena.riot.{RDFLanguages, RDFParser}
 import org.apache.jena.sys.JenaSystem
 import org.slf4j.LoggerFactory
 
-object ExtractLabel {
+object ExtractPredicates {
   def run(config: Config): Unit = {
     val prefix = FileResolver.getFilePrefixFromConfig(config)
     val docs = config.getStringList("labelDocs")
@@ -24,7 +24,7 @@ object ExtractLabel {
     val lang = RDFLanguages.nameToLang(langStr)
     val in = FileResolver.getInputStreamFromFiles(docs, prefix)
     val out = FileResolver.getOutputStreamFromFilename(outFilename, prefix)
-    val logger = LoggerFactory.getLogger(ExtractLabel.getClass)
+    val logger = LoggerFactory.getLogger(ExtractPredicates.getClass)
     val progressMonitor = ProgressMonitor.create(logger, "Discarder", 100, 1000)
     progressMonitor.start()
     val sink = new ProgressStreamRDF(

@@ -8,7 +8,7 @@ object TaskDispatch extends App {
   val task = conf.getString("task")
   val taskConf = conf.getConfig(task)
   task match {
-    case "ExtractLabel" => ExtractLabel.run(taskConf)
+    case "ExtractPredicates" => ExtractPredicates.run(taskConf)
     case "CollectLanguage" => CollectLanguage.run(taskConf)
   }
 }
