@@ -9,18 +9,23 @@ import org.apache.jena.riot.writer.WriterStreamRDFPlain
 
 class StreamRDFDiscarder(other: StreamRDF) extends StreamRDF {
   override def base(baseStr: String): Unit = {
+    other.base()
   }
 
   override def finish(): Unit = {
+    other.finish()
   }
 
   override def prefix(prefix: String, iri: String): Unit = {
+    other.prefix(prefix, iri)
   }
 
   override def quad(quadRecord: Quad): Unit = {
+    other.quad(quadRecord)
   }
 
   override def start(): Unit = {
+    other.start()
   }
 
   override def triple(tripleRecord: Triple): Unit = {
