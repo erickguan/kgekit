@@ -3,14 +3,10 @@ package me.erickguan.kgdoc
 import org.apache.jena.atlas.io.{AWriter, IO}
 import org.apache.jena.atlas.lib.CharSpace
 import org.apache.jena.graph.{Node, Triple}
-import org.apache.jena.rdf.model.impl.RDFDefaultErrorHandler
-import org.apache.jena.rdf.model.{Model, RDFErrorHandler, RDFWriter}
 import org.apache.jena.riot.out.{NodeFormatter, NodeFormatterNT}
 import org.apache.jena.riot.system.StreamRDF
-import org.apache.jena.shared.UnknownPropertyException
 import org.apache.jena.sparql.core.Quad
 
-import scala.collection.mutable
 
 class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
   def this(literalLangAllowed: Set[String], w: AWriter, charSpace: CharSpace) {
@@ -24,17 +20,10 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     this(literalLangAllowed, w, CharSpace.UTF8)
   }
 
-  var literalLanguageSet: mutable.Set[String] = mutable.Set()
   override def start(): Unit = {
-    literalLanguageSet = mutable.Set()
   }
 
   override def finish(): Unit = {
-    if (true) {
-      out.print("=====language===== ")
-      literalLanguageSet.foreach(f => out.print(s"$f "))
-      out.print("\n")
-    }
     IO.flush(out)
   }
 
@@ -44,7 +33,6 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     if (!literalLangAllowed.contains(o.getLiteralLanguage)) {
       return
     }
-    literalLanguageSet += o.getLiteralLanguage
     try {
       format(s)
       out.print("\t")

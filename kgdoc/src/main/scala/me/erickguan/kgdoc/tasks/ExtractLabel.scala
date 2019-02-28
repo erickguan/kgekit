@@ -23,6 +23,7 @@ object ExtractLabel {
     val langStr = config.getString("rdfLang")
     val outFilename = config.getString("outFilename")
     val literalLangAllowed = config.getStringList("literalLangAllowed")
+    val predicates = config.getStringList("predicates")
 
     JenaSystem.init()
     val lang = RDFLanguages.nameToLang(langStr)
@@ -36,7 +37,9 @@ object ExtractLabel {
         new StreamRDFWriterBareLabel(
           StreamRDFWriterBareLabel.getLiteralLangAllowedSet(literalLangAllowed),
           Writer2.wrap(new BufferingWriter(new OutputStreamWriter(out))),
-        )),
+        ),
+        predicates,
+      ),
       progressMonitor
     )
     RDFParser.source(in).lang(lang).parse(sink)
