@@ -1,11 +1,9 @@
 package me.erickguan.kgdoc
 
+import java.io._
 import java.nio.file.Paths
 
 import com.typesafe.config.Config
-import org.apache.jena.rdf.model.{Model, ModelFactory}
-
-import scala.collection.mutable
 
 object FileResolver {
   val PrefixKey = "basePrefix"
@@ -18,16 +16,19 @@ object FileResolver {
     }
   }
 
-  def getModelFromFile(docs: mutable.Buffer[String], prefix: String): Model = {
-    val model = ModelFactory.createDefaultModel()
-    for (docName <- docs) {
-      val path = Paths.get(prefix, docName)
-      val newModel = ModelFactory.createDefaultModel()
+  def getOutputStreamFromFilename(filename: String, prefix: String): OutputStream = {
+    new FileOutputStream(Paths.get(prefix, filename).toString)
+  }
 
-      newModel.read(path.toString)
-      model.add(newModel)
-    }
-    model
+  def getInputStreamFromFiles(docs: java.util.List[String], prefix: String): InputStream = {
+    import collection.JavaConverters._
+
+    new SequenceInputStream(docs
+      .asScala
+      .map(d => new FileInputStream(Paths.get(prefix, d).toString))
+      .iterator
+      .asJavaEnumeration
+    )
   }
 
 }

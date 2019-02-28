@@ -7,7 +7,7 @@ import org.apache.jena.sparql.core.Quad
 import org.apache.jena.riot.writer.WriterStreamRDFPlain
 
 
-class StreamRDFDiscarder extends StreamRDF {
+class StreamRDFDiscarder(other: StreamRDF) extends StreamRDF {
   override def base(baseStr: String): Unit = {
   }
 
@@ -24,6 +24,11 @@ class StreamRDFDiscarder extends StreamRDF {
   }
 
   override def triple(tripleRecord: Triple): Unit = {
-    print(tripleRecord)
+    if (tripleRecord.getPredicate.toString.indexOf("http://www.w3.org/2004/02/skos/core#prefLabel") != -1) {
+      val s = tripleRecord.getSubject
+//      print(s.isURI, s.isVariable, s.isLiteral)
+//      System.exit(1)
+      other.triple(tripleRecord)
+    }
   }
 }

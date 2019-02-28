@@ -9,6 +9,7 @@ lazy val root = (project in file("."))
     name := "kgdoc",
     libraryDependencies ++= Seq(
         jenaLibs % Compile,
+        loggerLib % Compile,
         confLib % Compile,
         scalaTest % Test
     )

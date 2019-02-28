@@ -10,20 +10,9 @@ import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.shared.UnknownPropertyException
 import org.apache.jena.sparql.core.Quad
 
-class StreamRDFWriterBare extends StreamRDF {
-  // This class is the overall structure - the NodeFormatter controls the
-  // appearance of the Nodes themselves.
-  protected var out: AWriter = null
-  protected var nodeFmt: NodeFormatter = null
-
-  /**
-    * Output tuples, choosing ASCII or UTF8 See
-    * {@link StreamRDFLib#writer} for ways to create a AWriter object.
-    */
+class StreamRDFWriterBareLabel(out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
   def this(w: AWriter, charSpace: CharSpace) {
-    this()
-    out = w
-    nodeFmt = new NodeFormatterBare(charSpace)
+    this(w, new NodeFormatterBare(charSpace))
   }
   /**
     * Output tuples, using UTF8 output See {@link StreamRDFLib#writer} for
@@ -43,14 +32,15 @@ class StreamRDFWriterBare extends StreamRDF {
 
   override def triple(triple: Triple): Unit = {
     val s = triple.getSubject
-    val p = triple.getPredicate
     val o = triple.getObject
+    if (o.getLiteralLanguage != "en") {
+      return
+    }
     format(s)
     out.print(" ")
-    format(p)
-    out.print(" ")
+
     format(o)
-    out.print(" .\n")
+    out.print("\n")
   }
 
   override def quad(quad: Quad): Unit = {
@@ -71,7 +61,7 @@ class StreamRDFWriterBare extends StreamRDF {
   }
 
   private def format(n: Node): Unit = {
-    nodeFmt.format(out, n)
+      nodeFmt.format(out, n)
   }
 
   override def base(base: String): Unit = {

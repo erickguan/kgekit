@@ -6,8 +6,8 @@ import org.apache.jena.graph.Triple
 
 import scala.collection.mutable.ListBuffer
 
-class StreamRDFCompose extends StreamRDF {
-  private val streamRDFs = ListBuffer[StreamRDF]()
+class StreamRDFCompose(streamRDFs: ListBuffer[StreamRDF]) extends StreamRDF {
+//  private val streamRDFs = ListBuffer[StreamRDF]()
 
   def addStreamRDF(streamRDF: StreamRDF): Unit = {
     streamRDFs.append(streamRDF)
