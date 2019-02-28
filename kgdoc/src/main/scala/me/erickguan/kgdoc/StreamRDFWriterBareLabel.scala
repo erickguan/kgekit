@@ -36,11 +36,16 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
     if (!literalLangAllowed.contains(o.getLiteralLanguage)) {
       return
     }
-    format(s)
-    out.print(" ")
+    try {
+      format(s)
+      out.print(" ")
 
-    format(o)
-    out.print("\n")
+      format(o)
+      out.print("\n")
+    } catch {
+      // bad line, we can filter this later
+      case e: Exception => out.print(s"=====$e=====\n\n")
+    }
   }
 
   override def quad(quad: Quad): Unit = {
