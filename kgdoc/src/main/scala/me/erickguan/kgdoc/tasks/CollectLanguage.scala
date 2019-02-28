@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 object CollectLanguage {
   def run(config: Config): Unit = {
     val prefix = FileResolver.getFilePrefixFromConfig(config)
-    val docs = config.getStringList("labelDocs")
+    val docs = config.getStringList("rdfDocs")
     val langStr = config.getString("rdfLang")
     val predicates = config.getStringList("predicates")
 
