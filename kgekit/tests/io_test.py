@@ -78,8 +78,11 @@ class MainTest(unittest.TestCase):
 
         kgekit.io.write_index_translation(translation_filepath, entities_ids, relations_ids)
         entities_ids_read, relations_ids_read = kgekit.io.read_translation(translation_filepath)
-        self.assertEqual(entities_ids_read, entities_ids)
-        self.assertEqual(relations_ids_read, relations_ids)
+        entities_ids_list = [(k,v) for k,v in entities_ids.items()]
+        relations_ids_list = [(k,v) for k,v in relations_ids.items()]
+
+        self.assertEqual(entities_ids_read, entities_ids_list)
+        self.assertEqual(relations_ids_read, relations_ids_list)
 
     def test_write_triples(self):
         triple_filepath = "triple_out.txt"

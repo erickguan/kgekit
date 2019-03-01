@@ -58,10 +58,10 @@ def write_index_translation(translation_filename, entity_ids, relation_ids, deli
     translation = triple_pb.Translation()
     entities = []
     for name, index in entity_ids.items():
-        translation.entities[name] = index
+        translation.entities.add(element=name, index=index)
     relations = []
     for name, index in relation_ids.items():
-        translation.relations[name] = index
+        translation.relations.add(element=name, index=index)
     with open(translation_filename, "wb") as f:
         f.write(translation.SerializeToString())
 
@@ -77,7 +77,12 @@ def read_translation(filename):
     translation = triple_pb.Translation()
     with open(filename, "rb") as f:
         translation.ParseFromString(f.read())
-    return (translation.entities, translation.relations)
+
+    def unwrap_translation_units(units):
+        for u in units: yield u.element, u.index
+
+    return (list(unwrap_translation_units(translation.entities)),
+        list(unwrap_translation_units(translation.relations)))
 
 def read_openke_translation(filename, delimiter='\t', entity_first=True):
     """Returns map with entity or relations from plain text."""

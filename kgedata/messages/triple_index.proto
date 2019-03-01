@@ -1,6 +1,11 @@
 syntax = "proto3";
 
+message TranslationUnit {
+  string element = 1;
+  uint64 index = 2;
+}
+
 message Translation {
-    map<string, uint32> entities = 1;
-    map<string, uint32> relations = 2;
+  repeated TranslationUnit entities = 1;
+  repeated TranslationUnit relations = 2;
 }
