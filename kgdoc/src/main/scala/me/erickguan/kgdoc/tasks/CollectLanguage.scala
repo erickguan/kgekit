@@ -21,7 +21,7 @@ object CollectLanguage {
     JenaSystem.init()
     val lang = RDFLanguages.nameToLang(langStr)
     val in = FileResolver.getInputStreamFromFiles(docs, prefix)
-    val logger = LoggerFactory.getLogger(ExtractPredicates.getClass)
+    val logger = LoggerFactory.getLogger(ExtractEntityPairByPredicates.getClass)
     val progressMonitor =
       ProgressMonitor.create(logger, "LanguageCollector", 100, 1000)
     progressMonitor.start()

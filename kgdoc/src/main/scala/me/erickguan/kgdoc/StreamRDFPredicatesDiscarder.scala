@@ -1,33 +1,15 @@
 package me.erickguan.kgdoc
 
 import org.apache.jena.graph.Triple
-import org.apache.jena.riot.system.StreamRDF
+import org.apache.jena.riot.system.{StreamRDF, StreamRDFWrapper}
 import org.apache.jena.sparql.core.Quad
 
+import scala.collection.JavaConverters._
 
-class StreamRDFPredicatesDiscarder(other: StreamRDF, predicates: Set[String]) extends StreamRDF {
+
+class StreamRDFPredicatesDiscarder(other: StreamRDF, predicates: Set[String]) extends StreamRDFWrapper(other) {
   def this(other: StreamRDF, predicates: java.util.List[String]) {
-    this(other, predicates)
-  }
-
-  override def base(baseStr: String): Unit = {
-    other.base(baseStr)
-  }
-
-  override def finish(): Unit = {
-    other.finish()
-  }
-
-  override def prefix(prefix: String, iri: String): Unit = {
-    other.prefix(prefix, iri)
-  }
-
-  override def quad(quadRecord: Quad): Unit = {
-    other.quad(quadRecord)
-  }
-
-  override def start(): Unit = {
-    other.start()
+    this(other, predicates.asScala.toSet)
   }
 
   override def triple(tripleRecord: Triple): Unit = {
@@ -36,7 +18,7 @@ class StreamRDFPredicatesDiscarder(other: StreamRDF, predicates: Set[String]) ex
       val s = tripleRecord.getSubject
 //      print(s.isURI, s.isVariable, s.isLiteral)
 //      System.exit(1)
-      other.triple(tripleRecord)
+      super.triple(tripleRecord)
     }
   }
 }

@@ -36,8 +36,10 @@ class NodeFormatterBare extends NodeFormatterBase {
       val str = n.toString
       if (str.indexOf(NodeFormatterBare.YAGO_PREFIX) != -1) {
         formatURI(w, str.substring(NodeFormatterBare.YAGO_PREFIX.length))
-      } else {
+      } else if (n.getLocalName.length > 0) {
         formatURI(w, n.getLocalName)
+      } else {
+        formatURI(w, str)
       }
     } catch {
       case e: Exception => formatURI(w, n.toString)

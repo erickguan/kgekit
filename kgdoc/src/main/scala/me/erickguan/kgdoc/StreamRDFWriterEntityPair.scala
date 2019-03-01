@@ -8,7 +8,7 @@ import org.apache.jena.riot.system.StreamRDF
 import org.apache.jena.sparql.core.Quad
 
 
-class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
+class StreamRDFWriterEntityPair(literalLangAllowed: Set[String], out: AWriter, nodeFmt: NodeFormatter) extends StreamRDF {
   def this(literalLangAllowed: Set[String], w: AWriter, charSpace: CharSpace) {
     this(literalLangAllowed, w, new NodeFormatterBare(charSpace))
   }
@@ -30,7 +30,7 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
   override def triple(triple: Triple): Unit = {
     val s = triple.getSubject
     val o = triple.getObject
-    if (!literalLangAllowed.contains(o.getLiteralLanguage)) {
+    if (literalLangAllowed.nonEmpty && !literalLangAllowed.contains(o.getLiteralLanguage)) {
       return
     }
     try {
@@ -75,7 +75,7 @@ class StreamRDFWriterBareLabel(literalLangAllowed: Set[String], out: AWriter, no
   private def outputGraphSlot(g: Node) = g != null && (g ne Quad.tripleInQuad) && !(Quad.isDefaultGraph(g))
 }
 
-object StreamRDFWriterBareLabel {
+object StreamRDFWriterEntityPair {
   def getLiteralLangAllowedSet(literalLangAllowed: java.util.List[String]): Set[String] = {
     import scala.collection.JavaConverters._
 

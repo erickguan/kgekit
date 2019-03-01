@@ -11,7 +11,7 @@ import org.apache.jena.riot.{RDFLanguages, RDFParser}
 import org.apache.jena.sys.JenaSystem
 import org.slf4j.LoggerFactory
 
-object ExtractPredicates {
+object ExtractEntityPairByPredicates {
   def run(config: Config): Unit = {
     val prefix = FileResolver.getFilePrefixFromConfig(config)
     val docs = config.getStringList("rdfDocs")
@@ -24,13 +24,13 @@ object ExtractPredicates {
     val lang = RDFLanguages.nameToLang(langStr)
     val in = FileResolver.getInputStreamFromFiles(docs, prefix)
     val out = FileResolver.getOutputStreamFromFilename(outFilename, prefix)
-    val logger = LoggerFactory.getLogger(ExtractPredicates.getClass)
+    val logger = LoggerFactory.getLogger(ExtractEntityPairByPredicates.getClass)
     val progressMonitor = ProgressMonitor.create(logger, "Discarder", 100, 1000)
     progressMonitor.start()
     val sink = new ProgressStreamRDF(
       new StreamRDFPredicatesDiscarder(
-        new StreamRDFWriterBareLabel(
-          StreamRDFWriterBareLabel.getLiteralLangAllowedSet(literalLangAllowed),
+        new StreamRDFWriterEntityPair(
+          StreamRDFWriterEntityPair.getLiteralLangAllowedSet(literalLangAllowed),
           Writer2.wrap(new BufferingWriter(new OutputStreamWriter(out))),
         ),
         predicates,

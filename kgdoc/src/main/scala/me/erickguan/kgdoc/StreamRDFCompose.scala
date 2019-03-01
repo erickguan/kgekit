@@ -12,7 +12,7 @@ class StreamRDFCompose(streamRDFs: ListBuffer[StreamRDF]) extends StreamRDF {
   }
 
   override def base(baseStr: String): Unit = {
-    streamRDFs.head.base(baseStr)
+    streamRDFs.foreach(s => s.base(baseStr))
   }
 
   override def finish(): Unit = {
@@ -20,7 +20,7 @@ class StreamRDFCompose(streamRDFs: ListBuffer[StreamRDF]) extends StreamRDF {
   }
 
   override def prefix(prefix: String, iri: String): Unit = {
-    streamRDFs.head.prefix(prefix, iri)
+    streamRDFs.foreach(s => s.prefix(prefix, iri))
   }
 
   override def quad(quadRecord: Quad): Unit = {
