@@ -1,44 +1,64 @@
+import sbt._
+import Keys._
 import Dependencies._
 
-ThisBuild / scalaVersion     := "2.12.8"
-ThisBuild / version          := "0.1.0-SNAPSHOT"
-ThisBuild / organization     := "me.erickguan.kgdoc"
+val scioVersion = "0.7.2"
+val beamVersion = "2.9.0"
+val scalaMacrosVersion = "2.1.1"
 
-lazy val root = (project in file("."))
+lazy val commonSettings = Defaults.coreDefaultSettings ++ Seq(
+  organization := "me.erickguan.kgdoc",
+  // Semantic versioning http://semver.org/
+  version := "0.1.0-SNAPSHOT",
+  scalaVersion := "2.12.8",
+  scalacOptions ++= Seq("-target:jvm-1.8",
+                        "-deprecation",
+                        "-feature",
+                        "-unchecked"),
+  javacOptions ++= Seq("-source", "1.8", "-target", "1.8")
+)
+
+lazy val paradiseDependency =
+  "org.scalamacros" % "paradise" % scalaMacrosVersion cross CrossVersion.full
+lazy val macroSettings = Seq(
+  libraryDependencies += "org.scala-lang" % "scala-reflect" % scalaVersion.value,
+  addCompilerPlugin(paradiseDependency)
+)
+
+lazy val root: Project = project
+  .in(file("."))
+  .settings(commonSettings)
+  .settings(macroSettings)
   .settings(
     name := "kgdoc",
+    description := "kgdoc",
+    publish / skip := true,
     libraryDependencies ++= Seq(
-        jenaLibs % Compile,
-        loggerLib % Compile,
-        confLib % Compile,
-        scalaTest % Test
+      "com.spotify" %% "scio-core" % scioVersion,
+      "com.spotify" %% "scio-test" % scioVersion % Test,
+      "org.apache.beam" % "beam-runners-direct-java" % beamVersion,
+      // optional dataflow runner
+       "org.apache.beam" % "beam-runners-google-cloud-dataflow-java" % beamVersion,
+      jenaLibs % Compile,
+      loggerLib % Compile,
+      confLib % Compile,
+      scalaTest % Test
     )
   )
+  .enablePlugins(PackPlugin)
 
-// Uncomment the following for publishing to Sonatype.
-// See https://www.scala-sbt.org/1.x/docs/Using-Sonatype.html for more detail.
+lazy val repl: Project = project
+  .in(file(".repl"))
+  .settings(commonSettings)
+  .settings(macroSettings)
+  .settings(
+    name := "repl",
+    description := "Scio REPL for kgdoc",
+    libraryDependencies ++= Seq(
+      "com.spotify" %% "scio-repl" % scioVersion
+    ),
+    Compile / mainClass := Some("com.spotify.scio.repl.ScioShell"),
+    publish / skip := true
+  )
+  .dependsOn(root)
 
-// ThisBuild / description := "Some descripiton about your project."
-// ThisBuild / licenses    := List("Apache 2" -> new URL("http://www.apache.org/licenses/LICENSE-2.0.txt"))
-// ThisBuild / homepage    := Some(url("https://github.com/example/project"))
-// ThisBuild / scmInfo := Some(
-//   ScmInfo(
-//     url("https://github.com/your-account/your-project"),
-//     "scm:git@github.com:your-account/your-project.git"
-//   )
-// )
-// ThisBuild / developers := List(
-//   Developer(
-//     id    = "Your identifier",
-//     name  = "Your Name",
-//     email = "your@email",
-//     url   = url("http://your.url")
-//   )
-// )
-// ThisBuild / pomIncludeRepository := { _ => false }
-// ThisBuild / publishTo := {
-//   val nexus = "https://oss.sonatype.org/"
-//   if (isSnapshot.value) Some("snapshots" at nexus + "content/repositories/snapshots")
-//   else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-// }
-// ThisBuild / publishMavenStyle := true

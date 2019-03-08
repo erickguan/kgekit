@@ -11,36 +11,23 @@ import org.apache.jena.riot.{RDFLanguages, RDFParser}
 import org.apache.jena.sys.JenaSystem
 import org.slf4j.LoggerFactory
 
-object ExtractEntityPairByPredicates {
-  def run(config: Config): Unit = {
-    val prefix = FileResolver.getFilePrefixFromConfig(config)
-    val docs = config.getStringList("rdfDocs")
-    val langStr = config.getString("rdfLang")
-    val outFilename = config.getString("outFilename")
-    val literalLangAllowed = config.getStringList("literalLangAllowed")
-    val predicates = config.getStringList("predicates")
-
-    JenaSystem.init()
-    val lang = RDFLanguages.nameToLang(langStr)
-    val in = FileResolver.getInputStreamFromFiles(docs, prefix)
-    val out = FileResolver.getOutputStreamFromFilename(outFilename, prefix)
-    val logger = LoggerFactory.getLogger(ExtractEntityPairByPredicates.getClass)
-    val progressMonitor = ProgressMonitor.create(logger, "Discarder", 100, 1000)
-    progressMonitor.start()
-    val sink = new ProgressStreamRDF(
-      new StreamRDFPredicatesDiscarder(
-        new StreamRDFSubjectDiscarder(
-          new StreamRDFEntityPairReverser(
-            new StreamRDFWriterEntityPair(
-              StreamRDFWriterEntityPair.getLiteralLangAllowedSet(literalLangAllowed),
-              Writer2.wrap(new BufferingWriter(new OutputStreamWriter(out))),
-            ),
-            predicates,
-          ),
-        ),
-      progressMonitor
-    )
-    RDFParser.source(in).lang(lang).parse(sink)
-    progressMonitor.finish()
-  }
-}
+//object ExtractEntityPairByPredicates {
+//  def run(config: Config): Unit = {
+//    val prefix = FileResolver.getFilePrefixFromConfig(config)
+//    val docs = config.getStringList("rdfDocs")
+//    val langStr = config.getString("rdfLang")
+//    val outFilename = config.getString("outFilename")
+//    val literalLangAllowed = config.getStringList("literalLangAllowed")
+//    val predicates = config.getStringList("predicates")
+//
+//    JenaSystem.init()
+//    val lang = RDFLanguages.nameToLang(langStr)
+//    val in = FileResolver.getInputStreamFromFiles(docs, prefix)
+//    val out = FileResolver.getOutputStreamFromFilename(outFilename, prefix)
+//    val logger = LoggerFactory.getLogger(ExtractEntityPairByPredicates.getClass)
+//    val progressMonitor = ProgressMonitor.create(logger, "Discarder", 100, 1000)
+//    progressMonitor.start()
+////    RDFParser.source(in).lang(lang).parse(sink)
+//    progressMonitor.finish()
+//  }
+//}
