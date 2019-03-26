@@ -4,6 +4,8 @@ from collections import defaultdict
 from itertools import filterfalse
 from functools import reduce
 import numpy as np
+import logging
+from superminhash import Superminhash
 
 def unpack(triple):
     """unpacks triple into (h, r, t). Can take Triple or TripleIndex."""
@@ -37,64 +39,77 @@ def pack_triples_numpy(triples):
     return np.stack(list(map(_transform_triple_numpy, triples)), axis=0)
 
 def _set_close_to(a, b, threshold):
-    return len(a & b) / len(b) > threshold
+    return a.similarity(b) > threshold
 
 def _assert_threshold(threshold):
     if threshold <= 0.0 or threshold > 1.0: raise ValueError("The threshold {} is not in the valid range of (0, 1]")
 
 def remove_deficit_relation(triples, threshold=0.0001):
+    logging.debug("remove deficit relation")
     _assert_threshold(threshold)
 
-    counter = defaultdict(list)
+    counter = defaultdict(int)
     for t in triples:
-        counter[t.relation].append(t)
+        counter[t.relation] += 1
 
     num_triples = len(triples)
     removal_set = set()
     for rel, rel_items in counter.items():
-        if len(rel_items) / num_triples < threshold:
-            removal_set = removal_set | set(rel_items)
+        if rel_items / num_triples < threshold:
+            removal_set |= rel
+    logging.info("Removing relations: "+ removal_set)
 
-    return list(filterfalse(lambda x: x in removal_set, triples))
+    return list(filterfalse(lambda x: x.relation in removal_set, triples))
 
 def remove_near_duplicate_relation(triples, threshold=0.97):
     """If entity pairs in a relation is as close as another relations, only keep one relation of such set."""
+    logging.debug("remove duplicate")
+
     _assert_threshold(threshold)
 
-    duplicate_rel_counter = defaultdict(set)
+    duplicate_rel_counter = defaultdict(list)
     relations = set()
     for t in triples:
-        duplicate_rel_counter[t.relation].add((t.head, t.tail))
+        duplicate_rel_counter[t.relation].append((t.head, t.tail))
         relations.add(t.relation)
     relations = list(relations)
 
     num_triples = len(triples)
     removal_relation_set = set()
+
+    for rel, values in duplicate_rel_counter.items():
+        duplicate_rel_counter[rel] = Superminhash(values)
     for i in relations:
-        if i in removal_relation_set: continue
-        close_relations = [i]
         for j in relations:
-            if i == j or j in removal_relation_set: continue
+            if i == j or i in removal_relation_set or j in removal_relation_set: continue
+            close_relations = [i]
             if _set_close_to(duplicate_rel_counter[i], duplicate_rel_counter[j], threshold):
                 close_relations.append(j)
         if len(close_relations) > 1:
             close_relations.pop(np.random.randint(len(close_relations)))
             removal_relation_set |= set(close_relations)
+    logging.info("Removing relations: "+ removal_relation_set)
 
     return list(filterfalse(lambda x: x.relation in removal_relation_set, triples))
 
 def remove_inverse_relation(triples, threshold=0.97):
     """if entity pairs in a relation overlaps its reverse pairs in another relation, only keep one relation of such set."""
+    logging.debug("remove inverse")
     _assert_threshold(threshold)
 
-    rel_counter = defaultdict(set)
-    inverse_rel_counter = defaultdict(set)
+    rel_counter = defaultdict(list)
+    inverse_rel_counter = defaultdict(list)
     relations = set()
     for t in triples:
-        rel_counter[t.relation].add((t.head, t.tail))
-        inverse_rel_counter[t.relation].add((t.tail, t.head))
+        rel_counter[t.relation].append((t.head, t.tail))
+        inverse_rel_counter[t.relation].append((t.tail, t.head))
         relations.add(t.relation)
     relations = list(relations)
+
+    for rel, values in rel_counter.items():
+        rel_counter[rel] = Superminhash(values)
+    for rel, values in inverse_rel_counter.items():
+        inverse_rel_counter[rel] = Superminhash(values)
 
     num_triples = len(triples)
     removal_relation_set = set()
@@ -108,6 +123,7 @@ def remove_inverse_relation(triples, threshold=0.97):
         if len(close_relations) > 1:
             close_relations.pop(np.random.randint(len(close_relations)))
             removal_relation_set |= set(close_relations)
+    logging.info("Removing relations: "+ removal_relation_set)
 
     return list(filterfalse(lambda x: x.relation in removal_relation_set, triples))
 
@@ -125,6 +141,7 @@ def remove_unqualified_relations_from_triples(triples, deficit_threshold, duplic
     triples = remove_deficit_relation(triples, deficit_threshold)
     triples = remove_near_duplicate_relation(triples, duplicate_threshold)
     triples = remove_inverse_relation(triples, inverse_threshold)
+    logging.info("current triples: " + len(triples))
     return triples
 
 def build_dataset(triples, valid_ratio, test_ratio):
