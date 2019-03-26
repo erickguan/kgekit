@@ -56,7 +56,7 @@ def remove_deficit_relation(triples, threshold=0.0001):
     removal_set = set()
     for rel, rel_items in counter.items():
         if rel_items / num_triples < threshold:
-            removal_set |= rel
+            removal_set.add(rel)
     logging.info("Removing relations: "+ removal_set)
 
     return list(filterfalse(lambda x: x.relation in removal_set, triples))

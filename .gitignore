@@ -21,3 +21,5 @@ tmp/
 *_pb2.py
 
 .settings
+
+.vscode/
