@@ -69,8 +69,8 @@ class Indexer(object):
     def shrink_indexes_in_place(self, triples):
         """Uses a union find to find segment."""
 
-        _ent_roots = UnionFind(self._ent_id)
-        _rel_roots = UnionFind(self._rel_id)
+        _ent_roots = self.UnionFind(self._ent_id)
+        _rel_roots = self.UnionFind(self._rel_id)
 
         for t in triples:
             _ent_roots.add(t.head)
