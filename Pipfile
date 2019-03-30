@@ -8,6 +8,7 @@ kgekit = {editable = true,path = "."}
 protobuf = "*"
 numpy = "*"
 superminhash = "*"
+bidict = "*"
 
 [dev-packages]
 pytest = "*"

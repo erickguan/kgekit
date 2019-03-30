@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "d2d69929d23aa41966a4fa3614f13f9aad8d1cb7f4c5fe14effe8d76c6a39681"
+            "sha256": "660a8d1159a6a81ba08becd22cc91cc1e7839fef43b7cbbacf783c465879517b"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,6 +16,14 @@
         ]
     },
     "default": {
+        "bidict": {
+            "hashes": [
+                "sha256:01bc0a403202513a822363f2d342721256e9a9056be05134aa0b0ba7614bc6cb",
+                "sha256:4d10630fd5d86b7c165387473c5180e7fca7635f12e24b1f426aac259c72c81a"
+            ],
+            "index": "pypi",
+            "version": "==0.18.0"
+        },
         "kgekit": {
             "editable": true,
             "path": "."

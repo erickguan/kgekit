@@ -19,6 +19,17 @@ def _assert_good_file(filename):
     if not (path.exists() and path.is_file()):
         raise FileNotFoundError("Can't find the triple file at {}.".format(path))
 
+def yield_triples(filename, triple_order="hrt", delimiter=DEFAULT_DELIMITER, read_fn=kgedata.get_triple):
+    _assert_good_file(filename)
+    assert_triple_order(triple_order)
+    with open(filename) as f:
+        line = f.readline().rstrip('\n')
+        while line:
+            triple = read_fn(line, triple_order, delimiter, True)
+            if triple is not None:
+                yield triple
+            line = f.readline().rstrip('\n')
+
 def read_triples(filename, read_fn=kgedata.get_triple, triple_order="hrt", delimiter=DEFAULT_DELIMITER, skip_first_line=False):
     _assert_good_file(filename)
     assert_triple_order(triple_order)
@@ -53,7 +64,7 @@ def read_labels(filename, delimiter=DEFAULT_DELIMITER):
         labels = [_label_processing(l, delimiter) for l in f]
         return labels
 
-def write_index_translation(translation_filename, entity_ids, relation_ids, delimiter=DEFAULT_DELIMITER):
+def write_index_translation(translation_filename, entity_ids, relation_ids):
     """write triples into a translation file."""
     translation = triple_pb.Translation()
     entities = []
