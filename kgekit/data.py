@@ -47,7 +47,7 @@ class Indexer(object):
             return e == self._root[e]
 
         def roots(self):
-            [self.root(e) for e in range(self._max_id)]
+            return [self.root(e) for e in range(self._max_id)]
 
         def union(self, e1, e2):
             """union by the smallest root"""
