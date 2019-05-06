@@ -17,7 +17,10 @@ def build_dataset(filename, deficit_threshold=1000, delimiter='\t', triple_order
         triples.append(indexer(triple))
 
     logging.info("removing unqualified relations")
-    triples = kgekit.data.remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold=0.97, inverse_threshold=0.97)
+    triples = kgekit.data.remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold=None, inverse_threshold=None)
+
+    logging.info("removing unqualified entities")
+    triples = kgekit.data.remove_unqualified_entities_from_triples(triples, 16)
 
     logging.info("update indexes")
     indexer.shrink_indexes_in_place(triples)

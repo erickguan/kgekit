@@ -191,6 +191,22 @@ def remove_deficit_relation(triples, threshold=1000):
 
     return list(filterfalse(lambda x: x.relation in removal_set, triples))
 
+def remove_deficit_entities(triples, threshold):
+    counter = defaultdict(int)
+    for t in triples:
+        counter[t.head] += 1
+        counter[t.tail] += 1
+
+    num_triples = len(triples)
+    removal_set = set()
+    for ent, ent_items in counter.items():
+        if ent_items < threshold:
+            removal_set.add(ent)
+    logging.info("Removing {} entities".format(len(removal_set)))
+
+    return list(filterfalse(lambda x: x.head in removal_set or x.tail in removal_set, triples))
+    
+
 def remove_near_duplicate_relation(triples, threshold=0.97):
     """If entity pairs in a relation is as close as another relations, only keep one relation of such set."""
     logging.debug("remove duplicate")
@@ -267,11 +283,16 @@ def remove_direct_link_triples(train, valid, test):
     filtered = filterfalse(lambda t: (t.head, t.tail) in pairs or (t.tail, t.head) in pairs, train)
     return list(filtered)
 
-def remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold, inverse_threshold):
+def remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold=None, inverse_threshold=None):
     triples = remove_deficit_relation(triples, deficit_threshold)
-    triples = remove_near_duplicate_relation(triples, duplicate_threshold)
-    triples = remove_inverse_relation(triples, inverse_threshold)
-    logging.info("current triples: " + str(len(triples)))
+    if duplicate_threshold is not None:
+        triples = remove_near_duplicate_relation(triples, duplicate_threshold)
+    if inverse_threshold is not None:
+        triples = remove_inverse_relation(triples, inverse_threshold)
+    return triples
+
+def remove_unqualified_entities_from_triples(triples, deficit_threshold=10):
+    triples = remove_deficit_entities(triples, deficit_threshold)
     return triples
 
 def build_dataset(triples, valid_ratio, test_ratio):
