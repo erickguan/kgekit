@@ -167,7 +167,7 @@ def _generate_triple_from_list(triples):
 
 def pack_triples_numpy(triples):
     """Packs a list of triple indexes into a 2D numpy array."""
-    return np.fromiter(_generate_triple_from_list(triples), dtype=np.dtype(np.int64), count=len(triples)).reshape(-1, 3)
+    return np.fromiter(_generate_triple_from_list(triples), dtype=np.dtype(np.int64), count=len(triples)*3).reshape(-1, 3)
 
 def _set_close_to(a, b, threshold):
     return a.similarity(b) > threshold
