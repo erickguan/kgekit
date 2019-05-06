@@ -64,6 +64,25 @@ def read_labels(filename, delimiter=DEFAULT_DELIMITER):
         labels = [_label_processing(l, delimiter) for l in f]
         return labels
 
+def _label_processing(l, delimiter):
+    splits = l.rstrip().split(delimiter)
+    return (splits[0], delimiter.join(splits[1:]))
+
+def _desc_processing(l, delimiter):
+    splits = l.rstrip().split(delimiter)
+    desc = delimiter.join(splits[1:])
+    desc_splits = desc.split('@')
+    return (splits[0], '@'.join(desc_splits[:-2]), desc_splits[-1])
+
+# see `read_labels`
+def read_descriptions(filename, delimiter=DEFAULT_DELIMITER):
+    """read label files. Format: ent label"""
+    _assert_good_file(filename)
+    with open(filename) as f:
+        descs = [_desc_processing(l, delimiter) for l in f]
+        return descs
+
+
 def write_index_translation(translation_filename, entity_ids, relation_ids):
     """write triples into a translation file."""
     translation = triple_pb.Translation()

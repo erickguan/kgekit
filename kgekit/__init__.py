@@ -1,3 +1,3 @@
 """kgekit helps with io and sampling"""
 
-__version__ = "0.22.1"
+__version__ = "0.23.0"

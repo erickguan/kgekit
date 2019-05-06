@@ -123,7 +123,7 @@ setup(name='kgekit',
         'numpy>=1.10'
       ],
       cmdclass=dict(build_ext=CMakeBuild, clean=CleanCommand),
-      ext_modules=[CMakeExtension('kgekit')],
+      ext_modules=[CMakeExtension('kgedata')],
       test_suite='tests',
       zip_safe=False,
       classifiers=[

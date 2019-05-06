@@ -159,11 +159,15 @@ def _transform_triple_numpy(x):
     """Transform triple index into a 1-D numpy array."""
     return np.array([x.head, x.relation, x.tail], dtype=np.int64)
 
+def _generate_triple_from_list(triples):
+    for t in triples:
+        yield t.head
+        yield t.relation
+        yield t.tail
+
 def pack_triples_numpy(triples):
     """Packs a list of triple indexes into a 2D numpy array."""
-    if len(triples) == 0:
-        return np.array([], dtype=np.int64)
-    return np.stack(list(map(_transform_triple_numpy, triples)), axis=0)
+    return np.fromiter(_generate_triple_from_list(triples), dtype=np.dtype(np.int64), count=len(triples)).reshape(-1, 3)
 
 def _set_close_to(a, b, threshold):
     return a.similarity(b) > threshold
