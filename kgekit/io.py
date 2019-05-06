@@ -111,8 +111,8 @@ def read_translation(filename):
     def unwrap_translation_units(units):
         for u in units: yield u.element, u.index
 
-    return (list(unwrap_translation_units(translation.entities)),
-        list(unwrap_translation_units(translation.relations)))
+    return (unwrap_translation_units(translation.entities),
+        unwrap_translation_units(translation.relations))
 
 def read_openke_translation(filename, delimiter='\t', entity_first=True):
     """Returns map with entity or relations from plain text."""
