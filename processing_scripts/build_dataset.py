@@ -20,11 +20,11 @@ def build_dataset(filename, deficit_threshold=1000, delimiter='\t', triple_order
     triples = kgekit.data.remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold=None, inverse_threshold=None)
 
     logging.info("removing unqualified entities")
-    triples = kgekit.data.remove_unqualified_entities_from_triples(triples, 220)
+    triples = kgekit.data.remove_unqualified_entities_from_triples(triples, 120)
     triples = kgekit.data.remove_unqualified_relations_from_triples(triples, deficit_threshold, duplicate_threshold=0.95, inverse_threshold=None)
 
     logging.info("update indexes")
-    indexer.shrink_indexes_in_place(triples)
+    triples = indexer.shrink_indexes_in_place(triples)
     ents, rels = indexer.mappings()
 
     logging.info("recording translations")
