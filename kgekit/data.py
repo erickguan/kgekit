@@ -9,7 +9,6 @@ import kgedata
 from superminhash import Superminhash
 from bidict import bidict
 
-
 class Indexer(object):
     """An indexer for triples."""
 
@@ -33,76 +32,42 @@ class Indexer(object):
     def mappings(self):
         return self._ents, self._rels
 
-    class UnionFind(object):
-        def __init__(self, max_id):
-            """every elements has a root of its precedence except the first."""
-            self._root = [0] + [i for i in range(max_id-1)]
-            self._max_id = max_id
-
-        def add(self, e):
-            """Create new root"""
-            self._root[e] = e
-
-        def root(self, e):
-            return e == self._root[e]
-
-        def roots(self):
-            return [self.root(e) for e in range(self._max_id)]
-
-        def union(self, e1, e2):
-            """union by the smallest root"""
-            root1 = self.find(e1)
-            root2 = self.find(e2)
-            if root1 == root2: return
-            if root1 < root2:
-                self._root[root2] = root1
-            else:
-                self._root[root1] = root2
-
-        def find(self, e):
-            """uses path compression."""
-            if e <= 0: return 0
-            if e != self._root[e]:
-                self._root[e] = self.find(self._root[e])
-            return self._root[e]
-
     def shrink_indexes_in_place(self, triples):
         """Uses a union find to find segment."""
 
-        _ent_roots = self.UnionFind(self._ent_id)
-        _rel_roots = self.UnionFind(self._rel_id)
+        ent_flags = [False for i in range(self._ent_id)]
+        rel_flags = [False for i in range(self._rel_id)]
 
         for t in triples:
-            _ent_roots.add(t.head)
-            _ent_roots.add(t.tail)
-            _rel_roots.add(t.relation)
-
-        for i, t in enumerate(triples):
-            h = _ent_roots.find(t.head)
-            r = _rel_roots.find(t.relation)
-            t = _ent_roots.find(t.tail)
-            triples[i] = kgedata.TripleIndex(h, r, t)
+            ent_flags[t.head] = True
+            ent_flags[t.tail] = True
+            rel_flags[t.relation] = True
 
         ents = bidict()
-        available_ent_idx = 0
-        for previous_idx, ent_exist in enumerate(_ent_roots.roots()):
-            if not ent_exist:
-                self._ents.inverse.pop(previous_idx)
-            else:
-                ents[self._ents.inverse[previous_idx]] = available_ent_idx
-            available_ent_idx += 1
+        ent_idx = 0
+        for previous_idx, ent_exist in enumerate(ent_flags):
+            if ent_exist:
+                ents[self._ents.inverse[previous_idx]] = ent_idx
+                ent_idx += 1
+        logging.info(f"before shrinking: {self._ent_id}\nafter shrinking: {ent_idx}")
+
         rels = bidict()
-        available_rel_idx = 0
-        for previous_idx, rel_exist in enumerate(_rel_roots.roots()):
-            if not rel_exist:
-                self._rels.inverse.pop(previous_idx)
-            else:
-                rels[self._rels.inverse[previous_idx]] = available_rel_idx
-            available_rel_idx += 1
+        rel_idx = 0
+        for previous_idx, rel_exist in enumerate(rel_flags):
+            if rel_exist:
+                rels[self._rels.inverse[previous_idx]] = rel_idx
+                rel_idx += 1
+        logging.info(f"before shrinking: {self._rel_id}\nafter shrinking: {rel_idx}")
+        
+        new_triples = [kgedata.TripleIndex(ents[self._ents.inverse[t.head]], rels[self._rels.inverse[t.relation]], ents[self._ents.inverse[t.tail]]) for t in triples]
+
+        self._ent_id = ent_idx
         self._ents = ents
+
+        self._rel_id = rel_idx
         self._rels = rels
-        self._ent_id = available_ent_idx
-        self._rel_id = available_rel_idx
+        
+        return new_triples
 
 
 def build_index_and_mapping(triples):
