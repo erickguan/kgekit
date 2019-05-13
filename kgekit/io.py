@@ -54,19 +54,15 @@ def read_triple_indexes_numpy(filename, triple_order="hrt", delimiter=DEFAULT_DE
 
 def _label_processing(l, delimiter):
     splits = l.rstrip().split(delimiter)
-    return (splits[0], delimiter.join(splits[1:]))
+    return splits
 
 # TODO: This consumes around 26G memory. It will be nicer to have stream version.
 def read_labels(filename, delimiter=DEFAULT_DELIMITER):
-    """read label files. Format: ent label"""
+    """read label files. Format: ent label lang"""
     _assert_good_file(filename)
     with open(filename) as f:
         labels = [_label_processing(l, delimiter) for l in f]
         return labels
-
-def _label_processing(l, delimiter):
-    splits = l.rstrip().split(delimiter)
-    return (splits[0], delimiter.join(splits[1:]))
 
 def _desc_processing(l, delimiter):
     splits = l.rstrip().split(delimiter)

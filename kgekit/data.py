@@ -141,7 +141,7 @@ def _assert_threshold(threshold):
     if threshold <= 0.0 or threshold > 1.0: raise ValueError("The threshold {} is not in the valid range of (0, 1]")
 
 def remove_deficit_relation(triples, threshold=1000):
-    logging.debug("remove deficit relation")
+    logging.debug(f"remove deficit relation less than {threshold} triples")
 
     counter = defaultdict(int)
     for t in triples:
