@@ -78,6 +78,10 @@ private:
     int64_t num_relation_ = -1;
 };
 
+/*
+ * TODO: Rename to LCWASampler can align the concept better with
+ *  A Review of Relational Machine Learning for Knowledge Graphs
+ */
 class CWASampler: private boost::noncopyable {
 public:
     CWASampler(

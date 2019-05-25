@@ -260,8 +260,9 @@ def remove_unqualified_entities_from_triples(triples, deficit_threshold=10):
     triples = remove_deficit_entities(triples, deficit_threshold)
     return triples
 
-def build_dataset(triples, valid_ratio, test_ratio):
+def build_dataset(triples, valid_ratio, test_ratio, remove_direct=True):
     triples = list(shuffle_triples(triples))
     train, valid, test = split_golden_set(triples, valid_ratio, test_ratio)
-    train = remove_direct_link_triples(train, valid, test)
+    if remove_direct:
+        train = remove_direct_link_triples(train, valid, test)
     return train, valid, test

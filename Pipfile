@@ -4,11 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-kgekit = {path = "."}
+kgekit = {editable = true,path = "."}
 protobuf = "*"
 numpy = "*"
 superminhash = "*"
 bidict = "*"
+pandas = "*"
 
 [dev-packages]
 pytest = "*"
